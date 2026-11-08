@@ -161,7 +161,7 @@ export function promptFor(step: Step, state: IntakeState, lang: Lang): BotMessag
       };
     case "tehsil": {
       const d = DISTRICTS.find((x) => x.name === state.data.district);
-      return { text: c.tehsil, chips: d?.tehsils.map((t) => ({ label: t, value: t })) };
+      return { text: c.tehsil, chips: d ? d.tehsils.map((t) => ({ label: t, value: t })) : [] };
     }
     case "location":
       return { text: c.location };

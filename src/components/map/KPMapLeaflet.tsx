@@ -3,9 +3,9 @@ import "leaflet/dist/leaflet.css";
 import { DISTRICTS, RISK_COLOR_VAR, RISK_LABEL } from "@/lib/data/districts";
 
 export interface KPMapProps {
-  selectedId?: string;
-  onSelect?: (id: string) => void;
-  className?: string;
+  selectedId?: string | undefined;
+  onSelect?: ((id: string) => void) | undefined;
+  className?: string | undefined;
 }
 
 export default function KPMapLeaflet({ selectedId, onSelect, className }: KPMapProps) {
@@ -16,7 +16,7 @@ export default function KPMapLeaflet({ selectedId, onSelect, className }: KPMapP
       minZoom={6}
       maxZoom={12}
       scrollWheelZoom={false}
-      className={className}
+      {...(className ? { className } : {})}
       style={{ height: "100%", width: "100%" }}
       attributionControl
     >

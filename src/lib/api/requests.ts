@@ -42,7 +42,10 @@ function readOverrides(): Record<string, RequestStatus> {
 function compute(): EmergencyRequest[] {
   const overrides = readOverrides();
   return [...readLocal(), ...DEMO_REQUESTS]
-    .map((r) => (overrides[r.id] ? { ...r, status: overrides[r.id] } : r))
+    .map((r) => {
+      const s = overrides[r.id];
+      return s ? { ...r, status: s } : r;
+    })
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 

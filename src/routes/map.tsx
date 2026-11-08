@@ -20,7 +20,7 @@ export const Route = createFileRoute("/map")({
 
 function MapPage() {
   const [selectedId, setSelectedId] = useState("swat");
-  const district = getDistrict(selectedId) ?? DISTRICTS[0];
+  const district = getDistrict(selectedId) ?? DISTRICTS[0]!;
 
   return (
     <>
