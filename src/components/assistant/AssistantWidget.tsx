@@ -162,18 +162,16 @@ setInput("");
       },
     ]);
   } catch (error) {
+    console.error("AI Chat Error:", error);
     push([
       {
         role: "bot",
         text:
-          lang === "ur"
-            ? "معذرت، AI معاون فی الحال دستیاب نہیں۔ ہنگامی صورت میں 1122 پر کال کریں۔"
-            : "Sorry, the AI assistant is temporarily unavailable. For emergencies, call Rescue 1122.",
-      },
-    ]);
-  } finally {
-    setBusy(false);
-  }
+          text: `AI Error: ${error instanceof Error ? error.message : String(error)}`
+  }]);
+} finally {
+  setBusy(false);
+}
   return;
 }
     let current = state;
