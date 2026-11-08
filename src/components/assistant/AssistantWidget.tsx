@@ -28,6 +28,8 @@ interface ChatMessage extends BotMessage {
   role: "bot" | "user";
   requestId?: string;
 }
+const N8N_CHAT_URL =
+  "https://najiyawazir.app.n8n.cloud/webhook/811faed4-007c-4cac-a579-4881b0135999/chat";
 
 const UI = {
   en: {
@@ -70,6 +72,8 @@ export function AssistantWidget() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
+  const sessionIdRef = useRef(crypto.randomUUID());
+  const [chatMode, setChatMode] = useState<"intake" | "ai">("intake");
   const idRef = useRef(0);
   const listRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -102,6 +106,23 @@ export function AssistantWidget() {
       push([{ role: "bot", ...promptFor(state.step, state, next) }]);
     }
   };
+  const switchChatMode = (mode: "intake" | "ai") => {
+  setChatMode(mode);
+  setMessages([]);
+  if (mode === "ai") {
+    push([
+      {
+        role: "bot",
+        text:
+          lang === "ur"
+            ? "السلام علیکم! میں FloodGuard AI ہوں۔ آپ سیلاب، موسم، پانی کی سطح یا حفاظتی اقدامات کے بارے میں پوچھ سکتے ہیں۔"
+            : "Hello! I am FloodGuard AI. Ask me about floods, weather, river levels, or safety guidance.",
+      },
+    ]);
+  } else {
+    push([{ role: "bot", ...greeting(lang) }]);
+  }
+};
 
   const reset = () => {
     setState(initialIntake());
@@ -111,6 +132,50 @@ export function AssistantWidget() {
   const handle = async (raw: string, display?: string) => {
     const text = raw.trim();
     if (!text || busy) return;
+    if (chatMode === "ai") {
+      push([{ role: "user", text }]);
+setInput("");
+  setBusy(true);
+  try {
+    const response = await fetch(N8N_CHAT_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        action: "sendMessage",
+        sessionId: sessionIdRef.current,
+        chatInput: text,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("AI assistant request failed");
+    }
+
+    const data = await response.json();
+
+    push([
+      {
+        role: "bot",
+        text: data.output ?? "Sorry, I could not generate a response.",
+      },
+    ]);
+  } catch (error) {
+    push([
+      {
+        role: "bot",
+        text:
+          lang === "ur"
+            ? "معذرت، AI معاون فی الحال دستیاب نہیں۔ ہنگامی صورت میں 1122 پر کال کریں۔"
+            : "Sorry, the AI assistant is temporarily unavailable. For emergencies, call Rescue 1122.",
+      },
+    ]);
+  } finally {
+    setBusy(false);
+  }
+  return;
+}
     let current = state;
     if (state.step === "done") {
       if (text === "__new") return reset();
@@ -201,6 +266,22 @@ export function AssistantWidget() {
                   </span>
                 </TooltipTrigger>
                 <TooltipContent>Pashto support will be added with the AI language model.</TooltipContent>
+                <div className="mt-3 flex gap-2">
+  <button
+    type="button"
+    onClick={() => switchChatMode("intake")}
+    className={cn("flex-1 rounded-md px-3 py-2 text-xs font-semibold", chatMode === "intake" ? "bg-white text-slate-900" : "bg-navy text-white")}
+  >
+    {lang === "ur" ? "ہنگامی فارم" : "Emergency Form"}
+  </button>
+  <button
+    type="button"
+    onClick={() => switchChatMode("ai")}
+    className={cn("flex-1 rounded-md px-3 py-2 text-xs font-semibold", chatMode === "ai" ? "bg-white text-slate-900" : "bg-navy text-white")}
+  >
+    {lang === "ur" ? "AI چیٹ" : "AI Chat"}
+  </button>
+</div>
               </Tooltip>
             </div>
           </header>
