@@ -111,12 +111,14 @@ export function AssistantWidget() {
   const handle = async (raw: string, display?: string) => {
     const text = raw.trim();
     if (!text || busy) return;
+    let current = state;
     if (state.step === "done") {
       if (text === "__new") return reset();
+      current = initialIntake();
     }
     push([{ role: "user", text: display ?? text }]);
     setInput("");
-    const result = advance(state, text, lang);
+    const result = advance(current, text, lang);
     if (result.kind === "reply") {
       setState(result.state);
       push(result.messages.map((m) => ({ role: "bot" as const, ...m })));
