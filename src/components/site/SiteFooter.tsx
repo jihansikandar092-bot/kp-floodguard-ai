@@ -75,12 +75,12 @@ function FooterLink({
   children,
 }: {
   to: "/" | "/dashboard" | "/map" | "/emergency" | "/admin" | "/integrations" | "/contact";
-  hash?: string;
+  hash?: string | undefined;
   children: React.ReactNode;
 }) {
   return (
     <li>
-      <Link to={to} hash={hash} className="hover:underline">
+      <Link to={to} {...(hash ? { hash } : {})} className="hover:underline">
         {children}
       </Link>
     </li>

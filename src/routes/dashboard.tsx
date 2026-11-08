@@ -15,9 +15,10 @@ import { FEATURED_DISTRICTS, getDistrict, RISK_COLOR_VAR } from "@/lib/data/dist
 import { getMonitoringSnapshot } from "@/lib/api/monitoring";
 
 export const Route = createFileRoute("/dashboard")({
-  validateSearch: (s: Record<string, unknown>): { district?: string } => ({
-    district: typeof s.district === "string" && getDistrict(s.district) ? s.district : undefined,
-  }),
+  validateSearch: (s: Record<string, unknown>): { district?: string | undefined } => {
+    const d = s["district"];
+    return { district: typeof d === "string" && getDistrict(d) ? d : undefined };
+  },
   head: () => ({
     meta: [
       { title: "Flood Monitoring Dashboard — KP FloodGuard AI" },
@@ -145,7 +146,7 @@ function FilterChip({
 }: {
   active: boolean;
   label: string;
-  search: { district?: string };
+  search: { district?: string | undefined };
   dot?: string;
 }) {
   return (

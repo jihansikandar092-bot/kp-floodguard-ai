@@ -166,8 +166,8 @@ function Field({
 }: {
   label: string;
   id: string;
-  error?: string;
-  hint?: string;
+  error?: string | undefined;
+  hint?: string | undefined;
   children: React.ReactNode;
 }) {
   return (
@@ -179,7 +179,7 @@ function Field({
   );
 }
 
-function FieldError({ msg }: { msg?: string }) {
+function FieldError({ msg }: { msg?: string | undefined }) {
   if (!msg) return null;
   return <p role="alert" className="mt-1.5 text-xs font-medium text-destructive">{msg}</p>;
 }

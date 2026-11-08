@@ -93,7 +93,7 @@ export function RiskComparisonChart({
   highlightId,
 }: {
   data: { id: string; name: string; score: number; level: RiskLevel }[];
-  highlightId?: string;
+  highlightId?: string | undefined;
 }) {
   return (
     <ResponsiveContainer width="100%" height="100%">
