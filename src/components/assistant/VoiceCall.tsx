@@ -3,6 +3,7 @@ import { RetellWebClient } from "retell-client-js-sdk";
 import { supabase } from "@/integrations/supabase/client";
 
 type S = "idle" | "connecting" | "listening" | "speaking";
+<VoiceCall />
 
 export default function VoiceCall() {
   const clientRef = useRef<RetellWebClient | null>(null);
