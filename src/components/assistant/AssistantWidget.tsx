@@ -28,8 +28,8 @@ interface ChatMessage extends BotMessage {
   role: "bot" | "user";
   requestId?: string;
 }
-const N8N_CHAT_URL =
-  "https://najiyawazir.app.n8n.cloud/webhook/811faed4-007c-4cac-a579-4881b0135999/chat";
+// Server-side relay to the n8n Chat Agent (avoids CORS, keeps the webhook off the client).
+const N8N_CHAT_PROXY = "/api/public/n8n-chat";
 
 const UI = {
   en: {
@@ -137,36 +137,29 @@ export function AssistantWidget() {
 setInput("");
   setBusy(true);
   try {
-    const response = await fetch(N8N_CHAT_URL, {
+    const response = await fetch(N8N_CHAT_PROXY, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        action: "sendMessage",
-        sessionId: sessionIdRef.current,
-        chatInput: text,
-      }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sessionId: sessionIdRef.current, chatInput: text }),
     });
-
-    if (!response.ok) {
-      throw new Error("AI assistant request failed");
-    }
-
-    const data = await response.json();
-
-    push([
-      {
-        role: "bot",
-        text: data.output ?? "Sorry, I could not generate a response.",
-      },
-    ]);
+    const data = (await response.json().catch(() => ({}))) as { reply?: string; error?: string };
+    if (!response.ok || !data.reply) throw new Error(data.error ?? "upstream_error");
+    push([{ role: "bot", text: data.reply }]);
       } catch (error) {
         console.error("AI Chat Error:", error);
+        const code = error instanceof Error ? error.message : "";
+        const inactive = code === "workflow_inactive";
         push([
           {
             role: "bot",
-            text: `AI Error: ${error instanceof Error ? error.message : String(error)}`,
+            text:
+              lang === "ur"
+                ? inactive
+                  ? "AI معاون اس وقت دستیاب نہیں ہے۔ براہ کرم بعد میں کوشش کریں۔ ہنگامی صورت میں فوراً 1122 پر کال کریں۔"
+                  : "معذرت، AI معاون سے رابطہ نہیں ہو سکا۔ دوبارہ کوشش کریں۔ ہنگامی صورت میں فوراً 1122 پر کال کریں۔"
+                : inactive
+                  ? "The AI assistant is currently unavailable. Please try again later. If anyone is in danger, call Rescue 1122 now."
+                  : "Sorry, I couldn't reach the AI assistant. Please try again. If anyone is in danger, call Rescue 1122 now.",
           },
         ]);
       } finally {
@@ -330,6 +323,15 @@ setInput("");
                 )}
               </div>
             ))}
+            {busy && chatMode === "ai" && (
+              <div className="flex items-start" role="status" aria-label="AI is typing">
+                <div className="flex gap-1 rounded-2xl rounded-bl-sm border bg-card px-3.5 py-3">
+                  {[0, 150, 300].map((d) => (
+                    <span key={d} className="size-1.5 animate-bounce rounded-full bg-muted-foreground" style={{ animationDelay: `${d}ms` }} />
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           <form
