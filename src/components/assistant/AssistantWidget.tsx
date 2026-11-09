@@ -34,7 +34,8 @@ const N8N_CHAT_PROXY = "/api/public/n8n-chat";
 const UI = {
   en: {
     title: "Emergency Assistant",
-    status: "Guided intake · AI model not connected yet",
+    status: "Guided emergency form",
+    statusAi: "AI Chat · FloodGuard AI agent",
     danger: "Life in danger? Call Rescue 1122 now.",
     placeholder: "Type your message…",
     mic: "Voice assistance (Retell AI) — coming soon",
@@ -47,7 +48,8 @@ const UI = {
   },
   ur: {
     title: "ہنگامی معاون",
-    status: "رہنمائی والا فارم · AI ابھی منسلک نہیں",
+    status: "رہنمائی والا ہنگامی فارم",
+    statusAi: "AI چیٹ · FloodGuard AI ایجنٹ",
     danger: "جان کو خطرہ ہے؟ فوراً ریسکیو 1122 پر کال کریں۔",
     placeholder: "اپنا پیغام لکھیں…",
     mic: "آواز کی سہولت (Retell AI) — جلد آ رہی ہے",
@@ -235,7 +237,7 @@ setInput("");
                 </span>
                 <div>
                   <p className="font-display font-bold leading-tight" lang={lang} dir={rtl ? "rtl" : "ltr"}>{ui.title}</p>
-                  <p className="text-xs text-navy-muted" lang={lang} dir={rtl ? "rtl" : "ltr"}>{ui.status}</p>
+                  <p className="text-xs text-navy-muted" lang={lang} dir={rtl ? "rtl" : "ltr"}>{chatMode === "ai" ? ui.statusAi : ui.status}</p>
                 </div>
               </div>
               <div className="flex gap-1">
