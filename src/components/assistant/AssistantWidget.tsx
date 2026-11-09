@@ -161,19 +161,19 @@ setInput("");
         text: data.output ?? "Sorry, I could not generate a response.",
       },
     ]);
-  } catch (error) {
-    console.error("AI Chat Error:", error);
-    push([
-      {
-        role: "bot",
-        text:
-          text: `AI Error: ${error instanceof Error ? error.message : String(error)}`
-  }]);
-} finally {
-  setBusy(false);
-}
-  return;
-}
+      } catch (error) {
+        console.error("AI Chat Error:", error);
+        push([
+          {
+            role: "bot",
+            text: `AI Error: ${error instanceof Error ? error.message : String(error)}`,
+          },
+        ]);
+      } finally {
+        setBusy(false);
+      }
+      return;
+    }
     let current = state;
     if (state.step === "done") {
       if (text === "__new") return reset();
@@ -264,7 +264,9 @@ setInput("");
                   </span>
                 </TooltipTrigger>
                 <TooltipContent>Pashto support will be added with the AI language model.</TooltipContent>
-                <div className="mt-3 flex gap-2">
+              </Tooltip>
+            </div>
+            <div className="mt-3 flex gap-2">
   <button
     type="button"
     onClick={() => switchChatMode("intake")}
@@ -280,8 +282,6 @@ setInput("");
     {lang === "ur" ? "AI چیٹ" : "AI Chat"}
   </button>
 </div>
-              </Tooltip>
-            </div>
           </header>
 
           <a href="tel:1122" className="flex items-center gap-2 bg-emergency px-4 py-2 text-xs font-semibold text-emergency-foreground" lang={lang} dir={rtl ? "rtl" : "ltr"}>
