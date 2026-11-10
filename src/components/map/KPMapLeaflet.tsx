@@ -30,7 +30,7 @@ export default function KPMapLeaflet({ data, selectedId, onSelect, className }: 
         const selected = d.id === selectedId;
         const live = data.districts.find(row => row.id === d.id);
         const rain = rainfall24h(live?.weather ?? null);
-        const flow = todayDischarge(live?.flood ?? null, data.fetchedAt);
+        const flow = todayDischarge(live?.flood ?? null, live?.floodUpdatedAt ?? data.fetchedAt);
         const radius = rain === null ? 9 : 9 + Math.min(12, rain / 5);
         return (
           <CircleMarker

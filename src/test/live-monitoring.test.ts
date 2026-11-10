@@ -3,6 +3,32 @@ import { DISTRICTS } from "@/lib/data/districts";
 import { fetchLiveData, floodUrl, weatherUrl, LIVE_STALE_TIME, liveSnapshot, rainfall24h, type WeatherData } from "@/lib/api/live-data";
 
 describe("Live monitoring rules", () => {
+  it("reports a 429 with the provider reason without blanking successful weather", async () => {
+    const weather = { current: { time: "2026-11-10T12:00", temperature_2m: 25.8, wind_speed_10m: 3.1 }, hourly: { time: [], precipitation: [] }, daily: { time: [], precipitation_sum: [] } };
+    const fetcher = vi.fn().mockResolvedValueOnce(Response.json(DISTRICTS.map(() => weather))).mockResolvedValueOnce(Response.json({ reason: "Too Many Requests" }, { status: 429 }));
+    const data = await fetchLiveData(fetcher);
+    expect(liveSnapshot(data, "bannu").totals.temperature).toBe(25.8);
+    expect(liveSnapshot(data, "bannu").totals.humidity).toBeNull();
+    expect(data.districts[2]?.floodError).toContain("GloFAS returned 429: Too Many Requests");
+    expect(data.diagnostics?.[1]?.status).toBe(429);
+    expect(data.diagnostics?.[1]?.bodyPreview).toContain("Too Many Requests");
+  });
+  it("isolates malformed district rows and averages only available district values", async () => {
+    const weather = { current: { time: "2026-11-10T12:00", temperature_2m: 24 }, hourly: { time: [], precipitation: [] }, daily: { time: [], precipitation_sum: [] } };
+    const rows = DISTRICTS.map(() => weather);
+    const fetcher = vi.fn().mockResolvedValueOnce(Response.json(rows.map((d, i) => i === 2 ? null : d))).mockResolvedValueOnce(Response.json(DISTRICTS.map(() => ({ daily: { time: [], river_discharge: [] } }))));
+    const data = await fetchLiveData(fetcher);
+    expect(data.districts[0]?.weather?.current.temperature_2m).toBe(24);
+    expect(data.districts[2]?.weather).toBeNull();
+    expect(liveSnapshot(data).totals.temperature).toBe(24);
+    expect(liveSnapshot(data, "bannu").totals.temperature).toBeNull();
+  });
+  it("accepts a single object response as well as multi-coordinate arrays", async () => {
+    const weather = { current: { time: "2026-11-10T12:00", temperature_2m: 24 }, hourly: { time: [], precipitation: [] }, daily: { time: [], precipitation_sum: [] } };
+    const data = await fetchLiveData(vi.fn().mockResolvedValueOnce(Response.json(weather)).mockResolvedValueOnce(Response.json({ daily: { time: [], river_discharge: [] } })));
+    expect(data.districts[0]?.weather?.current.temperature_2m).toBe(24);
+    expect(data.districts[1]?.weather).toBeNull();
+  });
   it("uses a 15 minute freshness window", () => expect(LIVE_STALE_TIME).toBe(900000));
   it("requests three past weather days and seven forecast days for every district without keys", () => {
     const url = weatherUrl();
