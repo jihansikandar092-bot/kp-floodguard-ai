@@ -1,5 +1,6 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { liveMonitoringOptions } from "@/lib/api/monitoring-query";
+import { useMonitoringFallback } from "@/lib/api/use-monitoring-fallback";
 import { liveSnapshot } from "@/lib/api/live-data";
 import { LiveStatus, MonitoringError, MonitoringPending } from "@/components/dashboard/LiveStatus";
 import { createFileRoute, Link } from "@tanstack/react-router";
@@ -43,7 +44,8 @@ export const Route = createFileRoute("/dashboard")({
 function DashboardPage() {
   const { district: districtId } = Route.useSearch();
   const snap = getMonitoringSnapshot(districtId);
-  const { data } = useSuspenseQuery(liveMonitoringOptions());
+  const { data: storedData } = useSuspenseQuery(liveMonitoringOptions());
+  const { data, fallbackLoading } = useMonitoringFallback(storedData, districtId);
   const live = liveSnapshot(data, districtId);
   const t = live.totals;
   const scope = snap.district?.name ?? "All monitored districts";
@@ -62,6 +64,7 @@ function DashboardPage() {
       />
       <div className="container-page space-y-6 py-8">
         <LiveStatus data={data} rows={live.rows} />
+        {fallbackLoading && <p role="status" className="text-sm text-muted-foreground">Fetching selected district directly from Open-Meteo…</p>}
         <DemoBanner><strong>Demo flood-risk data.</strong> Risk scores, categories, sample alerts and historical events remain illustrative. Weather and river discharge below are live model data; no verified danger thresholds are available.</DemoBanner>
 
         <nav aria-label="District filter" className="flex flex-wrap gap-2">

@@ -30,8 +30,9 @@ use the editor.
 <!-- LOVABLE:END -->
 
 ## Monitoring architecture
-- Fetch fixed district coordinates in a public createServerFn with Web fetch and validated DTOs; share TanStack Query options with a 15-minute freshness window across map and dashboard to avoid duplicate provider calls.
+- Read public monitoring_snapshots through createServerFn and shared 15-minute Query options; only authenticated 30-minute scheduled refreshes fetch all fixed district coordinates, avoiding visitor-driven Worker provider requests.
 - Keep GloFAS model discharge in m³/s separate from sample flood-risk scores and historical data; never infer gauge depth or danger thresholds from flow.
 - Missing provider metrics remain null; aggregates use available districts only with explicit coverage, never treating unavailable values as zero.
-- Cache public provider responses server-side for 15 minutes with per-source in-flight deduplication and short 429 backoff; retain last successes with original timestamps and explicit stale warnings on refresh failures.
+- Scheduled refreshes retry each source at most three total attempts with 2s/4s backoff and 6s timeouts; retain independent last-success metrics/timestamps in the database. Use Request.waitUntil for bounded background completion on Nitro Workers.
+- Direct browser CORS fallback is limited to the selected district with no stored metrics, never persists visitor data, and shares a 15-minute client cache; all stale snapshots must expose their age.
 - Use Router dehydrate/hydrate hooks with the existing root Query provider to reuse the same blocking monitoring snapshot on server and client; map tiles use the key-free OpenStreetMap endpoint.
