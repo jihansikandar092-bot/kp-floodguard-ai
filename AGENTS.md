@@ -28,3 +28,8 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Monitoring architecture
+- Fetch fixed district coordinates in a public createServerFn with Web fetch and validated DTOs; share TanStack Query options with a 15-minute freshness window across map and dashboard to avoid duplicate provider calls.
+- Keep GloFAS model discharge in m³/s separate from sample flood-risk scores and historical data; never infer gauge depth or danger thresholds from flow.
+- Missing provider values remain null, and aggregates require complete district coverage so unavailable data cannot become fabricated zeroes.
