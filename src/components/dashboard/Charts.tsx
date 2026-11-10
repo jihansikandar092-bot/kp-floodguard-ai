@@ -9,7 +9,6 @@ import {
   LineChart,
   Pie,
   PieChart,
-  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -29,7 +28,7 @@ const tooltipStyle = {
   labelStyle: { color: "var(--foreground)", fontWeight: 600 },
 } as const;
 
-export function RainfallChart({ data }: { data: { day: string; rainfall: number }[] }) {
+export function RainfallChart({ data }: { data: { day: string; rainfall: number | null }[] }) {
   return (
     <ResponsiveContainer width="100%" height="100%">
       <AreaChart data={data} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
@@ -42,29 +41,22 @@ export function RainfallChart({ data }: { data: { day: string; rainfall: number 
         <CartesianGrid stroke="var(--border)" vertical={false} />
         <XAxis dataKey="day" {...axis} />
         <YAxis {...axis} unit=" mm" width={56} />
-        <Tooltip {...tooltipStyle} formatter={(v: number) => [`${v} mm`, "Rainfall (demo)"]} />
+        <Tooltip {...tooltipStyle} formatter={(v: number) => [`${v} mm`, "Rainfall (mm)"]} />
         <Area type="monotone" dataKey="rainfall" stroke="var(--water)" strokeWidth={2.5} fill="url(#rainFill)" />
       </AreaChart>
     </ResponsiveContainer>
   );
 }
 
-export function RiverChart({ data }: { data: { day: string; level: number; danger: number }[] }) {
-  const danger = data[0]?.danger ?? 0;
+export function RiverChart({ data }: { data: { day: string; discharge: number | null }[] }) {
   return (
     <ResponsiveContainer width="100%" height="100%">
-      <LineChart data={data} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
+      <LineChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
         <CartesianGrid stroke="var(--border)" vertical={false} />
         <XAxis dataKey="day" {...axis} />
-        <YAxis {...axis} unit=" m" width={52} domain={[0, Math.ceil(danger * 1.15)]} />
-        <Tooltip {...tooltipStyle} formatter={(v: number) => [`${v} m`, "River level (demo)"]} />
-        <ReferenceLine
-          y={danger}
-          stroke="var(--emergency)"
-          strokeDasharray="5 4"
-          label={{ value: `Danger ${danger} m`, position: "insideTopRight", fill: "var(--emergency)", fontSize: 11 }}
-        />
-        <Line type="monotone" dataKey="level" stroke="var(--navy)" strokeWidth={2.5} dot={{ r: 3, fill: "var(--navy)" }} />
+        <YAxis {...axis} unit=" m³/s" width={85} domain={[0, "auto"]} />
+        <Tooltip {...tooltipStyle} formatter={(v: number) => [`${v} m³/s`, "River discharge"]} />
+        <Line type="monotone" dataKey="discharge" stroke="var(--water)" strokeWidth={2.5} dot={{ r: 3, fill: "var(--water)" }} />
       </LineChart>
     </ResponsiveContainer>
   );
