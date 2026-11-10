@@ -33,3 +33,4 @@ use the editor.
 - Fetch fixed district coordinates in a public createServerFn with Web fetch and validated DTOs; share TanStack Query options with a 15-minute freshness window across map and dashboard to avoid duplicate provider calls.
 - Keep GloFAS model discharge in m³/s separate from sample flood-risk scores and historical data; never infer gauge depth or danger thresholds from flow.
 - Missing provider values remain null, and aggregates require complete district coverage so unavailable data cannot become fabricated zeroes.
+- Use Router SSR Query integration with the existing root provider to hydrate the same monitoring snapshot on server and client; map tiles use the key-free OpenStreetMap endpoint.
