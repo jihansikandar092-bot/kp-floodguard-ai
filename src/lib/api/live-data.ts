@@ -61,7 +61,7 @@ export async function fetchLiveData(fetcher: typeof fetch = fetch): Promise<Live
         throw new Error(`${source} returned ${response.status}${reason}`);
       }
       const json: unknown = JSON.parse(body);
-      return { values: Array.isArray(json) ? json : [json], error: null, updatedAt: response.headers.get("x-monitoring-updated-at") ?? new Date().toISOString() };
+      return { values: Array.isArray(json) ? json : [json], error: response.headers.get("x-monitoring-error") ? `${source}: ${response.headers.get("x-monitoring-error")}` : null, updatedAt: response.headers.get("x-monitoring-updated-at") ?? new Date().toISOString() };
     } catch (error) {
       diagnostic.error = error instanceof Error ? `${source}: ${error.message}` : `${source}: fetch failed`;
       console.error("Monitoring request failed", JSON.stringify(diagnostic));
@@ -82,6 +82,7 @@ export async function fetchLiveData(fetcher: typeof fetch = fetch): Promise<Live
 
 export const mean = (values: (number | null)[]) => values.length && values.every(v => v !== null)
   ? Math.round(values.reduce<number>((sum, value) => sum + (value ?? 0), 0) / values.length * 10) / 10 : null;
+const availableMean = (values: (number | null)[]) => mean(values.filter(v => v !== null));
 
 export function rainfall24h(weather: WeatherData | null): number | null {
   if (!weather) return null;
@@ -99,7 +100,7 @@ export function liveSnapshot(data: LiveMonitoring, districtId?: string) {
   const rows = districtId ? data.districts.filter(d => d.id === districtId) : data.districts;
   function series(kind: "rainfall" | "discharge") {
     const dates = [...new Set(rows.flatMap(d => kind === "rainfall" ? d.weather?.daily.time ?? [] : d.flood?.daily.time ?? []))].sort();
-    return dates.map(day => ({ day, value: mean(rows.map(d => {
+    return dates.map(day => ({ day, value: availableMean(rows.map(d => {
       const daily = kind === "rainfall" ? d.weather?.daily : d.flood?.daily;
       const index = daily?.time.indexOf(day) ?? -1;
       if (!daily || index < 0) return null;
@@ -108,7 +109,7 @@ export function liveSnapshot(data: LiveMonitoring, districtId?: string) {
   }
   return {
     rows,
-    totals: { rainfall24h: mean(rows.map(d => rainfall24h(d.weather))), discharge: mean(rows.map(d => todayDischarge(d.flood, data.fetchedAt))), temperature: mean(rows.map(d => d.weather?.current.temperature_2m ?? null)), humidity: mean(rows.map(d => d.weather?.current.relative_humidity_2m ?? null)), wind: mean(rows.map(d => d.weather?.current.wind_speed_10m ?? null)) },
+    totals: { rainfall24h: availableMean(rows.map(d => rainfall24h(d.weather))), discharge: availableMean(rows.map(d => todayDischarge(d.flood, d.floodUpdatedAt ?? data.fetchedAt))), temperature: availableMean(rows.map(d => d.weather?.current.temperature_2m ?? null)), humidity: availableMean(rows.map(d => d.weather?.current.relative_humidity_2m ?? null)), wind: availableMean(rows.map(d => d.weather?.current.wind_speed_10m ?? null)) },
     rainfall: series("rainfall").map(d => ({ day: d.day, rainfall: d.value })),
     river: series("discharge").map(d => ({ day: d.day, discharge: d.value })),
   };

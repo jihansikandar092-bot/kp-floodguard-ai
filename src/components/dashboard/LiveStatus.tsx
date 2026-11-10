@@ -6,7 +6,7 @@ import type { LiveDistrict, LiveMonitoring } from "@/lib/api/live-data";
 
 export function LiveStatus({ data, rows }: { data: LiveMonitoring; rows: LiveDistrict[] }) {
   const queryClient = useQueryClient();
-  const unavailable = rows.some(d => !d.weather || !d.flood);
+  const unavailable = rows.some(d => !d.weather || !d.flood || d.weatherError || d.floodError);
   const updated = rows.flatMap(d => [d.weatherUpdatedAt, d.floodUpdatedAt]).filter((t): t is string => Boolean(t)).sort().at(-1);
   const reasons = [...new Set(rows.flatMap(d => [d.weatherError, d.floodError]).filter(Boolean))];
   return <div className="space-y-2 border-b pb-4 text-sm">
@@ -15,7 +15,8 @@ export function LiveStatus({ data, rows }: { data: LiveMonitoring; rows: LiveDis
       <Button variant="outline" size="sm" onClick={() => queryClient.invalidateQueries({ queryKey: ["live-monitoring"] })}><RefreshCw className="size-3.5" /> Refresh</Button>
     </div>
     <p className="text-xs text-muted-foreground">Last updated: {updated ? `${updated.replace("T", " ").slice(0, 19)} UTC` : "No successful fetch yet"} · Modelled weather and river discharge, not gauge measurements.</p>
-    {unavailable && <div role="alert" className="space-y-1 text-emergency"><p>Live data temporarily unavailable for {rows.filter(d => !d.weather || !d.flood).length} district(s).</p>{reasons.map(reason => <p key={reason}>{reason}</p>)}<p>Available metrics are still displayed; unavailable metrics show —.</p></div>}
+    {unavailable && <div role="alert" className="space-y-1 text-emergency"><p>Live data temporarily unavailable or outdated for {rows.filter(d => !d.weather || !d.flood || d.weatherError || d.floodError).length} district(s).</p>{reasons.map(reason => <p key={reason}>{reason}</p>)}<p>Available metrics are still displayed; unavailable metrics show —. Retained values use their last successful timestamp.</p></div>}
+    {rows.length > 1 && <p className="text-xs text-muted-foreground">Averages include available districts only: weather {rows.filter(d => d.weather).length}/{rows.length}; river discharge {rows.filter(d => d.flood).length}/{rows.length}. Individual missing metrics are excluded, not counted as zero.</p>}
   </div>;
 }
 export function MonitoringError() {

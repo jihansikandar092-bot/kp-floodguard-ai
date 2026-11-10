@@ -82,7 +82,7 @@ function DashboardPage() {
 
         <div className="grid gap-6 lg:grid-cols-3">
           <Panel title="Rainfall trend" subtitle={`Past 3 days + next 7 days · ${scope} · mm`} action={<span className="text-xs text-water">Open-Meteo</span>} className="lg:col-span-2" bodyClassName="h-72">
-            {live.rainfall.some(d => d.rainfall !== null) ? <RainfallChart data={live.rainfall} /> : <p role="status">Live data temporarily unavailable</p>}
+            {live.rainfall.some(d => d.rainfall !== null) ? <RainfallChart data={live.rainfall} /> : <p role="status">{live.rows.find(d => d.weatherError)?.weatherError ?? "Rainfall data not available"}</p>}
           </Panel>
           <Panel title="Flood-risk distribution" subtitle="Districts by risk category">
             <div className="relative h-44">
@@ -107,7 +107,7 @@ function DashboardPage() {
 
         <div className="grid gap-6 lg:grid-cols-3">
           <Panel title="River discharge" subtitle={`Past 7 days + next 7 days · ${scope} · m³/s (UTC dates)`} action={<span className="text-xs text-water">GloFAS</span>} className="lg:col-span-2" bodyClassName="h-72">
-            {live.river.some(d => d.discharge !== null) ? <RiverChart data={live.river} /> : <p role="status">Live data temporarily unavailable</p>}
+            {live.river.some(d => d.discharge !== null) ? <RiverChart data={live.river} /> : <p role="status">{live.rows.find(d => d.floodError)?.floodError ?? "River discharge data not available"}</p>}
           </Panel>
           <Panel title="Recent flood alerts" subtitle="Sample alerts for demonstration" bodyClassName="p-0">
             {snap.alerts.length === 0 ? (
