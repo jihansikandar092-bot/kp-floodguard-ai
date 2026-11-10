@@ -45,12 +45,13 @@ export function floodUrl() {
 // Public, fixed-coordinate reads only. No credentials, user input, or Node APIs.
 export async function fetchLiveData(fetcher: typeof fetch = fetch): Promise<LiveMonitoring> {
   const diagnostics: RequestDiagnostic[] = [];
-  async function request(url: URL, source: string): Promise<{ values: unknown[]; error: string | null }> {
+  async function request(url: URL, source: string): Promise<{ values: unknown[]; error: string | null; updatedAt: string | null }> {
     const diagnostic: RequestDiagnostic = { source, url: url.toString(), status: null, bodyPreview: "", error: null, cached: false };
     diagnostics.push(diagnostic);
     try {
       const response = await fetcher(url, { signal: AbortSignal.timeout(20000) });
       diagnostic.status = response.status;
+      diagnostic.cached = response.headers.get("x-monitoring-cache") === "hit";
       const body = await response.text();
       diagnostic.bodyPreview = body.slice(0, 300);
       console.info("Monitoring response", JSON.stringify(diagnostic));
@@ -60,11 +61,11 @@ export async function fetchLiveData(fetcher: typeof fetch = fetch): Promise<Live
         throw new Error(`${source} returned ${response.status}${reason}`);
       }
       const json: unknown = JSON.parse(body);
-      return { values: Array.isArray(json) ? json : [json], error: null };
+      return { values: Array.isArray(json) ? json : [json], error: null, updatedAt: response.headers.get("x-monitoring-updated-at") ?? new Date().toISOString() };
     } catch (error) {
       diagnostic.error = error instanceof Error ? `${source}: ${error.message}` : `${source}: fetch failed`;
       console.error("Monitoring request failed", JSON.stringify(diagnostic));
-      return { values: [], error: diagnostic.error };
+      return { values: [], error: diagnostic.error, updatedAt: null };
     }
   }
   const [weather, flood] = await Promise.all([request(weatherUrl(), "Open-Meteo"), request(floodUrl(), "GloFAS")]);
@@ -75,7 +76,7 @@ export async function fetchLiveData(fetcher: typeof fetch = fetch): Promise<Live
     const weatherError = weather.error ?? (w.success ? null : `Open-Meteo: ${d.name} data invalid or missing (${w.error.issues.map(i => i.path.join(".")).join(", ")})`);
     const floodError = flood.error ?? (f.success ? null : `GloFAS: ${d.name} data invalid or missing (${f.error.issues.map(i => i.path.join(".")).join(", ")})`);
     if (weatherError || floodError) console.warn("District monitoring unavailable", d.id, weatherError, floodError);
-    return { id: d.id, weather: w.success ? w.data : null, flood: f.success ? f.data : null, weatherUpdatedAt: w.success ? fetchedAt : null, floodUpdatedAt: f.success ? fetchedAt : null, weatherError, floodError };
+    return { id: d.id, weather: w.success ? w.data : null, flood: f.success ? f.data : null, weatherUpdatedAt: w.success ? weather.updatedAt : null, floodUpdatedAt: f.success ? flood.updatedAt : null, weatherError, floodError };
   }) };
 }
 
