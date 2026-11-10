@@ -22,7 +22,7 @@ export async function readMonitoringSnapshots(): Promise<LiveMonitoring> {
   return { origin: "snapshot", fetchedAt: data?.map(row => row.fetched_at).sort().at(-1) ?? "", districts: DISTRICTS.map(d => {
     const row = data?.find(row => row.district === d.id);
     const parsed = storedDistrictSchema.safeParse(row?.metrics);
-    if (parsed.success) return { ...parsed.data, id: d.id };
+    if (parsed.success) return { ...parsed.data, id: d.id, weatherError: parsed.data.weatherError ?? null, floodError: parsed.data.floodError ?? null };
     return { id: d.id, weather: null, flood: null, weatherUpdatedAt: null, floodUpdatedAt: null, weatherError: "No stored Open-Meteo snapshot available", floodError: "No stored GloFAS snapshot available" };
   }) };
 }
