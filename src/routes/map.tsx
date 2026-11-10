@@ -1,5 +1,6 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { liveMonitoringOptions } from "@/lib/api/monitoring-query";
+import { useMonitoringFallback } from "@/lib/api/use-monitoring-fallback";
 import { LiveStatus, MonitoringError, MonitoringPending } from "@/components/dashboard/LiveStatus";
 import { Button } from "@/components/ui/button";
 import { createFileRoute } from "@tanstack/react-router";
@@ -30,7 +31,8 @@ export const Route = createFileRoute("/map")({
 
 function MapPage() {
   const [selectedId, setSelectedId] = useState("swat");
-  const { data } = useSuspenseQuery(liveMonitoringOptions());
+  const { data: storedData } = useSuspenseQuery(liveMonitoringOptions());
+  const { data, fallbackLoading } = useMonitoringFallback(storedData, selectedId);
   const district = getDistrict(selectedId) ?? DISTRICTS[0];
   if (!district) return <p className="container-page py-12">No monitored districts available.</p>;
 
@@ -43,6 +45,7 @@ function MapPage() {
       />
       <div className="container-page space-y-6 py-8">
         <LiveStatus data={data} rows={data.districts} />
+        {fallbackLoading && <p role="status" className="text-sm text-muted-foreground">Fetching selected district directly from Open-Meteo…</p>}
         <DemoBanner>
           <strong>DEMO risk categories.</strong> Marker colours show sample risk only; sizes reflect live rainfall. Weather and discharge come from Open-Meteo / GloFAS, not a verified flood-risk model.
         </DemoBanner>

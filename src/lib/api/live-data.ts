@@ -24,26 +24,28 @@ export interface LiveDistrict {
   floodError?: string | null;
 }
 export interface RequestDiagnostic { source: string; url: string; status: number | null; bodyPreview: string; error: string | null; cached: boolean }
-export interface LiveMonitoring { districts: LiveDistrict[]; fetchedAt: string; diagnostics?: RequestDiagnostic[] }
+export interface LiveMonitoring { districts: LiveDistrict[]; fetchedAt: string; diagnostics?: RequestDiagnostic[]; origin?: "snapshot" | "browser" }
 
-export function weatherUrl() {
+export const storedDistrictSchema = z.object({ id: z.string(), weather: weatherSchema.nullable(), flood: floodSchema.nullable(), weatherUpdatedAt: z.string().nullable(), floodUpdatedAt: z.string().nullable(), weatherError: z.string().nullable().optional(), floodError: z.string().nullable().optional() });
+
+export function weatherUrl(districts = DISTRICTS) {
   const url = new URL("https://api.open-meteo.com/v1/forecast");
   url.search = new URLSearchParams({
-    latitude: DISTRICTS.map(d => d.lat).join(","), longitude: DISTRICTS.map(d => d.lng).join(","),
+    latitude: districts.map(d => d.lat).join(","), longitude: districts.map(d => d.lng).join(","),
     current: "temperature_2m,relative_humidity_2m,wind_speed_10m",
     hourly: "precipitation,temperature_2m,relative_humidity_2m,wind_speed_10m",
     daily: "precipitation_sum", past_days: "3", forecast_days: "7", timezone: "Asia/Karachi",
   }).toString();
   return url;
 }
-export function floodUrl() {
+export function floodUrl(districts = DISTRICTS) {
   const url = new URL("https://flood-api.open-meteo.com/v1/flood");
-  url.search = new URLSearchParams({ latitude: DISTRICTS.map(d => d.lat).join(","), longitude: DISTRICTS.map(d => d.lng).join(","), daily: "river_discharge", past_days: "7", forecast_days: "7" }).toString();
+  url.search = new URLSearchParams({ latitude: districts.map(d => d.lat).join(","), longitude: districts.map(d => d.lng).join(","), daily: "river_discharge", past_days: "7", forecast_days: "7" }).toString();
   return url;
 }
 
 // Public, fixed-coordinate reads only. No credentials, user input, or Node APIs.
-export async function fetchLiveData(fetcher: typeof fetch = fetch): Promise<LiveMonitoring> {
+export async function fetchLiveData(fetcher: typeof fetch = fetch, districts = DISTRICTS): Promise<LiveMonitoring> {
   const diagnostics: RequestDiagnostic[] = [];
   async function request(url: URL, source: string): Promise<{ values: unknown[]; error: string | null; updatedAt: string | null }> {
     const diagnostic: RequestDiagnostic = { source, url: url.toString(), status: null, bodyPreview: "", error: null, cached: false };
@@ -68,9 +70,9 @@ export async function fetchLiveData(fetcher: typeof fetch = fetch): Promise<Live
       return { values: [], error: diagnostic.error, updatedAt: null };
     }
   }
-  const [weather, flood] = await Promise.all([request(weatherUrl(), "Open-Meteo"), request(floodUrl(), "GloFAS")]);
+  const [weather, flood] = await Promise.all([request(weatherUrl(districts), "Open-Meteo"), request(floodUrl(districts), "GloFAS")]);
   const fetchedAt = new Date().toISOString();
-  return { fetchedAt, diagnostics, districts: DISTRICTS.map((d, index) => {
+  return { fetchedAt, diagnostics, districts: districts.map((d, index) => {
     const w = weatherSchema.safeParse(weather.values[index]);
     const f = floodSchema.safeParse(flood.values[index]);
     const weatherError = weather.error ?? (w.success ? null : `Open-Meteo: ${d.name} data invalid or missing (${w.error.issues.map(i => i.path.join(".")).join(", ")})`);

@@ -18,6 +18,7 @@ import { Route as IntegrationsRouteImport } from './routes/integrations'
 import { Route as MapRouteImport } from './routes/map'
 import { Route as ApiPublicMonitoringStatusRouteImport } from './routes/api/public/monitoring-status'
 import { Route as ApiPublicN8nChatRouteImport } from './routes/api/public/n8n-chat'
+import { Route as ApiPublicJobsRefreshMonitoringRouteImport } from './routes/api/public/jobs/refresh-monitoring'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -65,6 +66,12 @@ const ApiPublicN8nChatRoute = ApiPublicN8nChatRouteImport.update({
   path: '/api/public/n8n-chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicJobsRefreshMonitoringRoute =
+  ApiPublicJobsRefreshMonitoringRouteImport.update({
+    id: '/api/public/jobs/refresh-monitoring',
+    path: '/api/public/jobs/refresh-monitoring',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -76,6 +83,7 @@ export interface FileRoutesByFullPath {
   '/map': typeof MapRoute
   '/api/public/monitoring-status': typeof ApiPublicMonitoringStatusRoute
   '/api/public/n8n-chat': typeof ApiPublicN8nChatRoute
+  '/api/public/jobs/refresh-monitoring': typeof ApiPublicJobsRefreshMonitoringRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -87,6 +95,7 @@ export interface FileRoutesByTo {
   '/map': typeof MapRoute
   '/api/public/monitoring-status': typeof ApiPublicMonitoringStatusRoute
   '/api/public/n8n-chat': typeof ApiPublicN8nChatRoute
+  '/api/public/jobs/refresh-monitoring': typeof ApiPublicJobsRefreshMonitoringRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -99,6 +108,7 @@ export interface FileRoutesById {
   '/map': typeof MapRoute
   '/api/public/monitoring-status': typeof ApiPublicMonitoringStatusRoute
   '/api/public/n8n-chat': typeof ApiPublicN8nChatRoute
+  '/api/public/jobs/refresh-monitoring': typeof ApiPublicJobsRefreshMonitoringRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -112,6 +122,7 @@ export interface FileRouteTypes {
     | '/map'
     | '/api/public/monitoring-status'
     | '/api/public/n8n-chat'
+    | '/api/public/jobs/refresh-monitoring'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -123,6 +134,7 @@ export interface FileRouteTypes {
     | '/map'
     | '/api/public/monitoring-status'
     | '/api/public/n8n-chat'
+    | '/api/public/jobs/refresh-monitoring'
   id:
     | '__root__'
     | '/'
@@ -134,6 +146,7 @@ export interface FileRouteTypes {
     | '/map'
     | '/api/public/monitoring-status'
     | '/api/public/n8n-chat'
+    | '/api/public/jobs/refresh-monitoring'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -146,6 +159,7 @@ export interface RootRouteChildren {
   MapRoute: typeof MapRoute
   ApiPublicMonitoringStatusRoute: typeof ApiPublicMonitoringStatusRoute
   ApiPublicN8nChatRoute: typeof ApiPublicN8nChatRoute
+  ApiPublicJobsRefreshMonitoringRoute: typeof ApiPublicJobsRefreshMonitoringRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -213,6 +227,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicN8nChatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/jobs/refresh-monitoring': {
+      id: '/api/public/jobs/refresh-monitoring'
+      path: '/api/public/jobs/refresh-monitoring'
+      fullPath: '/api/public/jobs/refresh-monitoring'
+      preLoaderRoute: typeof ApiPublicJobsRefreshMonitoringRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -226,6 +247,7 @@ const rootRouteChildren: RootRouteChildren = {
   MapRoute: MapRoute,
   ApiPublicMonitoringStatusRoute: ApiPublicMonitoringStatusRoute,
   ApiPublicN8nChatRoute: ApiPublicN8nChatRoute,
+  ApiPublicJobsRefreshMonitoringRoute: ApiPublicJobsRefreshMonitoringRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

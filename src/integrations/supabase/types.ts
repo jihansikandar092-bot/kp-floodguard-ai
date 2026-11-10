@@ -14,7 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      monitoring_snapshots: {
+        Row: {
+          district: string
+          fetched_at: string
+          metrics: Json
+        }
+        Insert: {
+          district: string
+          fetched_at?: string
+          metrics?: Json
+        }
+        Update: {
+          district?: string
+          fetched_at?: string
+          metrics?: Json
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
