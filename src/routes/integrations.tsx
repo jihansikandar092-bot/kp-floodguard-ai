@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ArrowDown, CircleDashed } from "lucide-react";
+import { ArrowDown, CircleDashed, CircleCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { PageHeader } from "@/components/site/Demo";
 import { INTEGRATIONS } from "@/lib/api/integrations";
@@ -7,6 +7,8 @@ import { INTEGRATIONS } from "@/lib/api/integrations";
 export const Route = createFileRoute("/integrations")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Integrations & Architecture — KP FloodGuard AI" },
       { name: "description", content: "Planned data and AI integrations for KP FloodGuard AI: Open-Meteo, GloFAS, ML prediction API, OpenAI, Retell AI, n8n and Google Sheets." },
       { property: "og:title", content: "Integrations & Architecture — KP FloodGuard AI" },
@@ -28,7 +30,7 @@ function IntegrationsPage() {
       <PageHeader
         eyebrow="Technology integration"
         title="Integrations & Architecture"
-        description="The platform is modular: each service below plugs into a dedicated slot. None are connected yet — they will be switched on only after being wired up and tested."
+        description="The platform is modular: each service below plugs into a dedicated slot. Open-Meteo weather and GloFAS river discharge are connected. Other services retain their current status."
       />
       <div className="container-page space-y-12 py-10">
         <section aria-labelledby="flow">
@@ -59,7 +61,7 @@ function IntegrationsPage() {
                 <div className="flex items-start justify-between gap-3">
                   <h3 className="font-bold">{i.name}</h3>
                   <Badge variant="pending" className="shrink-0 gap-1">
-                    <CircleDashed className="size-3" aria-hidden /> Not connected
+                    {i.status === "connected" ? <CircleCheck className="size-3" aria-hidden /> : <CircleDashed className="size-3" aria-hidden />} {i.status === "connected" ? "Connected" : "Not connected"}
                   </Badge>
                 </div>
                 <p className="mt-2 text-sm text-muted-foreground">{i.purpose}</p>

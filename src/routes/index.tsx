@@ -24,6 +24,8 @@ import riverImg from "@/assets/swat-river-monitoring.jpg";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "KP FloodGuard AI — Smarter Flood Monitoring. Safer Communities." },
       {
         name: "description",

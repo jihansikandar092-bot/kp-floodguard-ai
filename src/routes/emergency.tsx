@@ -11,6 +11,8 @@ import { EMERGENCY_TYPE_LABEL, type EmergencyRequest } from "@/lib/emergency";
 export const Route = createFileRoute("/emergency")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Request Emergency Help — KP FloodGuard AI" },
       { name: "description", content: "Submit a flood emergency request for rescue, medical assistance, food, drinking water or shelter in Khyber Pakhtunkhwa." },
       { property: "og:title", content: "Request Emergency Help — KP FloodGuard AI" },

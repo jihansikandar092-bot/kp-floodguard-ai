@@ -1,13 +1,14 @@
 import { Link } from "@tanstack/react-router";
 import { CloudRain, Droplets, Gauge, Thermometer, Waves, Wind } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
+import { rainfall24h, todayDischarge, type LiveDistrict } from "@/lib/api/live-data";
 import { DemoBadge, RiskBadge } from "@/components/site/Demo";
 import type { District } from "@/lib/data/districts";
 
-export function DistrictDetail({ district }: { district: District }) {
+export function DistrictDetail({ district, live, fetchedAt }: { district: District; live: LiveDistrict | undefined; fetchedAt: string }) {
   const d = district.demo;
-  const pct = Math.min(100, Math.round((d.riverLevel / d.dangerLevel) * 100));
+  const w = live?.weather;
+  const flow = todayDischarge(live?.flood ?? null, fetchedAt);
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-start justify-between gap-3">
@@ -15,9 +16,9 @@ export function DistrictDetail({ district }: { district: District }) {
           <h2 className="text-2xl font-extrabold">{district.name}</h2>
           <p lang="ur" dir="rtl" className="text-muted-foreground">{district.nameUr}</p>
         </div>
-        <DemoBadge />
       </div>
       <div className="mt-3 flex items-center gap-3">
+        <DemoBadge />
         <RiskBadge level={d.riskLevel} />
         <span className="font-mono text-sm text-muted-foreground">Risk score {d.riskScore}/100</span>
       </div>
@@ -27,22 +28,21 @@ export function DistrictDetail({ district }: { district: District }) {
           <span className="inline-flex items-center gap-2 font-semibold">
             <Waves className="size-4 text-water" aria-hidden /> {district.river}
           </span>
-          <span className="font-mono">{d.riverLevel} m / {d.dangerLevel} m</span>
+          <span className="font-mono">{flow ?? "—"} m³/s</span>
         </div>
-        <Progress value={pct} className="mt-3 h-2" aria-label={`River level at ${pct}% of danger mark`} />
-        <p className="mt-2 text-xs text-muted-foreground">{pct}% of danger mark (sample value)</p>
+        <p className="mt-2 text-xs text-muted-foreground">GloFAS model discharge for today (UTC). Not measured river depth; no verified danger threshold.</p>
       </div>
 
+      {(!w || flow === null) && <p role="alert" className="mt-3 text-sm text-emergency">Live data temporarily unavailable</p>}
       <dl className="mt-4 grid grid-cols-2 gap-3">
-        <Metric icon={CloudRain} label="Rainfall (24h)" value={`${d.rainfall24h} mm`} />
-        <Metric icon={Thermometer} label="Temperature" value={`${d.temperature} °C`} />
-        <Metric icon={Droplets} label="Humidity" value={`${d.humidity}%`} />
-        <Metric icon={Wind} label="Wind speed" value={`${d.wind} km/h`} />
+        <Metric icon={CloudRain} label="Rainfall (24h)" value={`${rainfall24h(w ?? null) ?? "—"} mm`} />
+        <Metric icon={Thermometer} label="Temperature" value={`${w?.current.temperature_2m ?? "—"} °C`} />
+        <Metric icon={Droplets} label="Humidity" value={`${w?.current.relative_humidity_2m ?? "—"}%`} />
+        <Metric icon={Wind} label="Wind speed" value={`${w?.current.wind_speed_10m ?? "—"} km/h`} />
       </dl>
 
       <p className="mt-4 text-xs text-muted-foreground">
-        Sample values for demonstration. Live weather (Open-Meteo), river data (GloFAS) and ML risk
-        scores are not connected yet.
+        Source: Open-Meteo / GloFAS. Risk score and category remain DEMO, not a live flood assessment.
       </p>
 
       {district.featured && (

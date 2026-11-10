@@ -53,7 +53,7 @@ export function SiteFooter() {
       <div className="border-t border-navy-line">
         <div className="container-page flex flex-col gap-2 py-5 text-xs text-navy-muted sm:flex-row sm:justify-between">
           <p>© {new Date().getFullYear()} KP FloodGuard AI · Prototype for research and demonstration</p>
-          <p>All monitoring values shown are DEMO data until verified sources are connected.</p>
+          <p>Live weather &amp; discharge: Open-Meteo / GloFAS · Risk &amp; historical figures: DEMO.</p>
         </div>
       </div>
     </footer>

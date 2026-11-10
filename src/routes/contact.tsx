@@ -6,6 +6,8 @@ import { DISCLAIMER } from "@/components/site/SiteFooter";
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Contact & Helplines — KP FloodGuard AI" },
       { name: "description", content: "Official emergency helplines for Khyber Pakhtunkhwa and contact information for the KP FloodGuard AI project." },
       { property: "og:title", content: "Contact & Helplines — KP FloodGuard AI" },

@@ -6,6 +6,8 @@ import { RequestsTable } from "@/components/admin/RequestsTable";
 export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Rescue Coordination Dashboard — KP FloodGuard AI" },
       { name: "description", content: "Coordinator interface to review, filter and update flood emergency requests by district, type and status." },
       { property: "og:title", content: "Rescue Coordination Dashboard — KP FloodGuard AI" },

@@ -18,14 +18,14 @@ export const INTEGRATIONS: Integration[] = [
     name: "Open-Meteo Weather API",
     purpose: "Rainfall, temperature, humidity and wind per district.",
     powers: "Dashboard weather cards, rainfall charts, map details",
-    status: "not_connected",
+    status: "connected",
   },
   {
     id: "glofas",
     name: "GloFAS River Flood Data",
     purpose: "River discharge and flood forecasts for KP river basins.",
-    powers: "River level charts, danger thresholds, map details",
-    status: "not_connected",
+    powers: "River discharge forecasts and map details (no gauge depths or danger thresholds)",
+    status: "connected",
   },
   {
     id: "ml-api",
