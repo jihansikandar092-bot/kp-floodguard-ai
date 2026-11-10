@@ -8,7 +8,7 @@ import type { District } from "@/lib/data/districts";
 export function DistrictDetail({ district, live, fetchedAt }: { district: District; live: LiveDistrict | undefined; fetchedAt: string }) {
   const d = district.demo;
   const w = live?.weather;
-  const flow = todayDischarge(live?.flood ?? null, fetchedAt);
+  const flow = todayDischarge(live?.flood ?? null, live?.floodUpdatedAt ?? fetchedAt);
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-start justify-between gap-3">
@@ -33,7 +33,7 @@ export function DistrictDetail({ district, live, fetchedAt }: { district: Distri
         <p className="mt-2 text-xs text-muted-foreground">GloFAS model discharge for today (UTC). Not measured river depth; no verified danger threshold.</p>
       </div>
 
-      {(!w || flow === null) && <p role="alert" className="mt-3 text-sm text-emergency">Live data temporarily unavailable</p>}
+      {(live?.weatherError || live?.floodError || !w || flow === null) && <p role="alert" className="mt-3 text-sm text-emergency">{live?.weatherError ?? live?.floodError ?? "Data not available for this metric"}</p>}
       <dl className="mt-4 grid grid-cols-2 gap-3">
         <Metric icon={CloudRain} label="Rainfall (24h)" value={`${rainfall24h(w ?? null) ?? "—"} mm`} />
         <Metric icon={Thermometer} label="Temperature" value={`${w?.current.temperature_2m ?? "—"} °C`} />

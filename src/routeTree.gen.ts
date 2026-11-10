@@ -16,6 +16,7 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as EmergencyRouteImport } from './routes/emergency'
 import { Route as IntegrationsRouteImport } from './routes/integrations'
 import { Route as MapRouteImport } from './routes/map'
+import { Route as ApiPublicMonitoringStatusRouteImport } from './routes/api/public/monitoring-status'
 import { Route as ApiPublicN8nChatRouteImport } from './routes/api/public/n8n-chat'
 
 const IndexRoute = IndexRouteImport.update({
@@ -53,6 +54,12 @@ const MapRoute = MapRouteImport.update({
   path: '/map',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicMonitoringStatusRoute =
+  ApiPublicMonitoringStatusRouteImport.update({
+    id: '/api/public/monitoring-status',
+    path: '/api/public/monitoring-status',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicN8nChatRoute = ApiPublicN8nChatRouteImport.update({
   id: '/api/public/n8n-chat',
   path: '/api/public/n8n-chat',
@@ -67,6 +74,7 @@ export interface FileRoutesByFullPath {
   '/emergency': typeof EmergencyRoute
   '/integrations': typeof IntegrationsRoute
   '/map': typeof MapRoute
+  '/api/public/monitoring-status': typeof ApiPublicMonitoringStatusRoute
   '/api/public/n8n-chat': typeof ApiPublicN8nChatRoute
 }
 export interface FileRoutesByTo {
@@ -77,6 +85,7 @@ export interface FileRoutesByTo {
   '/emergency': typeof EmergencyRoute
   '/integrations': typeof IntegrationsRoute
   '/map': typeof MapRoute
+  '/api/public/monitoring-status': typeof ApiPublicMonitoringStatusRoute
   '/api/public/n8n-chat': typeof ApiPublicN8nChatRoute
 }
 export interface FileRoutesById {
@@ -88,6 +97,7 @@ export interface FileRoutesById {
   '/emergency': typeof EmergencyRoute
   '/integrations': typeof IntegrationsRoute
   '/map': typeof MapRoute
+  '/api/public/monitoring-status': typeof ApiPublicMonitoringStatusRoute
   '/api/public/n8n-chat': typeof ApiPublicN8nChatRoute
 }
 export interface FileRouteTypes {
@@ -100,6 +110,7 @@ export interface FileRouteTypes {
     | '/emergency'
     | '/integrations'
     | '/map'
+    | '/api/public/monitoring-status'
     | '/api/public/n8n-chat'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -110,6 +121,7 @@ export interface FileRouteTypes {
     | '/emergency'
     | '/integrations'
     | '/map'
+    | '/api/public/monitoring-status'
     | '/api/public/n8n-chat'
   id:
     | '__root__'
@@ -120,6 +132,7 @@ export interface FileRouteTypes {
     | '/emergency'
     | '/integrations'
     | '/map'
+    | '/api/public/monitoring-status'
     | '/api/public/n8n-chat'
   fileRoutesById: FileRoutesById
 }
@@ -131,6 +144,7 @@ export interface RootRouteChildren {
   EmergencyRoute: typeof EmergencyRoute
   IntegrationsRoute: typeof IntegrationsRoute
   MapRoute: typeof MapRoute
+  ApiPublicMonitoringStatusRoute: typeof ApiPublicMonitoringStatusRoute
   ApiPublicN8nChatRoute: typeof ApiPublicN8nChatRoute
 }
 
@@ -185,6 +199,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MapRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/monitoring-status': {
+      id: '/api/public/monitoring-status'
+      path: '/api/public/monitoring-status'
+      fullPath: '/api/public/monitoring-status'
+      preLoaderRoute: typeof ApiPublicMonitoringStatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/n8n-chat': {
       id: '/api/public/n8n-chat'
       path: '/api/public/n8n-chat'
@@ -203,6 +224,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmergencyRoute: EmergencyRoute,
   IntegrationsRoute: IntegrationsRoute,
   MapRoute: MapRoute,
+  ApiPublicMonitoringStatusRoute: ApiPublicMonitoringStatusRoute,
   ApiPublicN8nChatRoute: ApiPublicN8nChatRoute,
 }
 export const routeTree = rootRouteImport

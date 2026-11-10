@@ -32,5 +32,6 @@ use the editor.
 ## Monitoring architecture
 - Fetch fixed district coordinates in a public createServerFn with Web fetch and validated DTOs; share TanStack Query options with a 15-minute freshness window across map and dashboard to avoid duplicate provider calls.
 - Keep GloFAS model discharge in m³/s separate from sample flood-risk scores and historical data; never infer gauge depth or danger thresholds from flow.
-- Missing provider values remain null, and aggregates require complete district coverage so unavailable data cannot become fabricated zeroes.
+- Missing provider metrics remain null; aggregates use available districts only with explicit coverage, never treating unavailable values as zero.
+- Cache public provider responses server-side for 15 minutes with per-source in-flight deduplication and short 429 backoff; retain last successes with original timestamps and explicit stale warnings on refresh failures.
 - Use Router dehydrate/hydrate hooks with the existing root Query provider to reuse the same blocking monitoring snapshot on server and client; map tiles use the key-free OpenStreetMap endpoint.
