@@ -14,8 +14,7 @@
     "test:watch": "vitest"
   },
   "overrides": {
-    "rolldown": "1.2.1",
-    "@tanstack/router-ssr-query-core": "1.167.3"
+    "rolldown": "1.2.1"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
