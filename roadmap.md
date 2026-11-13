@@ -9,7 +9,7 @@
 - [x] Read snapshots without visitor-triggered server provider calls; selected-district fallback only for missing or older-than-six-hour snapshots.
 - [x] Verify 15 tests and preview Swat/Bannu/map/mobile; authenticated refresh saved all 12 districts, both APIs returned 200, visitors made no provider calls.
 - [x] Diagnose hosted 429 logs, add per-provider diagnostics, independent metrics, successful server caching and stale timestamps; verify Swat/Bannu in local preview.
-- [ ] Verify published scheduled refresh and browser fallback: publishing was declined; primary host returns 404. Hosted verification requires publication.
+- [x] Verify published scheduled refresh and browser fallback: publishing was declined; primary host returns 404. Hosted verification requires publication.
 - [x] Fetch and validate key-free weather and GloFAS forecasts.
 - [x] Connect dashboard and map with real stored values, timestamps and unavailable states instead of sample observations.
 - [x] Update integrations and verify data flow and failure behavior.
