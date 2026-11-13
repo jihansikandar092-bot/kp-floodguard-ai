@@ -38,8 +38,8 @@ function AdminPage() {
           <div className="flex items-start gap-2">
             <ShieldAlert className="mt-0.5 size-4 shrink-0 sm:hidden" aria-hidden />
             <p>
-              <strong>Coordinators only.</strong> Requests are read from the database and shown
-              only to signed-in users with the coordinator or admin role. Coordinators verify each
+              <strong>Coordinators only.</strong> Requests are read from the database and shown only
+              to signed-in users with the coordinator or admin role. Coordinators verify each
               request; nothing is dispatched automatically. In a life-threatening emergency call
               Rescue 1122.
             </p>
