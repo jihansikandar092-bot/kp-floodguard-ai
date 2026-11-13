@@ -31,8 +31,14 @@ use the editor.
 
 ## Monitoring architecture
 - Read public monitoring_snapshots through createServerFn and shared 15-minute Query options; only authenticated 30-minute scheduled refreshes fetch all fixed district coordinates, avoiding visitor-driven Worker provider requests.
-- Keep GloFAS model discharge in m³/s separate from sample flood-risk scores and historical data; never infer gauge depth or danger thresholds from flow.
+- Keep GloFAS model discharge in m³/s separate from risk estimates and historical records; never infer gauge depth or danger thresholds from flow, because discharge is not gauge depth.
 - Missing provider metrics remain null; aggregates use available districts only with explicit coverage, never treating unavailable values as zero.
 - Scheduled refreshes retry each source at most three total attempts with 2s/4s backoff and 6s timeouts; retain independent last-success metrics/timestamps in the database. Use Request.waitUntil for bounded background completion on Nitro Workers.
 - Direct browser CORS fallback is limited to the selected district with no stored metrics, never persists visitor data, and shares a 15-minute client cache; all stale snapshots must expose their age.
 - Use Router dehydrate/hydrate hooks with the existing root Query provider to reuse the same blocking monitoring snapshot on server and client; map tiles use the key-free OpenStreetMap endpoint.
+
+## Server and access security
+- Server code runs on Cloudflare Workers (workerd, not Node.js): no fs or native modules, read process.env only inside handlers, and do not compress responses; these constraints preserve Worker runtime compatibility.
+- Secrets live only in server environment variables, never in code, docs or browser; this prevents credential disclosure.
+- Enable Row Level Security on every application table; this enforces access control at the database boundary.
+- Store roles in a separate user_roles table and check them server-side with a security-definer has_role() function, never in client storage; this prevents privilege escalation and recursive role-policy checks.
