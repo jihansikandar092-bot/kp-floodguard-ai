@@ -46,7 +46,10 @@ export function mergeSnapshot(
   if (!next.flood && previous?.flood) {
     flood = previous.flood;
     floodUpdatedAt = previous.floodUpdatedAt;
-    retained.push({ metric: "river discharge", since: since("river discharge", previous.floodUpdatedAt) });
+    retained.push({
+      metric: "river discharge",
+      since: since("river discharge", previous.floodUpdatedAt),
+    });
   }
   return {
     ...next,

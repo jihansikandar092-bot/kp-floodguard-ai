@@ -25,7 +25,8 @@ export function useMonitoringFallback(
       if (cached && Date.now() - Date.parse(cached.savedAt) < LIVE_STALE_TIME) return cached;
       const data = await fetchLiveData(fetch, [district]);
       const row = data.districts[0];
-      if (row?.weather || row?.flood) return writeFallbackCache(district.id, data) ?? { savedAt: null, data };
+      if (row?.weather || row?.flood)
+        return writeFallbackCache(district.id, data) ?? { savedAt: null, data };
       // Provider failed: reuse the last good device copy (with its age) rather than nothing.
       return cached ?? { savedAt: null, data };
     },

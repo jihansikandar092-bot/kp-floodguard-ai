@@ -77,7 +77,12 @@ function MapPage() {
               </span>
             </div>
             <div className="relative z-0 h-[460px] md:h-[600px]">
-              <KPMap data={data} districts={DISTRICTS} selectedId={selectedId} onSelect={setSelectedId} />
+              <KPMap
+                data={data}
+                districts={DISTRICTS}
+                selectedId={selectedId}
+                onSelect={setSelectedId}
+              />
             </div>
           </div>
           <aside className="rounded-xl border bg-card p-5 shadow-card" aria-live="polite">

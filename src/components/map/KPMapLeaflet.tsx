@@ -11,7 +11,13 @@ export interface KPMapProps {
   className?: string | undefined;
 }
 
-export default function KPMapLeaflet({ data, districts, selectedId, onSelect, className }: KPMapProps) {
+export default function KPMapLeaflet({
+  data,
+  districts,
+  selectedId,
+  onSelect,
+  className,
+}: KPMapProps) {
   return (
     <MapContainer
       center={[34.0, 71.9]}

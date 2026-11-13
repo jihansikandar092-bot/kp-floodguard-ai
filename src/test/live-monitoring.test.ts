@@ -1,5 +1,4 @@
 import { describe, expect, it, vi } from "vitest";
-import { DISTRICTS } from "@/lib/data/districts";
 import {
   fetchLiveData,
   floodUrl,
@@ -9,6 +8,13 @@ import {
   rainfall24h,
   type WeatherData,
 } from "@/lib/api/live-data";
+
+// Test-only coordinates; production reads the districts table.
+const DISTRICTS = [
+  { id: "swat", name: "Swat", lat: 34.77, lng: 72.36 },
+  { id: "bannu", name: "Bannu", lat: 32.99, lng: 70.6 },
+  { id: "di-khan", name: "Dera Ismail Khan", lat: 31.83, lng: 70.9 },
+];
 
 describe("Live monitoring rules", () => {
   it("reports a 429 with the provider reason without blanking successful weather", async () => {
@@ -21,7 +27,7 @@ describe("Live monitoring rules", () => {
       .fn()
       .mockResolvedValueOnce(Response.json(DISTRICTS.map(() => weather)))
       .mockResolvedValueOnce(Response.json({ reason: "Too Many Requests" }, { status: 429 }));
-    const data = await fetchLiveData(fetcher);
+    const data = await fetchLiveData(fetcher, DISTRICTS);
     expect(liveSnapshot(data, "bannu").totals.temperature).toBe(25.8);
     expect(liveSnapshot(data, "bannu").totals.humidity).toBeNull();
     expect(data.districts[2]?.floodError).toContain("GloFAS returned 429: Too Many Requests");
@@ -41,7 +47,7 @@ describe("Live monitoring rules", () => {
       .mockResolvedValueOnce(
         Response.json(DISTRICTS.map(() => ({ daily: { time: [], river_discharge: [] } }))),
       );
-    const data = await fetchLiveData(fetcher);
+    const data = await fetchLiveData(fetcher, DISTRICTS);
     expect(data.districts[0]?.weather?.current.temperature_2m).toBe(24);
     expect(data.districts[2]?.weather).toBeNull();
     expect(liveSnapshot(data).totals.temperature).toBe(24);
@@ -58,13 +64,14 @@ describe("Live monitoring rules", () => {
         .fn()
         .mockResolvedValueOnce(Response.json(weather))
         .mockResolvedValueOnce(Response.json({ daily: { time: [], river_discharge: [] } })),
+      DISTRICTS.slice(0, 1),
     );
     expect(data.districts[0]?.weather?.current.temperature_2m).toBe(24);
     expect(data.districts[1]?.weather).toBeNull();
   });
   it("uses a 15 minute freshness window", () => expect(LIVE_STALE_TIME).toBe(900000));
   it("requests three past weather days and seven forecast days for every district without keys", () => {
-    const url = weatherUrl();
+    const url = weatherUrl(DISTRICTS);
     expect(url.searchParams.get("past_days")).toBe("3");
     expect(url.searchParams.get("forecast_days")).toBe("7");
     expect(url.searchParams.get("latitude")).toBe(DISTRICTS.map((d) => d.lat).join(","));
@@ -76,7 +83,7 @@ describe("Live monitoring rules", () => {
     expect(url.searchParams.has("apikey")).toBe(false);
   });
   it("requests seven past and seven forecast river discharge days without keys", () => {
-    const url = floodUrl();
+    const url = floodUrl(DISTRICTS);
     expect(url.searchParams.get("past_days")).toBe("7");
     expect(url.searchParams.get("forecast_days")).toBe("7");
     expect(url.searchParams.get("daily")).toBe("river_discharge");
@@ -84,7 +91,7 @@ describe("Live monitoring rules", () => {
   });
   it("never substitutes demo or zero for a failed API", async () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
-    const data = await fetchLiveData(vi.fn().mockRejectedValue(new Error("offline")));
+    const data = await fetchLiveData(vi.fn().mockRejectedValue(new Error("offline")), DISTRICTS);
     expect(data.districts).toHaveLength(DISTRICTS.length);
     expect(data.districts.every((d) => d.weather === null && d.flood === null)).toBe(true);
     expect(liveSnapshot(data).totals).toEqual({
@@ -112,7 +119,7 @@ describe("Live monitoring rules", () => {
       .mockResolvedValueOnce(Response.json(DISTRICTS.map(() => weather)))
       .mockResolvedValueOnce(new Response("Unavailable", { status: 503 }));
     vi.spyOn(console, "error").mockImplementation(() => {});
-    const data = await fetchLiveData(fetcher);
+    const data = await fetchLiveData(fetcher, DISTRICTS);
     const snapshot = liveSnapshot(data, "swat");
     expect(snapshot.totals.temperature).toBe(24);
     expect(snapshot.totals.discharge).toBeNull();
