@@ -64,7 +64,7 @@ describe("Live monitoring rules", () => {
         .fn()
         .mockResolvedValueOnce(Response.json(weather))
         .mockResolvedValueOnce(Response.json({ daily: { time: [], river_discharge: [] } })),
-      DISTRICTS.slice(0, 1),
+      DISTRICTS,
     );
     expect(data.districts[0]?.weather?.current.temperature_2m).toBe(24);
     expect(data.districts[1]?.weather).toBeNull();
