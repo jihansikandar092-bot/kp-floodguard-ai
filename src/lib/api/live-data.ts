@@ -24,18 +24,19 @@ export interface LiveDistrict {
   floodError?: string | null;
 }
 export interface RequestDiagnostic { source: string; url: string; status: number | null; bodyPreview: string; error: string | null; cached: boolean }
-export interface LiveMonitoring { districts: LiveDistrict[]; fetchedAt: string; diagnostics?: RequestDiagnostic[]; origin?: "snapshot" | "browser" }
+export interface LiveMonitoring { districts: LiveDistrict[]; fetchedAt: string; referenceCount?: number; diagnostics?: RequestDiagnostic[]; origin?: "snapshot" | "browser" }
 
 export const storedDistrictSchema = z.object({ id: z.string(), weather: weatherSchema.nullable(), flood: floodSchema.nullable(), weatherUpdatedAt: z.string().nullable(), floodUpdatedAt: z.string().nullable(), weatherError: z.string().nullable().optional(), floodError: z.string().nullable().optional() });
 
-export function weatherUrl(districts = DISTRICTS) {
-  const url = new URL("https://api.open-meteo.com/v1/forecast");
+export function weatherUrl(districts = DISTRICTS, config?: { baseUrl?: string | undefined; apiKey?: string | undefined }) {
+  const url = new URL("/v1/forecast", config?.baseUrl ?? "https://api.open-meteo.com");
   url.search = new URLSearchParams({
     latitude: districts.map(d => d.lat).join(","), longitude: districts.map(d => d.lng).join(","),
     current: "temperature_2m,relative_humidity_2m,wind_speed_10m",
     hourly: "precipitation,temperature_2m,relative_humidity_2m,wind_speed_10m",
     daily: "precipitation_sum", past_days: "3", forecast_days: "7", timezone: "Asia/Karachi",
   }).toString();
+  if (config?.apiKey) url.searchParams.set("apikey", config.apiKey);
   return url;
 }
 export function floodUrl(districts = DISTRICTS) {
@@ -45,21 +46,23 @@ export function floodUrl(districts = DISTRICTS) {
 }
 
 // Public, fixed-coordinate reads only. No credentials, user input, or Node APIs.
-export async function fetchLiveData(fetcher: typeof fetch = fetch, districts = DISTRICTS): Promise<LiveMonitoring> {
+export async function fetchLiveData(fetcher: typeof fetch = fetch, districts = DISTRICTS, config?: { baseUrl?: string | undefined; apiKey?: string | undefined }): Promise<LiveMonitoring> {
   const diagnostics: RequestDiagnostic[] = [];
   async function request(url: URL, source: string): Promise<{ values: unknown[]; error: string | null; updatedAt: string | null }> {
-    const diagnostic: RequestDiagnostic = { source, url: url.toString(), status: null, bodyPreview: "", error: null, cached: false };
+    const safeUrl = new URL(url);
+    safeUrl.searchParams.delete("apikey");
+    const diagnostic: RequestDiagnostic = { source, url: safeUrl.toString(), status: null, bodyPreview: "", error: null, cached: false };
     diagnostics.push(diagnostic);
     try {
       const response = await fetcher(url, { signal: AbortSignal.timeout(20000) });
       diagnostic.status = response.status;
       diagnostic.cached = response.headers.get("x-monitoring-cache") === "hit";
       const body = await response.text();
-      diagnostic.bodyPreview = body.slice(0, 300);
+      diagnostic.bodyPreview = (config?.apiKey ? body.replaceAll(config.apiKey, "[redacted]") : body).slice(0, 300);
       console.info("Monitoring response", JSON.stringify(diagnostic));
       if (!response.ok) {
         let reason = "";
-        try { const parsed = JSON.parse(body); if (typeof parsed.reason === "string") reason = `: ${parsed.reason.slice(0, 180)}`; } catch { /* Non-JSON provider error */ }
+        try { const parsed = JSON.parse(diagnostic.bodyPreview); if (typeof parsed.reason === "string") reason = `: ${parsed.reason.slice(0, 180)}`; } catch { /* Non-JSON provider error */ }
         throw new Error(`${source} returned ${response.status}${reason}`);
       }
       const json: unknown = JSON.parse(body);
@@ -70,7 +73,7 @@ export async function fetchLiveData(fetcher: typeof fetch = fetch, districts = D
       return { values: [], error: diagnostic.error, updatedAt: null };
     }
   }
-  const [weather, flood] = await Promise.all([request(weatherUrl(districts), "Open-Meteo"), request(floodUrl(districts), "GloFAS")]);
+  const [weather, flood] = await Promise.all([request(weatherUrl(districts, config), "Open-Meteo"), request(floodUrl(districts), "GloFAS")]);
   const fetchedAt = new Date().toISOString();
   return { fetchedAt, diagnostics, districts: districts.map((d, index) => {
     const w = weatherSchema.safeParse(weather.values[index]);
