@@ -1,13 +1,15 @@
 # Live monitoring
-- [ ] Add district reference storage, monitoring run history and service health without replacing working snapshots.
-- [ ] Stop retries on 429, support optional paid weather configuration, and verify retention and six-hour fallback rules.
-- [ ] Remove invented observations, alerts, historical series and seeded requests; connect landing numbers to stored readings.
-- [ ] Resolve lint findings, run tests, check automatic type/build results, and verify preview and published monitoring flows.
+- [x] Add district reference storage, monitoring run history and service health; verified 12 districts, 12 snapshots and 1 successful run.
+- [x] Stop retries on 429, support optional paid weather configuration, and verify retention and six-hour fallback rules in 19 passing tests.
+- [x] Remove invented observations, six alerts, generated historical series and seven seeded requests; connect landing numbers to stored readings.
+- [x] Resolve authored-code lint findings; verify automatic build OK and seven preview pages with no browser errors.
+- [ ] Separate type-check evidence: running server does not expose a type-check service; manual project typechecks are platform-managed.
+- [ ] Complete unknown district Pashto translations, region and ARDC classification: await verified reference information, currently null.
 - [x] Store independent successful monitoring snapshots and refresh every 30 minutes with bounded retries.
-- [x] Read snapshots without visitor-triggered server provider calls; selected-district browser fallback only without snapshots.
+- [x] Read snapshots without visitor-triggered server provider calls; selected-district fallback only for missing or older-than-six-hour snapshots.
 - [x] Verify 15 tests and preview Swat/Bannu/map/mobile; authenticated refresh saved all 12 districts, both APIs returned 200, visitors made no provider calls.
 - [x] Diagnose hosted 429 logs, add per-provider diagnostics, independent metrics, successful server caching and stale timestamps; verify Swat/Bannu in local preview.
-- [ ] Verify published scheduled refresh and browser fallback: blocked by no published deployment (project URL tool reports published_url null; primary host returns 404 "No published build"). Publish is required before hosted verification.
+- [ ] Verify published scheduled refresh and browser fallback: publishing was declined; primary host returns 404. Hosted verification requires publication.
 - [x] Fetch and validate key-free weather and GloFAS forecasts.
-- [x] Connect dashboard and map with honest live/sample labels and unavailable states.
+- [x] Connect dashboard and map with real stored values, timestamps and unavailable states instead of sample observations.
 - [x] Update integrations and verify data flow and failure behavior.
