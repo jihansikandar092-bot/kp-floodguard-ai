@@ -38,10 +38,10 @@ function AdminPage() {
           <div className="flex items-start gap-2">
             <ShieldAlert className="mt-0.5 size-4 shrink-0 sm:hidden" aria-hidden />
             <p>
-              <strong>Coordinator preview.</strong> Rows marked LOCAL were submitted from this
-              browser. No sample requests are provided. Coordinator sign-in and the shared Google
-              Sheets database are not connected yet, so status changes are saved on this device
-              only.
+              <strong>Coordinators only.</strong> Requests are read from the database and shown
+              only to signed-in users with the coordinator or admin role. Coordinators verify each
+              request; nothing is dispatched automatically. In a life-threatening emergency call
+              Rescue 1122.
             </p>
           </div>
         </DemoBanner>

@@ -18,24 +18,55 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { DemoBadge } from "@/components/site/Demo";
 import { useQuery } from "@tanstack/react-query";
 import { districtListOptions } from "@/lib/api/district-query";
 import {
   EMERGENCY_TYPES,
   EMERGENCY_TYPE_LABEL,
   REQUEST_STATUSES,
+  STATUS_BADGE,
   STATUS_LABEL,
   type EmergencyRequest,
   type RequestStatus,
 } from "@/lib/emergency";
-import { updateRequestStatus, useEmergencyRequests } from "@/lib/api/requests";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { listEmergencyRequests, updateEmergencyStatus } from "@/lib/api/requests.functions";
+import { useCoordinator } from "@/lib/api/use-coordinator";
 
 import { formatPkt, filterRequests } from "@/lib/request-display";
 const ALL = "all";
 
 export function RequestsTable() {
-  const requests = useEmergencyRequests();
+  const { signedIn, checking } = useCoordinator();
+  const listFn = useServerFn(listEmergencyRequests);
+  const list = useQuery({
+    queryKey: ["emergency-requests"],
+    queryFn: () => listFn(),
+    enabled: signedIn === true,
+    retry: false,
+  });
+  if (checking || (signedIn && list.isLoading))
+    return <Blocked text="Checking coordinator access…" />;
+  if (!signedIn)
+    return (
+      <Blocked text="Coordinator sign-in required. Emergency requests are visible only to verified coordinators." />
+    );
+  if (list.isError) return <Blocked text="Requests temporarily unavailable." />;
+  if (!list.data?.authorized)
+    return <Blocked text="Your account does not have the coordinator role. Access denied." />;
+  return <RequestsView requests={list.data.requests} />;
+}
+
+function Blocked({ text }: { text: string }) {
+  return (
+    <p role="status" className="rounded-xl border bg-card p-10 text-center text-sm text-muted-foreground shadow-card">
+      {text}
+    </p>
+  );
+}
+
+function RequestsView({ requests }: { requests: EmergencyRequest[] }) {
   const [district, setDistrict] = useState(ALL);
   const [type, setType] = useState(ALL);
   const [status, setStatus] = useState(ALL);
@@ -60,12 +91,18 @@ export function RequestsTable() {
     return c;
   }, [requests]);
 
-  const changeStatus = (r: EmergencyRequest, s: RequestStatus) => {
-    updateRequestStatus(r.id, s);
-    toast.success(`${r.id} marked “${STATUS_LABEL[s]}”`, {
-      description: "Saved on this device (preview mode).",
-    });
-  };
+  const qc = useQueryClient();
+  const updateFn = useServerFn(updateEmergencyStatus);
+  const mutation = useMutation({
+    mutationFn: (v: { r: EmergencyRequest; s: RequestStatus }) =>
+      updateFn({ data: { id: v.r.id, status: v.s } }),
+    onSuccess: (_d, v) => {
+      toast.success(`${v.r.code} marked “${STATUS_LABEL[v.s]}”`);
+      void qc.invalidateQueries({ queryKey: ["emergency-requests"] });
+    },
+    onError: () => toast.error("Status could not be updated"),
+  });
+  const changeStatus = (r: EmergencyRequest, s: RequestStatus) => mutation.mutate({ r, s });
 
   return (
     <div className="space-y-6">
@@ -78,7 +115,7 @@ export function RequestsTable() {
             aria-pressed={status === s}
             className="rounded-xl border bg-card p-4 text-left shadow-card transition-colors hover:border-primary aria-pressed:border-primary aria-pressed:ring-1 aria-pressed:ring-primary"
           >
-            <Badge variant={s}>{STATUS_LABEL[s]}</Badge>
+            <Badge variant={STATUS_BADGE[s]}>{STATUS_LABEL[s]}</Badge>
             <p className="mt-3 font-mono text-3xl font-bold">{counts[s]}</p>
             <p className="text-xs text-muted-foreground">requests</p>
           </button>
@@ -150,10 +187,12 @@ export function RequestsTable() {
               {rows.map((r) => (
                 <TableRow key={r.id} className="align-top">
                   <TableCell className="font-mono text-xs font-semibold">
-                    {r.id}
-                    <div className="mt-1">
-                      {r.source === "demo" ? <DemoBadge /> : <DemoBadge label="LOCAL" />}
-                    </div>
+                    {r.code}
+                    {r.isTest && (
+                      <div className="mt-1">
+                        <Badge variant="outline">TEST</Badge>
+                      </div>
+                    )}
                   </TableCell>
                   <TableCell className="whitespace-nowrap text-xs">
                     {formatPkt(r.createdAt)}
@@ -177,7 +216,7 @@ export function RequestsTable() {
                     {r.description}
                   </TableCell>
                   <TableCell>
-                    <StatusSelect value={r.status} onChange={(s) => changeStatus(r, s)} id={r.id} />
+                    <StatusSelect value={r.status} onChange={(s) => changeStatus(r, s)} id={r.code} />
                   </TableCell>
                 </TableRow>
               ))}
@@ -191,11 +230,11 @@ export function RequestsTable() {
             <li key={r.id} className="space-y-3 p-4">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="font-mono text-sm font-semibold">{r.id}</p>
+                  <p className="font-mono text-sm font-semibold">{r.code}</p>
                   <p className="text-xs text-muted-foreground">{formatPkt(r.createdAt)}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  {r.source === "demo" ? <DemoBadge /> : <DemoBadge label="LOCAL" />}
+                  {r.isTest && <Badge variant="outline">TEST</Badge>}
                   <TypeBadge type={r.type} />
                 </div>
               </div>
@@ -221,7 +260,7 @@ export function RequestsTable() {
               <StatusSelect
                 value={r.status}
                 onChange={(s) => changeStatus(r, s)}
-                id={`m-${r.id}`}
+                id={`m-${r.code}`}
               />
             </li>
           ))}
