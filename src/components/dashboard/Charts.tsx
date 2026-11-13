@@ -16,7 +16,12 @@ import {
 } from "recharts";
 import { RISK_COLOR_VAR, type RiskLevel } from "@/lib/data/districts";
 
-const axis = { stroke: "var(--muted-foreground)", fontSize: 11, tickLine: false, axisLine: false } as const;
+const axis = {
+  stroke: "var(--muted-foreground)",
+  fontSize: 11,
+  tickLine: false,
+  axisLine: false,
+} as const;
 const tooltipStyle = {
   contentStyle: {
     background: "var(--card)",
@@ -42,7 +47,13 @@ export function RainfallChart({ data }: { data: { day: string; rainfall: number 
         <XAxis dataKey="day" {...axis} />
         <YAxis {...axis} unit=" mm" width={56} />
         <Tooltip {...tooltipStyle} formatter={(v: number) => [`${v} mm`, "Rainfall (mm)"]} />
-        <Area type="monotone" dataKey="rainfall" stroke="var(--water)" strokeWidth={2.5} fill="url(#rainFill)" />
+        <Area
+          type="monotone"
+          dataKey="rainfall"
+          stroke="var(--water)"
+          strokeWidth={2.5}
+          fill="url(#rainFill)"
+        />
       </AreaChart>
     </ResponsiveContainer>
   );
@@ -56,7 +67,13 @@ export function RiverChart({ data }: { data: { day: string; discharge: number | 
         <XAxis dataKey="day" {...axis} />
         <YAxis {...axis} unit=" m³/s" width={85} domain={[0, "auto"]} />
         <Tooltip {...tooltipStyle} formatter={(v: number) => [`${v} m³/s`, "River discharge"]} />
-        <Line type="monotone" dataKey="discharge" stroke="var(--water)" strokeWidth={2.5} dot={{ r: 3, fill: "var(--water)" }} />
+        <Line
+          type="monotone"
+          dataKey="discharge"
+          stroke="var(--water)"
+          strokeWidth={2.5}
+          dot={{ r: 3, fill: "var(--water)" }}
+        />
       </LineChart>
     </ResponsiveContainer>
   );
@@ -69,10 +86,17 @@ export function HistoricalChart({ data }: { data: { year: string; events: number
         <CartesianGrid stroke="var(--border)" vertical={false} />
         <XAxis dataKey="year" {...axis} interval={1} />
         <YAxis {...axis} allowDecimals={false} />
-        <Tooltip {...tooltipStyle} cursor={{ fill: "var(--muted)" }} formatter={(v: number) => [v, "Flood events (illustrative)"]} />
+        <Tooltip
+          {...tooltipStyle}
+          cursor={{ fill: "var(--muted)" }}
+          formatter={(v: number) => [v, "Flood events (illustrative)"]}
+        />
         <Bar dataKey="events" radius={[4, 4, 0, 0]}>
           {data.map((d) => (
-            <Cell key={d.year} fill={d.year === "2010" || d.year === "2022" ? "var(--emergency)" : "var(--navy)"} />
+            <Cell
+              key={d.year}
+              fill={d.year === "2010" || d.year === "2022" ? "var(--emergency)" : "var(--navy)"}
+            />
           ))}
         </Bar>
       </BarChart>
@@ -93,7 +117,11 @@ export function RiskComparisonChart({
         <CartesianGrid stroke="var(--border)" horizontal={false} />
         <XAxis type="number" domain={[0, 100]} {...axis} />
         <YAxis type="category" dataKey="name" {...axis} width={110} />
-        <Tooltip {...tooltipStyle} cursor={{ fill: "var(--muted)" }} formatter={(v: number) => [`${v}/100`, "Risk score (demo)"]} />
+        <Tooltip
+          {...tooltipStyle}
+          cursor={{ fill: "var(--muted)" }}
+          formatter={(v: number) => [`${v}/100`, "Risk score (demo)"]}
+        />
         <Bar dataKey="score" radius={[0, 4, 4, 0]} barSize={14}>
           {data.map((d) => (
             <Cell
@@ -108,12 +136,25 @@ export function RiskComparisonChart({
   );
 }
 
-export function RiskDistributionChart({ data }: { data: { level: RiskLevel; name: string; value: number }[] }) {
+export function RiskDistributionChart({
+  data,
+}: {
+  data: { level: RiskLevel; name: string; value: number }[];
+}) {
   return (
     <ResponsiveContainer width="100%" height="100%">
       <PieChart>
         <Tooltip {...tooltipStyle} formatter={(v: number, n: string) => [`${v} districts`, n]} />
-        <Pie data={data} dataKey="value" nameKey="name" innerRadius="58%" outerRadius="88%" paddingAngle={3} stroke="var(--card)" strokeWidth={2}>
+        <Pie
+          data={data}
+          dataKey="value"
+          nameKey="name"
+          innerRadius="58%"
+          outerRadius="88%"
+          paddingAngle={3}
+          stroke="var(--card)"
+          strokeWidth={2}
+        >
           {data.map((d) => (
             <Cell key={d.level} fill={RISK_COLOR_VAR[d.level]} />
           ))}

@@ -3,8 +3,21 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { DemoBadge } from "@/components/site/Demo";
 import { DISTRICTS } from "@/lib/data/districts";
 import {
@@ -17,32 +30,8 @@ import {
 } from "@/lib/emergency";
 import { updateRequestStatus, useEmergencyRequests } from "@/lib/api/requests";
 
-const fmt = new Intl.DateTimeFormat("en-GB", {
-  timeZone: "Asia/Karachi",
-  day: "2-digit",
-  month: "short",
-  year: "numeric",
-  hour: "2-digit",
-  minute: "2-digit",
-  hour12: false,
-});
-export const formatPkt = (iso: string) => `${fmt.format(new Date(iso))} PKT`;
-
+import { formatPkt, filterRequests } from "@/lib/request-display";
 const ALL = "all";
-
-export function filterRequests(
-  list: EmergencyRequest[],
-  f: { district: string; type: string; status: string; q: string },
-) {
-  const q = f.q.trim().toLowerCase();
-  return list.filter(
-    (r) =>
-      (f.district === ALL || r.district === f.district) &&
-      (f.type === ALL || r.type === f.type) &&
-      (f.status === ALL || r.status === f.status) &&
-      (!q || r.id.toLowerCase().includes(q) || r.fullName.toLowerCase().includes(q) || r.location.toLowerCase().includes(q)),
-  );
-}
 
 export function RequestsTable() {
   const requests = useEmergencyRequests();
@@ -52,10 +41,16 @@ export function RequestsTable() {
   const [q, setQ] = useState("");
 
   const districtOptions = useMemo(
-    () => Array.from(new Set([...DISTRICTS.map((d) => d.name), ...requests.map((r) => r.district)])).sort(),
+    () =>
+      Array.from(
+        new Set([...DISTRICTS.map((d) => d.name), ...requests.map((r) => r.district)]),
+      ).sort(),
     [requests],
   );
-  const rows = useMemo(() => filterRequests(requests, { district, type, status, q }), [requests, district, type, status, q]);
+  const rows = useMemo(
+    () => filterRequests(requests, { district, type, status, q }),
+    [requests, district, type, status, q],
+  );
 
   const counts = useMemo(() => {
     const c: Record<RequestStatus, number> = { pending: 0, review: 0, progress: 0, resolved: 0 };
@@ -65,7 +60,9 @@ export function RequestsTable() {
 
   const changeStatus = (r: EmergencyRequest, s: RequestStatus) => {
     updateRequestStatus(r.id, s);
-    toast.success(`${r.id} marked “${STATUS_LABEL[s]}”`, { description: "Saved on this device (preview mode)." });
+    toast.success(`${r.id} marked “${STATUS_LABEL[s]}”`, {
+      description: "Saved on this device (preview mode).",
+    });
   };
 
   return (
@@ -89,13 +86,40 @@ export function RequestsTable() {
       <div className="rounded-xl border bg-card shadow-card">
         <div className="flex flex-col gap-3 border-b p-4 lg:flex-row lg:items-center">
           <div className="relative flex-1">
-            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
-            <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search ID, name or location" className="pl-9" aria-label="Search requests" />
+            <Search
+              className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+              aria-hidden
+            />
+            <Input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Search ID, name or location"
+              className="pl-9"
+              aria-label="Search requests"
+            />
           </div>
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 lg:w-[540px]">
-            <FilterSelect label="District" value={district} onChange={setDistrict} options={districtOptions.map((d) => ({ value: d, label: d }))} />
-            <FilterSelect label="Emergency type" value={type} onChange={setType} options={EMERGENCY_TYPES.map((t) => ({ value: t, label: EMERGENCY_TYPE_LABEL[t].en }))} />
-            <FilterSelect label="Status" value={status} onChange={setStatus} options={REQUEST_STATUSES.map((s) => ({ value: s, label: STATUS_LABEL[s] }))} />
+            <FilterSelect
+              label="District"
+              value={district}
+              onChange={setDistrict}
+              options={districtOptions.map((d) => ({ value: d, label: d }))}
+            />
+            <FilterSelect
+              label="Emergency type"
+              value={type}
+              onChange={setType}
+              options={EMERGENCY_TYPES.map((t) => ({
+                value: t,
+                label: EMERGENCY_TYPE_LABEL[t].en,
+              }))}
+            />
+            <FilterSelect
+              label="Status"
+              value={status}
+              onChange={setStatus}
+              options={REQUEST_STATUSES.map((s) => ({ value: s, label: STATUS_LABEL[s] }))}
+            />
           </div>
         </div>
 
@@ -125,17 +149,34 @@ export function RequestsTable() {
                 <TableRow key={r.id} className="align-top">
                   <TableCell className="font-mono text-xs font-semibold">
                     {r.id}
-                    <div className="mt-1">{r.source === "demo" ? <DemoBadge /> : <DemoBadge label="LOCAL" />}</div>
+                    <div className="mt-1">
+                      {r.source === "demo" ? <DemoBadge /> : <DemoBadge label="LOCAL" />}
+                    </div>
                   </TableCell>
-                  <TableCell className="whitespace-nowrap text-xs">{formatPkt(r.createdAt)}</TableCell>
+                  <TableCell className="whitespace-nowrap text-xs">
+                    {formatPkt(r.createdAt)}
+                  </TableCell>
                   <TableCell className="font-medium">{r.fullName}</TableCell>
-                  <TableCell className="font-mono text-xs"><a href={`tel:${r.phone}`} className="hover:underline">{r.phone}</a></TableCell>
-                  <TableCell>{r.district}<div className="text-xs text-muted-foreground">{r.tehsil}</div></TableCell>
+                  <TableCell className="font-mono text-xs">
+                    <a href={`tel:${r.phone}`} className="hover:underline">
+                      {r.phone}
+                    </a>
+                  </TableCell>
+                  <TableCell>
+                    {r.district}
+                    <div className="text-xs text-muted-foreground">{r.tehsil}</div>
+                  </TableCell>
                   <TableCell className="max-w-[180px] text-xs">{r.location}</TableCell>
-                  <TableCell><TypeBadge type={r.type} /></TableCell>
+                  <TableCell>
+                    <TypeBadge type={r.type} />
+                  </TableCell>
                   <TableCell className="text-right font-mono">{r.peopleAffected}</TableCell>
-                  <TableCell className="max-w-[220px] text-xs text-muted-foreground">{r.description}</TableCell>
-                  <TableCell><StatusSelect value={r.status} onChange={(s) => changeStatus(r, s)} id={r.id} /></TableCell>
+                  <TableCell className="max-w-[220px] text-xs text-muted-foreground">
+                    {r.description}
+                  </TableCell>
+                  <TableCell>
+                    <StatusSelect value={r.status} onChange={(s) => changeStatus(r, s)} id={r.id} />
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -158,19 +199,36 @@ export function RequestsTable() {
               </div>
               <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
                 <Item k="Name" v={r.fullName} />
-                <Item k="Phone" v={<a href={`tel:${r.phone}`} className="font-mono underline">{r.phone}</a>} />
+                <Item
+                  k="Phone"
+                  v={
+                    <a href={`tel:${r.phone}`} className="font-mono underline">
+                      {r.phone}
+                    </a>
+                  }
+                />
                 <Item k="District / Tehsil" v={`${r.district} · ${r.tehsil}`} />
                 <Item k="People affected" v={r.peopleAffected} />
-                <div className="col-span-2"><Item k="Exact location" v={r.location} /></div>
-                <div className="col-span-2"><Item k="Description" v={r.description} /></div>
+                <div className="col-span-2">
+                  <Item k="Exact location" v={r.location} />
+                </div>
+                <div className="col-span-2">
+                  <Item k="Description" v={r.description} />
+                </div>
               </dl>
-              <StatusSelect value={r.status} onChange={(s) => changeStatus(r, s)} id={`m-${r.id}`} />
+              <StatusSelect
+                value={r.status}
+                onChange={(s) => changeStatus(r, s)}
+                id={`m-${r.id}`}
+              />
             </li>
           ))}
         </ul>
 
         {rows.length === 0 && (
-          <p className="p-10 text-center text-sm text-muted-foreground">No requests match these filters.</p>
+          <p className="p-10 text-center text-sm text-muted-foreground">
+            No requests match these filters.
+          </p>
         )}
       </div>
     </div>
@@ -188,10 +246,22 @@ function Item({ k, v }: { k: string; v: React.ReactNode }) {
 
 function TypeBadge({ type }: { type: EmergencyRequest["type"] }) {
   const urgent = type === "rescue" || type === "medical";
-  return <Badge variant={urgent ? "high" : "outline"} className="whitespace-nowrap">{EMERGENCY_TYPE_LABEL[type].en}</Badge>;
+  return (
+    <Badge variant={urgent ? "high" : "outline"} className="whitespace-nowrap">
+      {EMERGENCY_TYPE_LABEL[type].en}
+    </Badge>
+  );
 }
 
-function StatusSelect({ value, onChange, id }: { value: RequestStatus; onChange: (s: RequestStatus) => void; id: string }) {
+function StatusSelect({
+  value,
+  onChange,
+  id,
+}: {
+  value: RequestStatus;
+  onChange: (s: RequestStatus) => void;
+  id: string;
+}) {
   return (
     <Select value={value} onValueChange={(v) => onChange(v as RequestStatus)}>
       <SelectTrigger className="h-8 w-[140px] text-xs" aria-label={`Status for ${id}`}>
@@ -199,7 +269,9 @@ function StatusSelect({ value, onChange, id }: { value: RequestStatus; onChange:
       </SelectTrigger>
       <SelectContent>
         {REQUEST_STATUSES.map((s) => (
-          <SelectItem key={s} value={s} className="text-xs">{STATUS_LABEL[s]}</SelectItem>
+          <SelectItem key={s} value={s} className="text-xs">
+            {STATUS_LABEL[s]}
+          </SelectItem>
         ))}
       </SelectContent>
     </Select>
@@ -225,7 +297,9 @@ function FilterSelect({
       <SelectContent>
         <SelectItem value={ALL}>All · {label}</SelectItem>
         {options.map((o) => (
-          <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+          <SelectItem key={o.value} value={o.value}>
+            {o.label}
+          </SelectItem>
         ))}
       </SelectContent>
     </Select>

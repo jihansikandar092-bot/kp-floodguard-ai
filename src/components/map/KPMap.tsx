@@ -24,19 +24,5 @@ export function KPMap(props: KPMapProps) {
 }
 
 export function MapLegend() {
-  const items = [
-    { level: "low", label: "Low Risk" },
-    { level: "medium", label: "Medium Risk" },
-    { level: "high", label: "High Risk" },
-  ] as const;
-  return (
-    <ul className="flex flex-wrap gap-x-4 gap-y-2 text-xs font-medium" aria-label="Risk legend">
-      {items.map((i) => (
-        <li key={i.level} className="inline-flex items-center gap-1.5">
-          <span className="size-3 rounded-full ring-2 ring-background" style={{ background: `var(--risk-${i.level})` }} aria-hidden />
-          {i.label}
-        </li>
-      ))}
-    </ul>
-  );
+  return <p className="text-xs text-muted-foreground">District monitoring · Risk: Not available</p>;
 }

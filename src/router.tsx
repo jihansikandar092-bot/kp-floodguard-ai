@@ -13,7 +13,9 @@ export const getRouter = () => {
     // Lets Query own freshness; set caching defaults on the QueryClient, not the router.
     defaultPreloadStaleTime: 0,
     dehydrate: () => ({ queryState: JSON.stringify(dehydrate(queryClient)) }),
-    hydrate: (state) => { hydrate(queryClient, JSON.parse(state.queryState)); },
+    hydrate: (state) => {
+      hydrate(queryClient, JSON.parse(state.queryState));
+    },
   });
 
   return router;

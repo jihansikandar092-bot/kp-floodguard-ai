@@ -10,18 +10,34 @@ export const Route = createFileRoute("/integrations")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { title: "Integrations & Architecture — KP FloodGuard AI" },
-      { name: "description", content: "Planned data and AI integrations for KP FloodGuard AI: Open-Meteo, GloFAS, ML prediction API, OpenAI, Retell AI, n8n and Google Sheets." },
+      {
+        name: "description",
+        content:
+          "Planned data and AI integrations for KP FloodGuard AI: Open-Meteo, GloFAS, ML prediction API, OpenAI, Retell AI, n8n and Google Sheets.",
+      },
       { property: "og:title", content: "Integrations & Architecture — KP FloodGuard AI" },
-      { property: "og:description", content: "How weather, river, ML and AI services plug into the platform." },
+      {
+        property: "og:description",
+        content: "How weather, river, ML and AI services plug into the platform.",
+      },
     ],
   }),
   component: IntegrationsPage,
 });
 
 const FLOW = [
-  { title: "Data sources", items: ["Open-Meteo weather", "GloFAS river discharge", "Historical flood records"] },
-  { title: "Intelligence", items: ["Python ML risk model", "OpenAI emergency chatbot", "Retell AI voice agent"] },
-  { title: "Action", items: ["Dashboard & map", "n8n request routing", "Google Sheets coordination"] },
+  {
+    title: "Data sources",
+    items: ["Open-Meteo weather", "GloFAS river discharge", "Historical flood records"],
+  },
+  {
+    title: "Intelligence",
+    items: ["Python ML risk model", "OpenAI emergency chatbot", "Retell AI voice agent"],
+  },
+  {
+    title: "Action",
+    items: ["Dashboard & map", "n8n request routing", "Google Sheets coordination"],
+  },
 ];
 
 function IntegrationsPage() {
@@ -34,7 +50,9 @@ function IntegrationsPage() {
       />
       <div className="container-page space-y-12 py-10">
         <section aria-labelledby="flow">
-          <h2 id="flow" className="text-xl font-bold">Data flow</h2>
+          <h2 id="flow" className="text-xl font-bold">
+            Data flow
+          </h2>
           <div className="mt-5 grid gap-4 md:grid-cols-3">
             {FLOW.map((col, i) => (
               <div key={col.title} className="relative rounded-xl border bg-card p-5 shadow-card">
@@ -42,11 +60,16 @@ function IntegrationsPage() {
                 <h3 className="mt-1 text-lg font-bold">{col.title}</h3>
                 <ul className="mt-4 space-y-2">
                   {col.items.map((it) => (
-                    <li key={it} className="rounded-md bg-muted px-3 py-2 text-sm font-medium">{it}</li>
+                    <li key={it} className="rounded-md bg-muted px-3 py-2 text-sm font-medium">
+                      {it}
+                    </li>
                   ))}
                 </ul>
                 {i < FLOW.length - 1 && (
-                  <ArrowDown className="absolute -bottom-5 left-1/2 size-5 -translate-x-1/2 text-muted-foreground md:hidden" aria-hidden />
+                  <ArrowDown
+                    className="absolute -bottom-5 left-1/2 size-5 -translate-x-1/2 text-muted-foreground md:hidden"
+                    aria-hidden
+                  />
                 )}
               </div>
             ))}
@@ -54,14 +77,24 @@ function IntegrationsPage() {
         </section>
 
         <section aria-labelledby="services">
-          <h2 id="services" className="text-xl font-bold">Services</h2>
+          <h2 id="services" className="text-xl font-bold">
+            Services
+          </h2>
           <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {INTEGRATIONS.map((i) => (
-              <article key={i.id} className="flex flex-col rounded-xl border bg-card p-5 shadow-card">
+              <article
+                key={i.id}
+                className="flex flex-col rounded-xl border bg-card p-5 shadow-card"
+              >
                 <div className="flex items-start justify-between gap-3">
                   <h3 className="font-bold">{i.name}</h3>
                   <Badge variant="pending" className="shrink-0 gap-1">
-                    {i.status === "connected" ? <CircleCheck className="size-3" aria-hidden /> : <CircleDashed className="size-3" aria-hidden />} {i.status === "connected" ? "Connected" : "Not connected"}
+                    {i.status === "connected" ? (
+                      <CircleCheck className="size-3" aria-hidden />
+                    ) : (
+                      <CircleDashed className="size-3" aria-hidden />
+                    )}{" "}
+                    {i.status === "connected" ? "Connected" : "Not connected"}
                   </Badge>
                 </div>
                 <p className="mt-2 text-sm text-muted-foreground">{i.purpose}</p>

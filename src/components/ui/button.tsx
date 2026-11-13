@@ -20,7 +20,8 @@ const buttonVariants = cva(
           "bg-emergency text-emergency-foreground shadow-sm hover:bg-emergency/90 font-semibold",
         "on-navy":
           "border border-navy-foreground/30 bg-transparent text-navy-foreground hover:bg-navy-foreground/10",
-        "navy-solid": "bg-navy-foreground text-navy-deep shadow-sm hover:bg-navy-foreground/90 font-semibold",
+        "navy-solid":
+          "bg-navy-foreground text-navy-deep shadow-sm hover:bg-navy-foreground/90 font-semibold",
       },
       size: {
         default: "h-9 px-4 py-2",

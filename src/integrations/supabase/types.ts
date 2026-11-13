@@ -14,21 +14,125 @@ export type Database = {
   }
   public: {
     Tables: {
+      districts: {
+        Row: {
+          id: string
+          is_ardc: boolean | null
+          lat: number
+          lng: number
+          name_en: string
+          name_ps: string | null
+          name_ur: string
+          region: string | null
+          slug: string
+        }
+        Insert: {
+          id: string
+          is_ardc?: boolean | null
+          lat: number
+          lng: number
+          name_en: string
+          name_ps?: string | null
+          name_ur: string
+          region?: string | null
+          slug: string
+        }
+        Update: {
+          id?: string
+          is_ardc?: boolean | null
+          lat?: number
+          lng?: number
+          name_en?: string
+          name_ps?: string | null
+          name_ur?: string
+          region?: string | null
+          slug?: string
+        }
+        Relationships: []
+      }
+      monitoring_runs: {
+        Row: {
+          districts_failed: number
+          districts_ok: number
+          error_text: string | null
+          finished_at: string | null
+          http_status: Json
+          id: string
+          started_at: string
+          status: string
+        }
+        Insert: {
+          districts_failed?: number
+          districts_ok?: number
+          error_text?: string | null
+          finished_at?: string | null
+          http_status?: Json
+          id?: string
+          started_at?: string
+          status?: string
+        }
+        Update: {
+          districts_failed?: number
+          districts_ok?: number
+          error_text?: string | null
+          finished_at?: string | null
+          http_status?: Json
+          id?: string
+          started_at?: string
+          status?: string
+        }
+        Relationships: []
+      }
       monitoring_snapshots: {
         Row: {
           district: string
+          district_id: string | null
           fetched_at: string
+          id: string
           metrics: Json
         }
         Insert: {
           district: string
+          district_id?: string | null
           fetched_at?: string
+          id?: string
           metrics?: Json
         }
         Update: {
           district?: string
+          district_id?: string | null
           fetched_at?: string
+          id?: string
           metrics?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "monitoring_snapshot_district_ref"
+            columns: ["district_id"]
+            isOneToOne: false
+            referencedRelation: "districts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_health: {
+        Row: {
+          last_error_at: string | null
+          last_error_text: string | null
+          last_success_at: string | null
+          service: string
+        }
+        Insert: {
+          last_error_at?: string | null
+          last_error_text?: string | null
+          last_success_at?: string | null
+          service: string
+        }
+        Update: {
+          last_error_at?: string | null
+          last_error_text?: string | null
+          last_success_at?: string | null
+          service?: string
         }
         Relationships: []
       }

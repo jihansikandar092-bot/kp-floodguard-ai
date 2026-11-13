@@ -24,7 +24,7 @@ export function Panel({
           <h2 className="text-base font-bold">{title}</h2>
           {subtitle && <p className="mt-0.5 text-xs text-muted-foreground">{subtitle}</p>}
         </div>
-        {action ?? <DemoBadge />}
+        {action}
       </header>
       <div className={cn("p-5", bodyClassName)}>{children}</div>
     </section>
@@ -38,7 +38,7 @@ export function StatCard({
   unit,
   hint,
   tone = "navy",
-  demo = true,
+  demo = false,
 }: {
   icon: LucideIcon;
   label: string;
@@ -62,7 +62,7 @@ export function StatCard({
         {demo && <DemoBadge />}
       </div>
       <p className="mt-4 text-xs font-medium text-muted-foreground">{label}</p>
-      <p className="mt-1 font-mono text-2xl font-bold tracking-tight">
+      <p className="mt-1 font-mono text-xl font-bold break-words ">
         {value}
         {unit && <span className="ml-1 text-sm font-medium text-muted-foreground">{unit}</span>}
       </p>

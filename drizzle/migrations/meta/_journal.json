@@ -8,6 +8,13 @@
       "when": 1794294316496,
       "tag": "0000_monitoring_snapshots",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1794555613903,
+      "tag": "0001_monitoring_audit_storage",
+      "breakpoints": true
     }
   ]
 }

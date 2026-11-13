@@ -23,7 +23,10 @@ export function SiteHeader() {
             Prototype platform · Not an official emergency service
           </p>
           <div className="flex items-center gap-4 ml-auto">
-            <a href="tel:1122" className="inline-flex items-center gap-1.5 font-semibold hover:underline">
+            <a
+              href="tel:1122"
+              className="inline-flex items-center gap-1.5 font-semibold hover:underline"
+            >
               <Phone className="size-3.5" aria-hidden /> Rescue 1122
             </a>
             <a href="tel:1700" className="inline-flex items-center gap-1.5 hover:underline">

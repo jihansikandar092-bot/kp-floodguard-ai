@@ -33,8 +33,11 @@ use the editor.
 - Read public monitoring_snapshots through createServerFn and shared 15-minute Query options; only authenticated 30-minute scheduled refreshes fetch all fixed district coordinates, avoiding visitor-driven Worker provider requests.
 - Keep GloFAS model discharge in m³/s separate from risk estimates and historical records; never infer gauge depth or danger thresholds from flow, because discharge is not gauge depth.
 - Missing provider metrics remain null; aggregates use available districts only with explicit coverage, never treating unavailable values as zero.
-- Scheduled refreshes retry each source at most three total attempts with 2s/4s backoff and 6s timeouts; retain independent last-success metrics/timestamps in the database. Use Request.waitUntil for bounded background completion on Nitro Workers.
-- Direct browser CORS fallback is limited to the selected district with no stored metrics, never persists visitor data, and shares a 15-minute client cache; all stale snapshots must expose their age.
+- Scheduled refreshes retry transient failures at most three times with 2s/4s backoff and 6s timeouts, stop on 429 until the next run, and retain independent last-success metrics/timestamps; record runs and service health for auditable failures. Use Request.waitUntil for bounded background completion on Nitro Workers.
+- Direct browser CORS fallback is limited to the selected district with missing metrics or newest source older than six hours, never persists visitor data, and shares a 15-minute client cache; disable focus/reconnect retries and expose stored age separately.
+- District reference rows own public reference counts; keep unknown translations and classification fields null rather than inventing them.
+- Read optional paid weather configuration only during scheduled refresh; strip credentials from diagnostics and retry logs.
+- Shared assistant events and request formatting/filtering live in client-safe utilities, so component exports remain Fast Refresh compatible; standard shadcn utility exports are allowlisted and integration-managed generated files are excluded from lint.
 - Use Router dehydrate/hydrate hooks with the existing root Query provider to reuse the same blocking monitoring snapshot on server and client; map tiles use the key-free OpenStreetMap endpoint.
 
 ## Server and access security
