@@ -7,7 +7,13 @@ import {
   needsBrowserFallback,
 } from "@/lib/api/snapshot-rules";
 import { fetchLiveData, weatherUrl, type LiveDistrict } from "@/lib/api/live-data";
-import { DISTRICTS } from "@/lib/data/districts";
+
+// Test-only coordinates; production reads the districts table.
+const DISTRICTS = [
+  { id: "swat", name: "Swat", lat: 34.77, lng: 72.36 },
+  { id: "bannu", name: "Bannu", lat: 32.99, lng: 70.6 },
+  { id: "di-khan", name: "Dera Ismail Khan", lat: 31.83, lng: 70.9 },
+];
 
 describe("Stored monitoring rules", () => {
   it("refreshes at a thirty minute interval", () => expect(SNAPSHOT_INTERVAL).toBe(1800000));

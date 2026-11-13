@@ -9,11 +9,14 @@ import { cn } from "@/lib/utils";
 import { KPMap, MapLegend } from "@/components/map/KPMap";
 import { DistrictDetail } from "@/components/map/DistrictDetail";
 import { DemoBanner, PageHeader } from "@/components/site/Demo";
-import { DISTRICTS, getDistrict } from "@/lib/data/districts";
+import { districtListOptions } from "@/lib/api/district-query";
 
 export const Route = createFileRoute("/map")({
   loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(liveMonitoringOptions());
+    await Promise.all([
+      context.queryClient.ensureQueryData(liveMonitoringOptions()),
+      context.queryClient.ensureQueryData(districtListOptions()),
+    ]);
   },
   pendingComponent: MonitoringPending,
   errorComponent: MonitoringError,
@@ -39,10 +42,12 @@ export const Route = createFileRoute("/map")({
 });
 
 function MapPage() {
-  const [selectedId, setSelectedId] = useState("swat");
+  const { data: DISTRICTS } = useSuspenseQuery(districtListOptions());
+  const [chosenId, setSelectedId] = useState<string>();
+  const district = DISTRICTS.find((d) => d.id === chosenId) ?? DISTRICTS[0];
+  const selectedId = district?.id;
   const { data: storedData } = useSuspenseQuery(liveMonitoringOptions());
-  const { data, fallbackLoading } = useMonitoringFallback(storedData, selectedId);
-  const district = getDistrict(selectedId) ?? DISTRICTS[0];
+  const { data, fallbackLoading } = useMonitoringFallback(storedData, DISTRICTS, selectedId);
   if (!district) return <p className="container-page py-12">No monitored districts available.</p>;
 
   return (
@@ -72,7 +77,12 @@ function MapPage() {
               </span>
             </div>
             <div className="relative z-0 h-[460px] md:h-[600px]">
-              <KPMap data={data} selectedId={selectedId} onSelect={setSelectedId} />
+              <KPMap
+                data={data}
+                districts={DISTRICTS}
+                selectedId={selectedId}
+                onSelect={setSelectedId}
+              />
             </div>
           </div>
           <aside className="rounded-xl border bg-card p-5 shadow-card" aria-live="polite">

@@ -6,7 +6,7 @@
  * connected, `classifyEmergency` and step parsing can be replaced by model calls
  * while the UI and confirmation step stay the same.
  */
-import { DISTRICTS, getDistrict } from "@/lib/data/districts";
+import type { District } from "@/lib/data/districts";
 import {
   EMERGENCY_TYPES,
   EMERGENCY_TYPE_LABEL,
@@ -14,6 +14,12 @@ import {
   type EmergencyRequestInput,
   type EmergencyType,
 } from "@/lib/emergency";
+
+// District reference rows are loaded from the database by the widget.
+let DISTRICTS: District[] = [];
+export function setIntakeDistricts(list: District[]) {
+  DISTRICTS = list;
+}
 
 export type Lang = "en" | "ur";
 
@@ -368,6 +374,6 @@ export function advance(state: IntakeState, input: string, lang: Lang): AdvanceR
 
 export function districtLabel(name: string | undefined, lang: Lang) {
   if (!name) return "";
-  const d = DISTRICTS.find((x) => x.name === name) ?? getDistrict(name);
+  const d = DISTRICTS.find((x) => x.name === name) ?? DISTRICTS.find((x) => x.id === name);
   return lang === "ur" && d ? d.nameUr : name;
 }

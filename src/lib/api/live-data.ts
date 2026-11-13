@@ -1,5 +1,7 @@
 import { z } from "zod";
-import { DISTRICTS } from "@/lib/data/districts";
+import type { District } from "@/lib/data/districts";
+
+type Coordinates = Pick<District, "id" | "name" | "lat" | "lng">;
 
 export const LIVE_STALE_TIME = 15 * 60 * 1000;
 const metric = z
@@ -41,6 +43,8 @@ export interface LiveDistrict {
   floodUpdatedAt: string | null;
   weatherError?: string | null;
   floodError?: string | null;
+  /** Metrics whose last good value was kept because the newest refresh lacked them. */
+  retainedMetrics?: { metric: string; since: string | null }[];
 }
 export interface RequestDiagnostic {
   source: string;
@@ -56,6 +60,8 @@ export interface LiveMonitoring {
   referenceCount?: number;
   diagnostics?: RequestDiagnostic[];
   origin?: "snapshot" | "browser";
+  /** When the selected-district browser reading was saved on this device. */
+  browserCachedAt?: string | null;
 }
 
 export const storedDistrictSchema = z.object({
@@ -66,10 +72,13 @@ export const storedDistrictSchema = z.object({
   floodUpdatedAt: z.string().nullable(),
   weatherError: z.string().nullable().optional(),
   floodError: z.string().nullable().optional(),
+  retainedMetrics: z
+    .array(z.object({ metric: z.string(), since: z.string().nullable() }))
+    .optional(),
 });
 
 export function weatherUrl(
-  districts = DISTRICTS,
+  districts: Coordinates[],
   config?: { baseUrl?: string | undefined; apiKey?: string | undefined },
 ) {
   const url = new URL("/v1/forecast", config?.baseUrl ?? "https://api.open-meteo.com");
@@ -86,7 +95,7 @@ export function weatherUrl(
   if (config?.apiKey) url.searchParams.set("apikey", config.apiKey);
   return url;
 }
-export function floodUrl(districts = DISTRICTS) {
+export function floodUrl(districts: Coordinates[]) {
   const url = new URL("https://flood-api.open-meteo.com/v1/flood");
   url.search = new URLSearchParams({
     latitude: districts.map((d) => d.lat).join(","),
@@ -101,7 +110,7 @@ export function floodUrl(districts = DISTRICTS) {
 // Public, fixed-coordinate reads only. No credentials, user input, or Node APIs.
 export async function fetchLiveData(
   fetcher: typeof fetch = fetch,
-  districts = DISTRICTS,
+  districts: Coordinates[],
   config?: { baseUrl?: string | undefined; apiKey?: string | undefined },
 ): Promise<LiveMonitoring> {
   const diagnostics: RequestDiagnostic[] = [];

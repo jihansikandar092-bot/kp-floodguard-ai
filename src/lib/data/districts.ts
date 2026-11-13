@@ -1,146 +1,70 @@
-/** District reference names and approximate headquarters coordinates. */
+/** District reference rows come from the `districts` table; this file only adds tehsil/river labels by id. */
 
 export type RiskLevel = "low" | "medium" | "high";
 
 export interface District {
   id: string;
+  slug: string;
   name: string;
   nameUr: string;
+  namePs: string | null;
   lat: number;
   lng: number;
-  river: string;
-  /** Districts offered as dashboard filters */
-  featured: boolean;
+  region: string | null;
+  river: string | null;
   tehsils: string[];
 }
 
-export const DISTRICTS: District[] = [
-  {
-    id: "swat",
-    name: "Swat",
-    nameUr: "سوات",
-    lat: 34.77,
-    lng: 72.36,
+export interface DistrictRow {
+  id: string;
+  slug: string;
+  name_en: string;
+  name_ur: string;
+  name_ps: string | null;
+  lat: number;
+  lng: number;
+  region: string | null;
+}
+
+// Administrative sub-division and main river names, keyed by district id.
+const DISTRICT_DETAILS: Record<string, { river: string; tehsils: string[] }> = {
+  swat: {
     river: "Swat River",
-    featured: true,
     tehsils: ["Babuzai", "Barikot", "Kabal", "Matta", "Khwazakhela", "Bahrain", "Charbagh"],
   },
-  {
-    id: "nowshera",
-    name: "Nowshera",
-    nameUr: "نوشہرہ",
-    lat: 34.015,
-    lng: 71.98,
-    river: "Kabul River",
-    featured: true,
-    tehsils: ["Nowshera", "Pabbi", "Jehangira"],
-  },
-  {
-    id: "bannu",
-    name: "Bannu",
-    nameUr: "بنوں",
-    lat: 32.99,
-    lng: 70.6,
-    river: "Kurram River",
-    featured: true,
-    tehsils: ["Bannu", "Domel", "Miryan"],
-  },
-  {
-    id: "upper-dir",
-    name: "Upper Dir",
-    nameUr: "اپر دیر",
-    lat: 35.21,
-    lng: 71.88,
-    river: "Panjkora River",
-    featured: true,
-    tehsils: ["Dir", "Wari", "Sheringal", "Barawal"],
-  },
-  {
-    id: "mardan",
-    name: "Mardan",
-    nameUr: "مردان",
-    lat: 34.2,
-    lng: 72.04,
+  nowshera: { river: "Kabul River", tehsils: ["Nowshera", "Pabbi", "Jehangira"] },
+  bannu: { river: "Kurram River", tehsils: ["Bannu", "Domel", "Miryan"] },
+  "upper-dir": { river: "Panjkora River", tehsils: ["Dir", "Wari", "Sheringal", "Barawal"] },
+  mardan: {
     river: "Kalpani Stream",
-    featured: true,
     tehsils: ["Mardan", "Takht Bhai", "Katlang", "Rustam", "Garhi Kapura"],
   },
-  {
-    id: "peshawar",
-    name: "Peshawar",
-    nameUr: "پشاور",
-    lat: 34.01,
-    lng: 71.58,
-    river: "Kabul River",
-    featured: false,
-    tehsils: ["Peshawar City", "Mathra", "Badaber", "Chamkani"],
-  },
-  {
-    id: "charsadda",
-    name: "Charsadda",
-    nameUr: "چارسدہ",
-    lat: 34.15,
-    lng: 71.73,
-    river: "Swat River",
-    featured: false,
-    tehsils: ["Charsadda", "Tangi", "Shabqadar"],
-  },
-  {
-    id: "chitral",
-    name: "Lower Chitral",
-    nameUr: "چترال",
-    lat: 35.85,
-    lng: 71.79,
-    river: "Chitral River",
-    featured: false,
-    tehsils: ["Chitral", "Drosh"],
-  },
-  {
-    id: "shangla",
-    name: "Shangla",
-    nameUr: "شانگلہ",
-    lat: 34.88,
-    lng: 72.65,
-    river: "Indus River",
-    featured: false,
-    tehsils: ["Alpuri", "Puran", "Bisham", "Chakesar"],
-  },
-  {
-    id: "lower-dir",
-    name: "Lower Dir",
-    nameUr: "لوئر دیر",
-    lat: 34.83,
-    lng: 71.84,
+  peshawar: { river: "Kabul River", tehsils: ["Peshawar City", "Mathra", "Badaber", "Chamkani"] },
+  charsadda: { river: "Swat River", tehsils: ["Charsadda", "Tangi", "Shabqadar"] },
+  chitral: { river: "Chitral River", tehsils: ["Chitral", "Drosh"] },
+  shangla: { river: "Indus River", tehsils: ["Alpuri", "Puran", "Bisham", "Chakesar"] },
+  "lower-dir": {
     river: "Panjkora River",
-    featured: false,
     tehsils: ["Timergara", "Samarbagh", "Adenzai", "Lal Qila"],
   },
-  {
-    id: "mansehra",
-    name: "Mansehra",
-    nameUr: "مانسہرہ",
-    lat: 34.33,
-    lng: 73.2,
-    river: "Kunhar River",
-    featured: false,
-    tehsils: ["Mansehra", "Balakot", "Oghi"],
-  },
-  {
-    id: "di-khan",
-    name: "Dera Ismail Khan",
-    nameUr: "ڈیرہ اسماعیل خان",
-    lat: 31.83,
-    lng: 70.9,
-    river: "Indus River",
-    featured: false,
-    tehsils: ["D.I. Khan", "Paharpur", "Kulachi", "Paroa"],
-  },
-];
+  mansehra: { river: "Kunhar River", tehsils: ["Mansehra", "Balakot", "Oghi"] },
+  "di-khan": { river: "Indus River", tehsils: ["D.I. Khan", "Paharpur", "Kulachi", "Paroa"] },
+};
 
-export const FEATURED_DISTRICTS = DISTRICTS.filter((d) => d.featured);
-
-export function getDistrict(id: string) {
-  return DISTRICTS.find((d) => d.id === id);
+export function toDistrict(row: DistrictRow): District {
+  const details = DISTRICT_DETAILS[row.id];
+  return {
+    id: row.id,
+    slug: row.slug,
+    name: row.name_en,
+    nameUr: row.name_ur,
+    namePs: row.name_ps,
+    lat: row.lat,
+    lng: row.lng,
+    region: row.region,
+    river: details?.river ?? null,
+    tehsils: details?.tehsils ?? [],
+  };
 }
 
 export const RISK_LABEL: Record<RiskLevel, string> = {

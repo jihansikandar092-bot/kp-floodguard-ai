@@ -17,6 +17,7 @@ export const Route = createFileRoute("/api/public/monitoring-status")({
               floodError: d.floodError,
               weatherUpdatedAt: d.weatherUpdatedAt,
               floodUpdatedAt: d.floodUpdatedAt,
+              retainedMetrics: d.retainedMetrics ?? [],
               values: liveSnapshot(data, d.id).totals,
             })),
           },

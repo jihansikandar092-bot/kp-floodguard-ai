@@ -21,12 +21,15 @@ import { LiveStatus, MonitoringError, MonitoringPending } from "@/components/das
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { liveMonitoringOptions } from "@/lib/api/monitoring-query";
 import { liveSnapshot } from "@/lib/api/live-data";
-import { DISTRICTS } from "@/lib/data/districts";
+import { districtListOptions } from "@/lib/api/district-query";
 import riverImg from "@/assets/swat-river-monitoring.jpg";
 
 export const Route = createFileRoute("/")({
   loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(liveMonitoringOptions());
+    await Promise.all([
+      context.queryClient.ensureQueryData(liveMonitoringOptions()),
+      context.queryClient.ensureQueryData(districtListOptions()),
+    ]);
   },
   pendingComponent: MonitoringPending,
   errorComponent: MonitoringError,
@@ -124,6 +127,7 @@ const STEPS = [
 
 function Index() {
   const { data } = useSuspenseQuery(liveMonitoringOptions());
+  const { data: districts } = useSuspenseQuery(districtListOptions());
   const totals = liveSnapshot(data).totals;
   return (
     <>
@@ -182,7 +186,7 @@ function Index() {
                 >
                   <div className="absolute inset-0 animate-sweep [background:conic-gradient(from_0deg,transparent_0deg,transparent_300deg,var(--navy-line)_360deg)] opacity-70" />
                 </div>
-                <KPSchematicMap />
+                <KPSchematicMap districts={districts} />
               </div>
               <div className="absolute inset-x-5 bottom-5 flex items-center justify-between rounded-lg border border-navy-line bg-navy px-3 py-2 text-xs">
                 <span className="text-navy-muted">Flood risk: Not available</span>

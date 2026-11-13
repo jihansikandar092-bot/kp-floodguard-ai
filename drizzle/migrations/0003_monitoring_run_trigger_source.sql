@@ -1,0 +1,2 @@
+ALTER TABLE public.monitoring_runs ADD COLUMN trigger_source text NOT NULL DEFAULT 'unknown';
+COMMENT ON COLUMN public.monitoring_runs.trigger_source IS 'schedule = managed 30-minute schedule; manual = explicit operator call; unknown = recorded before this column existed';

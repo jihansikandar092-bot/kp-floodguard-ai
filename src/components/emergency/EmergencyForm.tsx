@@ -13,7 +13,8 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { DISTRICTS } from "@/lib/data/districts";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { districtListOptions } from "@/lib/api/district-query";
 import {
   EMERGENCY_TYPES,
   EMERGENCY_TYPE_LABEL,
@@ -50,6 +51,7 @@ export function EmergencyForm({ onSubmitted }: { onSubmitted: (r: EmergencyReque
     },
   });
 
+  const { data: DISTRICTS } = useSuspenseQuery(districtListOptions());
   const districtName = watch("district");
   const tehsils = DISTRICTS.find((d) => d.name === districtName)?.tehsils ?? [];
 
