@@ -24,7 +24,7 @@ export function retryingMonitoringFetch(fetcher: typeof fetch = fetch, pause = (
       try {
         const response = await fetcher(input, { ...init, signal: AbortSignal.timeout(6000) });
         if (attempt === 2 || response.status < 500) return response;
-        console.warn("Monitoring retry", String(input), response.status, "attempt", attempt + 1);
+        console.warn("Monitoring retry", response.status, "attempt", attempt + 1);
         await response.body?.cancel();
       } catch (error) {
         if (attempt === 2) throw error;
