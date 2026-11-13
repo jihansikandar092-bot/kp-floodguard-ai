@@ -36,10 +36,17 @@ export const Route = createFileRoute("/api/public/n8n-chat")({
           const raw = await res.text();
           if (!res.ok) {
             console.error(`n8n chat failed [${res.status}]: ${raw}`);
-            return Response.json({ error: res.status === 404 ? "workflow_inactive" : "upstream_error" }, { status: 502 });
+            return Response.json(
+              { error: res.status === 404 ? "workflow_inactive" : "upstream_error" },
+              { status: 502 },
+            );
           }
           let data: unknown = raw;
-          try { data = JSON.parse(raw); } catch { /* plain text reply */ }
+          try {
+            data = JSON.parse(raw);
+          } catch {
+            /* plain text reply */
+          }
           const reply = extractReply(data);
           if (!reply) return Response.json({ error: "empty_reply" }, { status: 502 });
           return Response.json({ reply });

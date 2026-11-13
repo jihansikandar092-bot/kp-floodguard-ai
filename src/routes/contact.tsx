@@ -9,7 +9,11 @@ export const Route = createFileRoute("/contact")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { title: "Contact & Helplines — KP FloodGuard AI" },
-      { name: "description", content: "Official emergency helplines for Khyber Pakhtunkhwa and contact information for the KP FloodGuard AI project." },
+      {
+        name: "description",
+        content:
+          "Official emergency helplines for Khyber Pakhtunkhwa and contact information for the KP FloodGuard AI project.",
+      },
       { property: "og:title", content: "Contact & Helplines — KP FloodGuard AI" },
       { property: "og:description", content: "Rescue 1122, PDMA KP and other official helplines." },
     ],
@@ -19,7 +23,11 @@ export const Route = createFileRoute("/contact")({
 
 const HELPLINES = [
   { name: "Rescue 1122", number: "1122", note: "Emergency rescue & ambulance" },
-  { name: "PDMA Khyber Pakhtunkhwa", number: "1700", note: "Provincial disaster management helpline" },
+  {
+    name: "PDMA Khyber Pakhtunkhwa",
+    number: "1700",
+    note: "Provincial disaster management helpline",
+  },
   { name: "Police", number: "15", note: "Police emergency" },
   { name: "Edhi Ambulance", number: "115", note: "Ambulance service" },
 ];
@@ -34,7 +42,9 @@ function ContactPage() {
       />
       <div className="container-page grid gap-8 py-10 lg:grid-cols-[1fr_380px]">
         <section aria-labelledby="helplines">
-          <h2 id="helplines" className="text-xl font-bold">Official emergency helplines</h2>
+          <h2 id="helplines" className="text-xl font-bold">
+            Official emergency helplines
+          </h2>
           <ul className="mt-5 grid gap-3 sm:grid-cols-2">
             {HELPLINES.map((h) => (
               <li key={h.number}>
@@ -54,7 +64,10 @@ function ContactPage() {
               </li>
             ))}
           </ul>
-          <p className="mt-4 text-xs text-muted-foreground">Please verify helpline numbers with local authorities before relying on them in an emergency.</p>
+          <p className="mt-4 text-xs text-muted-foreground">
+            Please verify helpline numbers with local authorities before relying on them in an
+            emergency.
+          </p>
         </section>
 
         <aside className="space-y-4">
@@ -65,7 +78,10 @@ function ContactPage() {
               demonstration. Project contact details will be published here.
             </p>
           </div>
-          <div id="disclaimer" className="rounded-xl border border-emergency/40 bg-emergency-soft p-5">
+          <div
+            id="disclaimer"
+            className="rounded-xl border border-emergency/40 bg-emergency-soft p-5"
+          >
             <h2 className="flex items-center gap-2 font-bold text-emergency">
               <AlertTriangle className="size-4" aria-hidden /> Disclaimer
             </h2>

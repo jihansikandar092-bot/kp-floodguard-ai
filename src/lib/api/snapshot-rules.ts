@@ -5,20 +5,26 @@ export const STALE_SNAPSHOT_AGE = 6 * 60 * 60 * 1000;
 export function needsBrowserFallback(row: LiveDistrict | undefined, now = Date.now()) {
   if (!row?.weather && !row?.flood) return true;
   const times = [row.weatherUpdatedAt, row.floodUpdatedAt].filter((t): t is string => Boolean(t));
-  return times.length === 0 || times.every(t => now - Date.parse(t) > STALE_SNAPSHOT_AGE);
+  return times.length === 0 || times.every((t) => now - Date.parse(t) > STALE_SNAPSHOT_AGE);
 }
-export function mergeSnapshot(previous: LiveDistrict | undefined, next: LiveDistrict): LiveDistrict {
+export function mergeSnapshot(
+  previous: LiveDistrict | undefined,
+  next: LiveDistrict,
+): LiveDistrict {
   return {
     ...next,
     weather: next.weather ?? previous?.weather ?? null,
     flood: next.flood ?? previous?.flood ?? null,
-    weatherUpdatedAt: next.weather ? next.weatherUpdatedAt : previous?.weatherUpdatedAt ?? null,
-    floodUpdatedAt: next.flood ? next.floodUpdatedAt : previous?.floodUpdatedAt ?? null,
+    weatherUpdatedAt: next.weather ? next.weatherUpdatedAt : (previous?.weatherUpdatedAt ?? null),
+    floodUpdatedAt: next.flood ? next.floodUpdatedAt : (previous?.floodUpdatedAt ?? null),
   };
 }
 
 // Three total tries per source; rate limits wait until the next scheduled run.
-export function retryingMonitoringFetch(fetcher: typeof fetch = fetch, pause = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms))): typeof fetch {
+export function retryingMonitoringFetch(
+  fetcher: typeof fetch = fetch,
+  pause = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms)),
+): typeof fetch {
   return async (input, init) => {
     for (let attempt = 0; attempt < 3; attempt++) {
       try {

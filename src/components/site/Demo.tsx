@@ -12,7 +12,13 @@ export function DemoBadge({ className, label = "DEMO" }: { className?: string; l
   );
 }
 
-export function DemoBanner({ children, className }: { children: React.ReactNode; className?: string }) {
+export function DemoBanner({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
     <div
       role="note"
@@ -30,7 +36,11 @@ export function DemoBanner({ children, className }: { children: React.ReactNode;
 export function RiskBadge({ level, className }: { level: RiskLevel; className?: string }) {
   return (
     <Badge variant={level} className={cn("gap-1.5", className)}>
-      <span className="size-2 rounded-full" style={{ background: `var(--risk-${level})` }} aria-hidden />
+      <span
+        className="size-2 rounded-full"
+        style={{ background: `var(--risk-${level})` }}
+        aria-hidden
+      />
       {RISK_LABEL[level]}
     </Badge>
   );

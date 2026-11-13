@@ -155,4 +155,3 @@ export const RISK_COLOR_VAR: Record<RiskLevel, string> = {
   medium: "var(--risk-medium)",
   high: "var(--risk-high)",
 };
-

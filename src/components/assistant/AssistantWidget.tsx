@@ -60,8 +60,26 @@ const UI = {
 } as const;
 
 const FIELD_LABELS = {
-  en: { type: "Type", district: "District", tehsil: "Tehsil", location: "Location", fullName: "Name", phone: "Phone", peopleAffected: "People", description: "Details" },
-  ur: { type: "قسم", district: "ضلع", tehsil: "تحصیل", location: "مقام", fullName: "نام", phone: "فون", peopleAffected: "افراد", description: "تفصیل" },
+  en: {
+    type: "Type",
+    district: "District",
+    tehsil: "Tehsil",
+    location: "Location",
+    fullName: "Name",
+    phone: "Phone",
+    peopleAffected: "People",
+    description: "Details",
+  },
+  ur: {
+    type: "قسم",
+    district: "ضلع",
+    tehsil: "تحصیل",
+    location: "مقام",
+    fullName: "نام",
+    phone: "فون",
+    peopleAffected: "افراد",
+    description: "تفصیل",
+  },
 } as const;
 
 export function AssistantWidget() {
@@ -72,7 +90,9 @@ export function AssistantWidget() {
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const sessionIdRef = useRef("");
-  useEffect(() => { sessionIdRef.current = crypto.randomUUID(); }, []);
+  useEffect(() => {
+    sessionIdRef.current = crypto.randomUUID();
+  }, []);
   const [chatMode, setChatMode] = useState<"intake" | "ai">("intake");
   const idRef = useRef(0);
   const listRef = useRef<HTMLDivElement>(null);
@@ -107,22 +127,22 @@ export function AssistantWidget() {
     }
   };
   const switchChatMode = (mode: "intake" | "ai") => {
-  setChatMode(mode);
-  setMessages([]);
-  if (mode === "ai") {
-    push([
-      {
-        role: "bot",
-        text:
-          lang === "ur"
-            ? "السلام علیکم! میں FloodGuard AI ہوں۔ آپ سیلاب، موسم، پانی کی سطح یا حفاظتی اقدامات کے بارے میں پوچھ سکتے ہیں۔"
-            : "Hello! I am FloodGuard AI. Ask me about floods, weather, river levels, or safety guidance.",
-      },
-    ]);
-  } else {
-    push([{ role: "bot", ...greeting(lang) }]);
-  }
-};
+    setChatMode(mode);
+    setMessages([]);
+    if (mode === "ai") {
+      push([
+        {
+          role: "bot",
+          text:
+            lang === "ur"
+              ? "السلام علیکم! میں FloodGuard AI ہوں۔ آپ سیلاب، موسم، پانی کی سطح یا حفاظتی اقدامات کے بارے میں پوچھ سکتے ہیں۔"
+              : "Hello! I am FloodGuard AI. Ask me about floods, weather, river levels, or safety guidance.",
+        },
+      ]);
+    } else {
+      push([{ role: "bot", ...greeting(lang) }]);
+    }
+  };
 
   const reset = () => {
     setState(initialIntake());
@@ -134,17 +154,20 @@ export function AssistantWidget() {
     if (!text || busy) return;
     if (chatMode === "ai") {
       push([{ role: "user", text }]);
-setInput("");
-  setBusy(true);
-  try {
-    const response = await fetch(N8N_CHAT_PROXY, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sessionId: sessionIdRef.current, chatInput: text }),
-    });
-    const data = (await response.json().catch(() => ({}))) as { reply?: string; error?: string };
-    if (!response.ok || !data.reply) throw new Error(data.error ?? "upstream_error");
-    push([{ role: "bot", text: data.reply }]);
+      setInput("");
+      setBusy(true);
+      try {
+        const response = await fetch(N8N_CHAT_PROXY, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sessionId: sessionIdRef.current, chatInput: text }),
+        });
+        const data = (await response.json().catch(() => ({}))) as {
+          reply?: string;
+          error?: string;
+        };
+        if (!response.ok || !data.reply) throw new Error(data.error ?? "upstream_error");
+        push([{ role: "bot", text: data.reply }]);
       } catch (error) {
         console.error("AI Chat Error:", error);
         const code = error instanceof Error ? error.message : "";
@@ -214,7 +237,10 @@ setInput("");
           aria-label="Open emergency assistant"
         >
           <span className="relative grid size-8 place-items-center rounded-full bg-emergency">
-            <span className="absolute inset-0 rounded-full bg-emergency animate-pulse-ring" aria-hidden />
+            <span
+              className="absolute inset-0 rounded-full bg-emergency animate-pulse-ring"
+              aria-hidden
+            />
             <Bot className="relative size-4.5" aria-hidden />
           </span>
           Emergency Assistant
@@ -234,56 +260,106 @@ setInput("");
                   <Bot className="size-5" aria-hidden />
                 </span>
                 <div>
-                  <p className="font-display font-bold leading-tight" lang={lang} dir={rtl ? "rtl" : "ltr"}>{ui.title}</p>
-                  <p className="text-xs text-navy-muted" lang={lang} dir={rtl ? "rtl" : "ltr"}>{chatMode === "ai" ? ui.statusAi : ui.status}</p>
+                  <p
+                    className="font-display font-bold leading-tight"
+                    lang={lang}
+                    dir={rtl ? "rtl" : "ltr"}
+                  >
+                    {ui.title}
+                  </p>
+                  <p className="text-xs text-navy-muted" lang={lang} dir={rtl ? "rtl" : "ltr"}>
+                    {chatMode === "ai" ? ui.statusAi : ui.status}
+                  </p>
                 </div>
               </div>
               <div className="flex gap-1">
-                <Button variant="on-navy" size="icon" className="size-8 border-0" onClick={reset} aria-label={ui.reset}>
+                <Button
+                  variant="on-navy"
+                  size="icon"
+                  className="size-8 border-0"
+                  onClick={reset}
+                  aria-label={ui.reset}
+                >
                   <RotateCcw />
                 </Button>
-                <Button variant="on-navy" size="icon" className="size-8 border-0" onClick={() => setOpen(false)} aria-label="Close assistant">
+                <Button
+                  variant="on-navy"
+                  size="icon"
+                  className="size-8 border-0"
+                  onClick={() => setOpen(false)}
+                  aria-label="Close assistant"
+                >
                   <X />
                 </Button>
               </div>
             </div>
-            <div className="mt-3 flex gap-1 rounded-lg bg-navy p-1 text-xs" role="group" aria-label="Language">
-              <LangButton active={lang === "en"} onClick={() => changeLang("en")}>English</LangButton>
-              <LangButton active={lang === "ur"} onClick={() => changeLang("ur")} lang="ur">اردو</LangButton>
+            <div
+              className="mt-3 flex gap-1 rounded-lg bg-navy p-1 text-xs"
+              role="group"
+              aria-label="Language"
+            >
+              <LangButton active={lang === "en"} onClick={() => changeLang("en")}>
+                English
+              </LangButton>
+              <LangButton active={lang === "ur"} onClick={() => changeLang("ur")} lang="ur">
+                اردو
+              </LangButton>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <span className="flex-1">
-                    <LangButton active={false} disabled lang="ps">پښتو · soon</LangButton>
+                    <LangButton active={false} disabled lang="ps">
+                      پښتو · soon
+                    </LangButton>
                   </span>
                 </TooltipTrigger>
-                <TooltipContent>Pashto support will be added with the AI language model.</TooltipContent>
+                <TooltipContent>
+                  Pashto support will be added with the AI language model.
+                </TooltipContent>
               </Tooltip>
             </div>
             <div className="mt-3 flex gap-2">
-  <button
-    type="button"
-    onClick={() => switchChatMode("intake")}
-    className={cn("flex-1 rounded-md px-3 py-2 text-xs font-semibold", chatMode === "intake" ? "bg-white text-slate-900" : "bg-navy text-white")}
-  >
-    {lang === "ur" ? "ہنگامی فارم" : "Emergency Form"}
-  </button>
-  <button
-    type="button"
-    onClick={() => switchChatMode("ai")}
-    className={cn("flex-1 rounded-md px-3 py-2 text-xs font-semibold", chatMode === "ai" ? "bg-white text-slate-900" : "bg-navy text-white")}
-  >
-    {lang === "ur" ? "AI چیٹ" : "AI Chat"}
-  </button>
-</div>
+              <button
+                type="button"
+                onClick={() => switchChatMode("intake")}
+                className={cn(
+                  "flex-1 rounded-md px-3 py-2 text-xs font-semibold",
+                  chatMode === "intake" ? "bg-white text-slate-900" : "bg-navy text-white",
+                )}
+              >
+                {lang === "ur" ? "ہنگامی فارم" : "Emergency Form"}
+              </button>
+              <button
+                type="button"
+                onClick={() => switchChatMode("ai")}
+                className={cn(
+                  "flex-1 rounded-md px-3 py-2 text-xs font-semibold",
+                  chatMode === "ai" ? "bg-white text-slate-900" : "bg-navy text-white",
+                )}
+              >
+                {lang === "ur" ? "AI چیٹ" : "AI Chat"}
+              </button>
+            </div>
           </header>
 
-          <a href="tel:1122" className="flex items-center gap-2 bg-emergency px-4 py-2 text-xs font-semibold text-emergency-foreground" lang={lang} dir={rtl ? "rtl" : "ltr"}>
+          <a
+            href="tel:1122"
+            className="flex items-center gap-2 bg-emergency px-4 py-2 text-xs font-semibold text-emergency-foreground"
+            lang={lang}
+            dir={rtl ? "rtl" : "ltr"}
+          >
             <Phone className="size-3.5 shrink-0" aria-hidden /> {ui.danger}
           </a>
 
-          <div ref={listRef} className="flex-1 space-y-3 overflow-y-auto bg-muted/50 px-4 py-4" aria-live="polite">
+          <div
+            ref={listRef}
+            className="flex-1 space-y-3 overflow-y-auto bg-muted/50 px-4 py-4"
+            aria-live="polite"
+          >
             {messages.map((m) => (
-              <div key={m.id} className={cn("flex flex-col", m.role === "user" ? "items-end" : "items-start")}>
+              <div
+                key={m.id}
+                className={cn("flex flex-col", m.role === "user" ? "items-end" : "items-start")}
+              >
                 <div
                   lang={lang}
                   dir="auto"
@@ -298,7 +374,11 @@ setInput("");
                   {m.text}
                   {m.summary && <Summary data={m.summary} lang={lang} title={ui.summaryTitle} />}
                   {m.requestId && (
-                    <Link to="/admin" className="mt-2 block text-xs font-semibold underline" onClick={() => setOpen(false)}>
+                    <Link
+                      to="/admin"
+                      className="mt-2 block text-xs font-semibold underline"
+                      onClick={() => setOpen(false)}
+                    >
                       View in coordinator preview →
                     </Link>
                   )}
@@ -313,7 +393,8 @@ setInput("");
                         onClick={() => handle(c.value, c.label)}
                         className={cn(
                           "rounded-full border bg-card px-3 py-1.5 text-xs font-medium transition-colors hover:border-primary hover:bg-secondary",
-                          c.value === "__confirm" && "border-emergency bg-emergency text-emergency-foreground hover:bg-emergency/90 hover:border-emergency",
+                          c.value === "__confirm" &&
+                            "border-emergency bg-emergency text-emergency-foreground hover:bg-emergency/90 hover:border-emergency",
                         )}
                       >
                         {c.label}
@@ -327,7 +408,11 @@ setInput("");
               <div className="flex items-start" role="status" aria-label="AI is typing">
                 <div className="flex gap-1 rounded-2xl rounded-bl-sm border bg-card px-3.5 py-3">
                   {[0, 150, 300].map((d) => (
-                    <span key={d} className="size-1.5 animate-bounce rounded-full bg-muted-foreground" style={{ animationDelay: `${d}ms` }} />
+                    <span
+                      key={d}
+                      className="size-1.5 animate-bounce rounded-full bg-muted-foreground"
+                      style={{ animationDelay: `${d}ms` }}
+                    />
                   ))}
                 </div>
               </div>
@@ -351,7 +436,9 @@ setInput("");
               </TooltipTrigger>
               <TooltipContent>{ui.mic}</TooltipContent>
             </Tooltip>
-            <label htmlFor="assistant-input" className="sr-only">{ui.placeholder}</label>
+            <label htmlFor="assistant-input" className="sr-only">
+              {ui.placeholder}
+            </label>
             <input
               id="assistant-input"
               ref={inputRef}
@@ -393,7 +480,15 @@ function LangButton({
   );
 }
 
-function Summary({ data, lang, title }: { data: BotMessage["summary"]; lang: Lang; title: string }) {
+function Summary({
+  data,
+  lang,
+  title,
+}: {
+  data: BotMessage["summary"];
+  lang: Lang;
+  title: string;
+}) {
   if (!data) return null;
   const L = FIELD_LABELS[lang];
   const rows: [string, string | undefined][] = [

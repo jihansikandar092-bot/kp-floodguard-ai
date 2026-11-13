@@ -10,7 +10,13 @@ export function Logo({ inverted = false, className }: { inverted?: boolean; clas
         )}
         aria-hidden
       >
-        <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2">
+        <svg
+          viewBox="0 0 24 24"
+          className="size-5"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
           <path d="M12 2.5 4 5.5v6c0 4.8 3.4 8.6 8 10 4.6-1.4 8-5.2 8-10v-6l-8-3Z" />
           <path d="M7.5 13c1.2-1 2.3-1 3.5 0s2.3 1 3.5 0 2.3-1 2.5-.8" strokeLinecap="round" />
         </svg>

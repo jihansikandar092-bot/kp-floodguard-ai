@@ -13,31 +13,52 @@ export function SiteFooter() {
           <Logo inverted />
           <p className="mt-4 max-w-sm text-sm leading-relaxed text-navy-muted">
             KP FloodGuard AI combines weather monitoring, historical flood records, machine learning
-            and an emergency assistant to help communities in Khyber Pakhtunkhwa prepare and respond.
+            and an emergency assistant to help communities in Khyber Pakhtunkhwa prepare and
+            respond.
           </p>
         </div>
 
         <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 md:col-span-8">
-        <FooterCol title="Platform">
-          <FooterLink to="/" hash="about">About KP FloodGuard AI</FooterLink>
-          <FooterLink to="/" hash="features">Features</FooterLink>
-          <FooterLink to="/dashboard">Flood Dashboard</FooterLink>
-          <FooterLink to="/map">Interactive Map</FooterLink>
-        </FooterCol>
+          <FooterCol title="Platform">
+            <FooterLink to="/" hash="about">
+              About KP FloodGuard AI
+            </FooterLink>
+            <FooterLink to="/" hash="features">
+              Features
+            </FooterLink>
+            <FooterLink to="/dashboard">Flood Dashboard</FooterLink>
+            <FooterLink to="/map">Interactive Map</FooterLink>
+          </FooterCol>
 
-        <FooterCol title="Assistance">
-          <FooterLink to="/emergency">Emergency Assistance</FooterLink>
-          <FooterLink to="/admin">Coordinator Dashboard</FooterLink>
-          <FooterLink to="/integrations">Integrations</FooterLink>
-          <FooterLink to="/contact">Contact</FooterLink>
-        </FooterCol>
+          <FooterCol title="Assistance">
+            <FooterLink to="/emergency">Emergency Assistance</FooterLink>
+            <FooterLink to="/admin">Coordinator Dashboard</FooterLink>
+            <FooterLink to="/integrations">Integrations</FooterLink>
+            <FooterLink to="/contact">Contact</FooterLink>
+          </FooterCol>
 
-        <FooterCol title="Official helplines">
-          <li><a className="hover:underline" href="tel:1122">Rescue 1122</a></li>
-          <li><a className="hover:underline" href="tel:1700">PDMA KP · 1700</a></li>
-          <li><a className="hover:underline" href="tel:15">Police · 15</a></li>
-          <li><a className="hover:underline" href="tel:115">Edhi Ambulance · 115</a></li>
-        </FooterCol>
+          <FooterCol title="Official helplines">
+            <li>
+              <a className="hover:underline" href="tel:1122">
+                Rescue 1122
+              </a>
+            </li>
+            <li>
+              <a className="hover:underline" href="tel:1700">
+                PDMA KP · 1700
+              </a>
+            </li>
+            <li>
+              <a className="hover:underline" href="tel:15">
+                Police · 15
+              </a>
+            </li>
+            <li>
+              <a className="hover:underline" href="tel:115">
+                Edhi Ambulance · 115
+              </a>
+            </li>
+          </FooterCol>
         </div>
       </div>
 
@@ -52,8 +73,12 @@ export function SiteFooter() {
       </div>
       <div className="border-t border-navy-line">
         <div className="container-page flex flex-col gap-2 py-5 text-xs text-navy-muted sm:flex-row sm:justify-between">
-          <p>© {new Date().getFullYear()} KP FloodGuard AI · Prototype for research and demonstration</p>
-          <p>Live weather &amp; discharge: Open-Meteo / GloFAS · Risk &amp; historical figures: DEMO.</p>
+          <p>
+            © {new Date().getFullYear()} KP FloodGuard AI · Prototype for research and demonstration
+          </p>
+          <p>
+            Live weather &amp; discharge: Open-Meteo / GloFAS · Risk &amp; historical figures: DEMO.
+          </p>
         </div>
       </div>
     </footer>

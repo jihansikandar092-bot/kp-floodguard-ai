@@ -28,7 +28,7 @@ export default function KPMapLeaflet({ data, selectedId, onSelect, className }: 
       />
       {DISTRICTS.map((d) => {
         const selected = d.id === selectedId;
-        const live = data.districts.find(row => row.id === d.id);
+        const live = data.districts.find((row) => row.id === d.id);
         const rain = rainfall24h(live?.weather ?? null);
         const flow = todayDischarge(live?.flood ?? null, live?.floodUpdatedAt ?? data.fetchedAt);
         const radius = rain === null ? 9 : 9 + Math.min(12, rain / 5);
@@ -46,7 +46,13 @@ export default function KPMapLeaflet({ data, selectedId, onSelect, className }: 
             eventHandlers={{ click: () => onSelect?.(d.id) }}
           >
             <Tooltip direction="top" offset={[0, -8]}>
-              <strong>{d.name}</strong><br />Rainfall (24h): {rain ?? "Not available"} mm<br />River discharge: {flow ?? "Not available"} m³/s<br />Risk: Not available
+              <strong>{d.name}</strong>
+              <br />
+              Rainfall (24h): {rain ?? "Not available"} mm
+              <br />
+              River discharge: {flow ?? "Not available"} m³/s
+              <br />
+              Risk: Not available
             </Tooltip>
           </CircleMarker>
         );

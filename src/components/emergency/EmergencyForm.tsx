@@ -4,7 +4,13 @@ import { Controller, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { DISTRICTS } from "@/lib/data/districts";
@@ -60,7 +66,11 @@ export function EmergencyForm({ onSubmitted }: { onSubmitted: (r: EmergencyReque
           control={control}
           name="type"
           render={({ field }) => (
-            <div role="radiogroup" aria-label="Emergency type" className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-5">
+            <div
+              role="radiogroup"
+              aria-label="Emergency type"
+              className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-5"
+            >
               {EMERGENCY_TYPES.map((t) => {
                 const Icon = TYPE_ICON[t];
                 const active = field.value === t;
@@ -73,7 +83,8 @@ export function EmergencyForm({ onSubmitted }: { onSubmitted: (r: EmergencyReque
                     onClick={() => field.onChange(t)}
                     className={cn(
                       "flex flex-col items-center gap-2 rounded-lg border bg-card px-3 py-4 text-sm font-semibold transition-all hover:border-primary",
-                      active && "border-emergency bg-emergency-soft text-emergency ring-1 ring-emergency",
+                      active &&
+                        "border-emergency bg-emergency-soft text-emergency ring-1 ring-emergency",
                     )}
                   >
                     <Icon className="size-5" aria-hidden />
@@ -90,10 +101,28 @@ export function EmergencyForm({ onSubmitted }: { onSubmitted: (r: EmergencyReque
       <fieldset className="grid gap-5 sm:grid-cols-2">
         <legend className="mb-3 text-base font-bold sm:col-span-2">2. Your details</legend>
         <Field label="Full Name" id="fullName" error={errors.fullName?.message}>
-          <Input id="fullName" autoComplete="name" {...register("fullName")} aria-invalid={!!errors.fullName} />
+          <Input
+            id="fullName"
+            autoComplete="name"
+            {...register("fullName")}
+            aria-invalid={!!errors.fullName}
+          />
         </Field>
-        <Field label="Phone Number" id="phone" error={errors.phone?.message} hint="Mobile number rescuers can call">
-          <Input id="phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="0300 1234567" {...register("phone")} aria-invalid={!!errors.phone} />
+        <Field
+          label="Phone Number"
+          id="phone"
+          error={errors.phone?.message}
+          hint="Mobile number rescuers can call"
+        >
+          <Input
+            id="phone"
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel"
+            placeholder="0300 1234567"
+            {...register("phone")}
+            aria-invalid={!!errors.phone}
+          />
         </Field>
       </fieldset>
 
@@ -110,7 +139,9 @@ export function EmergencyForm({ onSubmitted }: { onSubmitted: (r: EmergencyReque
                 </SelectTrigger>
                 <SelectContent>
                   {DISTRICTS.map((d) => (
-                    <SelectItem key={d.id} value={d.name}>{d.name}</SelectItem>
+                    <SelectItem key={d.id} value={d.name}>
+                      {d.name}
+                    </SelectItem>
                   ))}
                   <SelectItem value="Other">Other district</SelectItem>
                 </SelectContent>
@@ -119,13 +150,25 @@ export function EmergencyForm({ onSubmitted }: { onSubmitted: (r: EmergencyReque
           />
         </Field>
         <Field label="Tehsil" id="tehsil" error={errors.tehsil?.message}>
-          <Input id="tehsil" list="tehsil-options" {...register("tehsil")} aria-invalid={!!errors.tehsil} />
+          <Input
+            id="tehsil"
+            list="tehsil-options"
+            {...register("tehsil")}
+            aria-invalid={!!errors.tehsil}
+          />
           <datalist id="tehsil-options">
-            {tehsils.map((t) => <option key={t} value={t} />)}
+            {tehsils.map((t) => (
+              <option key={t} value={t} />
+            ))}
           </datalist>
         </Field>
         <div className="sm:col-span-2">
-          <Field label="Exact Location" id="location" error={errors.location?.message} hint="Village, street, nearest landmark">
+          <Field
+            label="Exact Location"
+            id="location"
+            error={errors.location?.message}
+            hint="Village, street, nearest landmark"
+          >
             <Input id="location" {...register("location")} aria-invalid={!!errors.location} />
           </Field>
         </div>
@@ -133,12 +176,29 @@ export function EmergencyForm({ onSubmitted }: { onSubmitted: (r: EmergencyReque
 
       <fieldset className="grid gap-5 sm:grid-cols-3">
         <legend className="mb-3 text-base font-bold sm:col-span-3">4. Situation</legend>
-        <Field label="Number of People Affected" id="peopleAffected" error={errors.peopleAffected?.message}>
-          <Input id="peopleAffected" type="number" min={1} inputMode="numeric" {...register("peopleAffected", { valueAsNumber: true })} aria-invalid={!!errors.peopleAffected} />
+        <Field
+          label="Number of People Affected"
+          id="peopleAffected"
+          error={errors.peopleAffected?.message}
+        >
+          <Input
+            id="peopleAffected"
+            type="number"
+            min={1}
+            inputMode="numeric"
+            {...register("peopleAffected", { valueAsNumber: true })}
+            aria-invalid={!!errors.peopleAffected}
+          />
         </Field>
         <div className="sm:col-span-3">
           <Field label="Emergency Description" id="description" error={errors.description?.message}>
-            <Textarea id="description" rows={4} placeholder="What is happening? Any injured, elderly or children?" {...register("description")} aria-invalid={!!errors.description} />
+            <Textarea
+              id="description"
+              rows={4}
+              placeholder="What is happening? Any injured, elderly or children?"
+              {...register("description")}
+              aria-invalid={!!errors.description}
+            />
           </Field>
         </div>
       </fieldset>
@@ -174,12 +234,20 @@ function Field({
     <div className="space-y-1.5">
       <Label htmlFor={id}>{label}</Label>
       {children}
-      {error ? <FieldError msg={error} /> : hint && <p className="text-xs text-muted-foreground">{hint}</p>}
+      {error ? (
+        <FieldError msg={error} />
+      ) : (
+        hint && <p className="text-xs text-muted-foreground">{hint}</p>
+      )}
     </div>
   );
 }
 
 function FieldError({ msg }: { msg?: string | undefined }) {
   if (!msg) return null;
-  return <p role="alert" className="mt-1.5 text-xs font-medium text-destructive">{msg}</p>;
+  return (
+    <p role="alert" className="mt-1.5 text-xs font-medium text-destructive">
+      {msg}
+    </p>
+  );
 }

@@ -52,21 +52,74 @@ export const initialIntake = (): IntakeState => ({ step: "describe", data: {} })
 
 const KEYWORDS: Record<EmergencyType, string[]> = {
   rescue: [
-    "rescue", "trapped", "stuck", "stranded", "drown", "boat", "roof", "swept", "evacuat",
-    "bachao", "phans", "ریسکیو", "بچاؤ", "بچاو", "پھنس", "ڈوب", "کشتی", "چھت",
+    "rescue",
+    "trapped",
+    "stuck",
+    "stranded",
+    "drown",
+    "boat",
+    "roof",
+    "swept",
+    "evacuat",
+    "bachao",
+    "phans",
+    "ریسکیو",
+    "بچاؤ",
+    "بچاو",
+    "پھنس",
+    "ڈوب",
+    "کشتی",
+    "چھت",
   ],
   medical: [
-    "medical", "doctor", "injur", "hurt", "sick", "medicine", "ambulance", "bleed", "fever", "pregnan",
-    "dawai", "zakhmi", "bimar", "طبی", "ڈاکٹر", "زخمی", "بیمار", "دوائی", "دوا", "ایمبولینس", "بخار",
+    "medical",
+    "doctor",
+    "injur",
+    "hurt",
+    "sick",
+    "medicine",
+    "ambulance",
+    "bleed",
+    "fever",
+    "pregnan",
+    "dawai",
+    "zakhmi",
+    "bimar",
+    "طبی",
+    "ڈاکٹر",
+    "زخمی",
+    "بیمار",
+    "دوائی",
+    "دوا",
+    "ایمبولینس",
+    "بخار",
   ],
   water: [
-    "drinking water", "clean water", "thirst", "potable", "water to drink", "peenay", "peene",
-    "پینے", "پیاس", "صاف پانی",
+    "drinking water",
+    "clean water",
+    "thirst",
+    "potable",
+    "water to drink",
+    "peenay",
+    "peene",
+    "پینے",
+    "پیاس",
+    "صاف پانی",
   ],
   food: ["food", "hungry", "ration", "meal", "khana", "khurak", "کھانا", "خوراک", "راشن", "بھوک"],
   shelter: [
-    "shelter", "tent", "homeless", "house destroyed", "place to stay", "roofless", "panah", "khaima",
-    "پناہ", "خیمہ", "رہائش", "بے گھر",
+    "shelter",
+    "tent",
+    "homeless",
+    "house destroyed",
+    "place to stay",
+    "roofless",
+    "panah",
+    "khaima",
+    "پناہ",
+    "خیمہ",
+    "رہائش",
+    "بے گھر",
   ],
 };
 
@@ -110,7 +163,8 @@ const COPY = {
     location: "What is the exact location? Include village, street or a nearby landmark.",
     name: "What is your full name?",
     phone: "What mobile number can rescuers call? (e.g. 0300 1234567)",
-    phoneErr: "That number doesn't look right. Please enter a Pakistani mobile number like 0300 1234567.",
+    phoneErr:
+      "That number doesn't look right. Please enter a Pakistani mobile number like 0300 1234567.",
     people: "How many people are affected?",
     peopleErr: "Please enter the number of people as a number, e.g. 5.",
     description: "Please describe the situation in a little more detail.",
@@ -122,7 +176,8 @@ const COPY = {
     confirmHint: "Choose “Confirm & submit” or “Start over”.",
   },
   ur: {
-    greet: "السلام علیکم۔ میں سیلاب کی ہنگامی صورتحال رپورٹ کرنے میں آپ کی مدد کر سکتا ہوں۔ مختصر بتائیں کیا ہو رہا ہے؟",
+    greet:
+      "السلام علیکم۔ میں سیلاب کی ہنگامی صورتحال رپورٹ کرنے میں آپ کی مدد کر سکتا ہوں۔ مختصر بتائیں کیا ہو رہا ہے؟",
     type: "آپ کو کس قسم کی مدد چاہیے؟",
     understood: (t: string) => `سمجھ گیا — یہ ${t} کی درخواست ہے۔`,
     district: "آپ کس ضلع میں ہیں؟",
@@ -170,7 +225,10 @@ export function promptFor(step: Step, state: IntakeState, lang: Lang): BotMessag
     case "phone":
       return { text: c.phone };
     case "people":
-      return { text: c.people, chips: ["1", "2-5", "6-20", "20+"].map((v) => ({ label: v, value: v })) };
+      return {
+        text: c.people,
+        chips: ["1", "2-5", "6-20", "20+"].map((v) => ({ label: v, value: v })),
+      };
     case "description":
       return { text: c.description };
     case "confirm":
@@ -187,7 +245,17 @@ export function promptFor(step: Step, state: IntakeState, lang: Lang): BotMessag
   }
 }
 
-const ORDER: Step[] = ["type", "district", "tehsil", "location", "name", "phone", "people", "description", "confirm"];
+const ORDER: Step[] = [
+  "type",
+  "district",
+  "tehsil",
+  "location",
+  "name",
+  "phone",
+  "people",
+  "description",
+  "confirm",
+];
 
 function nextStep(data: Partial<EmergencyRequestInput>, from: Step): Step {
   const start = from === "describe" ? 0 : ORDER.indexOf(from) + 1;

@@ -53,7 +53,8 @@ export default {
       // Preserve the Worker lifetime for authenticated scheduled refresh retries.
       const context = ctx as { waitUntil?: (promise: Promise<unknown>) => void } | undefined;
       if (context?.waitUntil) {
-        (request as Request & { waitUntil?: (promise: Promise<unknown>) => void }).waitUntil = context.waitUntil.bind(context);
+        (request as Request & { waitUntil?: (promise: Promise<unknown>) => void }).waitUntil =
+          context.waitUntil.bind(context);
       }
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
