@@ -230,7 +230,15 @@ export function AssistantWidget() {
         ]);
       } catch (e) {
         console.error("assistant submit failed", e);
-        push([{ role: "bot", text: lang === "ur" ? "درخواست نہیں بھیجی جا سکی۔ دوبارہ کوشش کریں یا 1122 پر کال کریں۔" : "Could not send the request. Try again or call Rescue 1122." }]);
+        push([
+          {
+            role: "bot",
+            text:
+              lang === "ur"
+                ? "درخواست نہیں بھیجی جا سکی۔ دوبارہ کوشش کریں یا 1122 پر کال کریں۔"
+                : "Could not send the request. Try again or call Rescue 1122.",
+          },
+        ]);
       } finally {
         setBusy(false);
       }

@@ -21,5 +21,9 @@ export function useCoordinator() {
     enabled: signedIn === true,
     retry: false,
   });
-  return { signedIn, coordinator: q.data?.coordinator === true, checking: signedIn === null || q.isLoading };
+  return {
+    signedIn,
+    coordinator: q.data?.coordinator === true,
+    checking: signedIn === null || q.isLoading,
+  };
 }

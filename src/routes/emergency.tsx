@@ -116,7 +116,8 @@ function Confirmation({ request, onReset }: { request: SubmittedRequest; onReset
         <div>
           <h2 className="text-2xl font-extrabold">Request recorded</h2>
           <p className="mt-1 text-muted-foreground">
-            Reference <span className="font-mono font-semibold text-foreground">{request.code}</span>
+            Reference{" "}
+            <span className="font-mono font-semibold text-foreground">{request.code}</span>
           </p>
         </div>
       </div>
@@ -124,8 +125,8 @@ function Confirmation({ request, onReset }: { request: SubmittedRequest; onReset
       <div className="mt-6 flex gap-3 rounded-lg border border-demo-foreground/20 bg-demo p-4 text-sm text-demo-foreground">
         <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden />
         <p>
-          In a life-threatening emergency call Rescue 1122 immediately. This request is recorded
-          for coordinators to review; it does not guarantee dispatch.
+          In a life-threatening emergency call Rescue 1122 immediately. This request is recorded for
+          coordinators to review; it does not guarantee dispatch.
           {request.isTest && <strong> Marked as a test request.</strong>}
         </p>
       </div>

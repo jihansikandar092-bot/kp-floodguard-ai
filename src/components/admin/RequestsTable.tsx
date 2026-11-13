@@ -60,7 +60,10 @@ export function RequestsTable() {
 
 function Blocked({ text }: { text: string }) {
   return (
-    <p role="status" className="rounded-xl border bg-card p-10 text-center text-sm text-muted-foreground shadow-card">
+    <p
+      role="status"
+      className="rounded-xl border bg-card p-10 text-center text-sm text-muted-foreground shadow-card"
+    >
       {text}
     </p>
   );
@@ -216,7 +219,11 @@ function RequestsView({ requests }: { requests: EmergencyRequest[] }) {
                     {r.description}
                   </TableCell>
                   <TableCell>
-                    <StatusSelect value={r.status} onChange={(s) => changeStatus(r, s)} id={r.code} />
+                    <StatusSelect
+                      value={r.status}
+                      onChange={(s) => changeStatus(r, s)}
+                      id={r.code}
+                    />
                   </TableCell>
                 </TableRow>
               ))}

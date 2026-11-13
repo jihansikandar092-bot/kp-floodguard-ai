@@ -42,7 +42,11 @@ export const submitEmergencyRequest = createServerFn({ method: "POST" })
       .gte("created_at", since);
     if (countErr) {
       console.error("rate limit check failed", countErr.message);
-      return { ok: false, error: "unavailable", message: "Request service temporarily unavailable." };
+      return {
+        ok: false,
+        error: "unavailable",
+        message: "Request service temporarily unavailable.",
+      };
     }
     if ((count ?? 0) >= RATE_LIMIT_PER_HOUR) {
       return {
@@ -86,7 +90,11 @@ export const submitEmergencyRequest = createServerFn({ method: "POST" })
       .single();
     if (error || !row) {
       console.error("emergency request insert failed", error?.message);
-      return { ok: false, error: "unavailable", message: "Request service temporarily unavailable." };
+      return {
+        ok: false,
+        error: "unavailable",
+        message: "Request service temporarily unavailable.",
+      };
     }
     await supabaseAdmin.from("submission_rate_limits").insert({ ip_hash: ipHash });
     return { ok: true, code: row.request_code, createdAt: row.created_at };
@@ -109,7 +117,12 @@ async function callerIsCoordinator(token: string) {
 }
 
 async function isCoordinator(ctx: {
-  supabase: { rpc: (fn: "has_role", args: { _user_id: string; _role: "coordinator" | "admin" }) => PromiseLike<{ data: boolean | null }> };
+  supabase: {
+    rpc: (
+      fn: "has_role",
+      args: { _user_id: string; _role: "coordinator" | "admin" },
+    ) => PromiseLike<{ data: boolean | null }>;
+  };
   userId: string;
 }) {
   const [c, a] = await Promise.all([

@@ -77,10 +77,17 @@ export function EmergencyForm({ onSubmitted }: { onSubmitted: (r: SubmittedReque
         data: { ...values, language: "en", isTest: coordinator && isTest },
       });
       if (!res.ok) return setSubmitError(res.message);
-      onSubmitted({ ...values, code: res.code, createdAt: res.createdAt, isTest: coordinator && isTest });
+      onSubmitted({
+        ...values,
+        code: res.code,
+        createdAt: res.createdAt,
+        isTest: coordinator && isTest,
+      });
     } catch (e) {
       console.error("submit failed", e);
-      setSubmitError("Could not send your request. Check your connection and try again, or call Rescue 1122.");
+      setSubmitError(
+        "Could not send your request. Check your connection and try again, or call Rescue 1122.",
+      );
     }
   });
 
