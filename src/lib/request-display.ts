@@ -20,7 +20,7 @@ export function filterRequests(
       (f.type === "all" || r.type === f.type) &&
       (f.status === "all" || r.status === f.status) &&
       (!q ||
-        r.id.toLowerCase().includes(q) ||
+        r.code.toLowerCase().includes(q) ||
         r.fullName.toLowerCase().includes(q) ||
         r.location.toLowerCase().includes(q)),
   );

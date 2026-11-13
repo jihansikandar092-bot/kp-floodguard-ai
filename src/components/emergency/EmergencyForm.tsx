@@ -19,10 +19,20 @@ import {
   EMERGENCY_TYPES,
   EMERGENCY_TYPE_LABEL,
   emergencyRequestSchema,
-  type EmergencyRequest,
+  type EmergencyRequestInput,
   type EmergencyType,
 } from "@/lib/emergency";
-import { submitEmergencyRequest } from "@/lib/api/requests";
+import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { Checkbox } from "@/components/ui/checkbox";
+import { submitEmergencyRequest } from "@/lib/api/requests.functions";
+import { useCoordinator } from "@/lib/api/use-coordinator";
+
+export interface SubmittedRequest extends EmergencyRequestInput {
+  code: string;
+  createdAt: string;
+  isTest: boolean;
+}
 
 const TYPE_ICON: Record<EmergencyType, typeof LifeBuoy> = {
   rescue: LifeBuoy,
@@ -32,7 +42,7 @@ const TYPE_ICON: Record<EmergencyType, typeof LifeBuoy> = {
   shelter: Home,
 };
 
-export function EmergencyForm({ onSubmitted }: { onSubmitted: (r: EmergencyRequest) => void }) {
+export function EmergencyForm({ onSubmitted }: { onSubmitted: (r: SubmittedRequest) => void }) {
   const {
     register,
     control,
@@ -55,13 +65,38 @@ export function EmergencyForm({ onSubmitted }: { onSubmitted: (r: EmergencyReque
   const districtName = watch("district");
   const tehsils = DISTRICTS.find((d) => d.name === districtName)?.tehsils ?? [];
 
+  const submit = useServerFn(submitEmergencyRequest);
+  const { coordinator } = useCoordinator();
+  const [isTest, setIsTest] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
   const onSubmit = handleSubmit(async (values) => {
-    const { request } = await submitEmergencyRequest(values, "form");
-    onSubmitted(request);
+    setSubmitError(null);
+    try {
+      const res = await submit({
+        data: { ...values, language: "en", isTest: coordinator && isTest },
+      });
+      if (!res.ok) return setSubmitError(res.message);
+      onSubmitted({
+        ...values,
+        code: res.code,
+        createdAt: res.createdAt,
+        isTest: coordinator && isTest,
+      });
+    } catch (e) {
+      console.error("submit failed", e);
+      setSubmitError(
+        "Could not send your request. Check your connection and try again, or call Rescue 1122.",
+      );
+    }
   });
 
   return (
     <form onSubmit={onSubmit} noValidate className="space-y-8">
+      <p className="rounded-lg border-2 border-emergency bg-emergency-soft p-4 text-sm font-semibold text-emergency">
+        In a life-threatening emergency call Rescue 1122 immediately. This request is recorded for
+        coordinators to review; it does not guarantee dispatch.
+      </p>
       <fieldset>
         <legend className="text-base font-bold">1. Type of emergency</legend>
         <Controller
@@ -206,10 +241,23 @@ export function EmergencyForm({ onSubmitted }: { onSubmitted: (r: EmergencyReque
       </fieldset>
 
       <div className="flex flex-col gap-3 border-t pt-6 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-xs text-muted-foreground sm:max-w-md">
-          Prototype: your request will be saved on this device as a demo record. It is not yet
-          forwarded to rescue teams. In immediate danger, call Rescue 1122.
-        </p>
+        <div className="space-y-3 sm:max-w-md">
+          {coordinator && (
+            <label className="flex items-center gap-2 text-sm">
+              <Checkbox checked={isTest} onCheckedChange={(v) => setIsTest(v === true)} />
+              This is a test request
+            </label>
+          )}
+          <p className="text-xs text-muted-foreground">
+            Your request is stored securely for coordinators to review. In immediate danger, call
+            Rescue 1122.
+          </p>
+          {submitError && (
+            <p role="alert" className="text-sm font-medium text-destructive">
+              {submitError}
+            </p>
+          )}
+        </div>
         <Button type="submit" variant="emergency" size="lg" disabled={isSubmitting}>
           {isSubmitting ? <Loader2 className="animate-spin" /> : <Ambulance />}
           Submit Emergency Request
