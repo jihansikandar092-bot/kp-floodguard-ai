@@ -41,6 +41,8 @@ use the editor.
 - Use Router dehydrate/hydrate hooks with the existing root Query provider to reuse the same blocking monitoring snapshot on server and client; map tiles use the key-free OpenStreetMap endpoint.
 
 ## Server and access security
+- Use TanStack Start file-based routing and never edit generated routeTree.gen.ts; this preserves generated route consistency.
+- Express visual styling through semantic Tailwind design tokens; this preserves theme consistency.
 - Server code runs on Cloudflare Workers (workerd, not Node.js): no fs or native modules, read process.env only inside handlers, and do not compress responses; these constraints preserve Worker runtime compatibility.
 - Secrets live only in server environment variables, never in code, docs or browser; this prevents credential disclosure.
 - Enable Row Level Security on every application table; this enforces access control at the database boundary.
