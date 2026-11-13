@@ -89,7 +89,12 @@ function RequestsView({ requests }: { requests: EmergencyRequest[] }) {
   );
 
   const counts = useMemo(() => {
-    const c: Record<RequestStatus, number> = { pending: 0, review: 0, progress: 0, resolved: 0 };
+    const c: Record<RequestStatus, number> = {
+      pending: 0,
+      under_review: 0,
+      in_progress: 0,
+      resolved: 0,
+    };
     requests.forEach((r) => c[r.status]++);
     return c;
   }, [requests]);
