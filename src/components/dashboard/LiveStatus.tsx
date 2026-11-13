@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "@tanstack/react-router";
+import { useHydrated, useRouter } from "@tanstack/react-router";
 import { RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { LiveDistrict, LiveMonitoring } from "@/lib/api/live-data";
@@ -15,9 +15,12 @@ export function LiveStatus({ data, rows }: { data: LiveMonitoring; rows: LiveDis
     .sort()
     .at(-1);
   const reasons = [...new Set(rows.flatMap((d) => [d.weatherError, d.floodError]).filter(Boolean))];
-  const fresh = freshness(data.fetchedAt);
+  // Age-based text depends on the viewer clock, so it renders only after hydration.
+  const hydrated = useHydrated();
+  const fresh = hydrated ? freshness(data.fetchedAt) : { level: "unknown" as const, label: "…" };
   const retained = rows.filter((d) => d.retainedMetrics?.length);
-  const minutes = (t: string) => Math.max(0, Math.floor((Date.now() - Date.parse(t)) / 60000));
+  const minutes = (t: string) =>
+    !hydrated ? "…" : Math.max(0, Math.floor((Date.now() - Date.parse(t)) / 60000));
   return (
     <div className="space-y-2 border-b pb-4 text-sm">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -47,9 +50,7 @@ export function LiveStatus({ data, rows }: { data: LiveMonitoring; rows: LiveDis
         · Modelled weather and river discharge, not gauge measurements.
       </p>
       <p className="text-xs text-muted-foreground">
-        {data.fetchedAt
-          ? `Data updated ${Math.max(0, Math.floor((Date.now() - Date.parse(data.fetchedAt)) / 60000))} minutes ago`
-          : "Not available"}
+        {data.fetchedAt ? `Data updated ${minutes(data.fetchedAt)} minutes ago` : "Not available"}
       </p>
       {fresh.level === "outdated" && (
         <p role="alert" className="text-emergency">
