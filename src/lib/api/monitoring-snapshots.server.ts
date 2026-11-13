@@ -1,39 +1,24 @@
-import { createClient } from "@supabase/supabase-js";
-import type { Database, Json } from "@/integrations/supabase/types";
-import { DISTRICTS } from "@/lib/data/districts";
+import type { Json } from "@/integrations/supabase/types";
 import { fetchLiveData, storedDistrictSchema, type LiveMonitoring } from "./live-data";
+import { publicDbClient, readDistricts } from "./public-db.server";
 import { mergeSnapshot, retryingMonitoringFetch } from "./snapshot-rules";
 
 export async function readMonitoringSnapshots(): Promise<LiveMonitoring> {
-  const key = process.env["SUPABASE_PUBLISHABLE_KEY"];
-  const url = process.env["SUPABASE_URL"];
-  if (!key || !url) throw new Error("Monitoring storage unavailable");
-  const client = createClient<Database>(url, key, {
-    auth: { persistSession: false, autoRefreshToken: false },
-    global: {
-      fetch: (input, init) => {
-        const headers = new Headers(init?.headers);
-        if (key.startsWith("sb_") && headers.get("Authorization") === `Bearer ${key}`)
-          headers.delete("Authorization");
-        headers.set("apikey", key);
-        return fetch(input, { ...init, headers });
-      },
-    },
-  });
+  const client = publicDbClient();
   const [{ data, error }, references] = await Promise.all([
     client.from("monitoring_snapshots").select("district_id,metrics,fetched_at"),
-    client.from("districts").select("id", { count: "exact" }),
+    readDistricts(),
   ]);
   if (error) throw new Error("Monitoring storage temporarily unavailable");
   return {
     origin: "snapshot",
-    referenceCount: references.count ?? 0,
+    referenceCount: references.length,
     fetchedAt:
       data
         ?.map((row) => row.fetched_at)
         .sort()
         .at(-1) ?? "",
-    districts: DISTRICTS.map((d) => {
+    districts: references.map((d) => {
       const row = data?.find((row) => row.district_id === d.id);
       const parsed = storedDistrictSchema.safeParse(row?.metrics);
       if (parsed.success)
@@ -57,18 +42,21 @@ export async function readMonitoringSnapshots(): Promise<LiveMonitoring> {
 }
 
 // Called only by the authenticated scheduler, never by page reads.
-export async function refreshMonitoringSnapshots() {
+export async function refreshMonitoringSnapshots(triggerSource: "schedule" | "manual") {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const startedAt = new Date().toISOString();
   const { data: run, error: startError } = await supabaseAdmin
     .from("monitoring_runs")
-    .insert({ started_at: startedAt })
+    .insert({ started_at: startedAt, trigger_source: triggerSource })
     .select("id")
     .single();
   if (startError || !run) throw new Error("Monitoring run logging unavailable");
+  let total = 0;
   try {
-    const previous = await readMonitoringSnapshots();
-    const latest = await fetchLiveData(retryingMonitoringFetch(), DISTRICTS, {
+    const [previous, districts] = await Promise.all([readMonitoringSnapshots(), readDistricts()]);
+    if (!districts.length) throw new Error("No district reference rows available");
+    total = districts.length;
+    const latest = await fetchLiveData(retryingMonitoringFetch(), districts, {
       baseUrl: process.env["OPEN_METEO_BASE_URL"],
       apiKey: process.env["OPEN_METEO_API_KEY"],
     });
@@ -120,7 +108,7 @@ export async function refreshMonitoringSnapshots() {
         .update({
           finished_at: finishedAt,
           status:
-            ok === DISTRICTS.length
+            ok === districts.length
               ? "success"
               : ok > 0 || latest.districts.some((d) => d.weather || d.flood)
                 ? "partial"
@@ -129,7 +117,7 @@ export async function refreshMonitoringSnapshots() {
             (latest.diagnostics ?? []).map((d) => [d.source, d.status]),
           ),
           districts_ok: ok,
-          districts_failed: DISTRICTS.length - ok,
+          districts_failed: districts.length - ok,
           error_text: errors.join("; ") || null,
         })
         .eq("id", run.id),
@@ -147,7 +135,7 @@ export async function refreshMonitoringSnapshots() {
       .update({
         status: "failed",
         finished_at: new Date().toISOString(),
-        districts_failed: DISTRICTS.length,
+        districts_failed: total,
         error_text: "Monitoring refresh failed; prior snapshots retained",
       })
       .eq("id", run.id);
