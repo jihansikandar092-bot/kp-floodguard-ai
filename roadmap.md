@@ -1,4 +1,8 @@
 # Live monitoring
+- [ ] Add district reference storage, monitoring run history and service health without replacing working snapshots.
+- [ ] Stop retries on 429, support optional paid weather configuration, and verify retention and six-hour fallback rules.
+- [ ] Remove invented observations, alerts, historical series and seeded requests; connect landing numbers to stored readings.
+- [ ] Resolve lint findings, run tests, check automatic type/build results, and verify preview and published monitoring flows.
 - [x] Store independent successful monitoring snapshots and refresh every 30 minutes with bounded retries.
 - [x] Read snapshots without visitor-triggered server provider calls; selected-district browser fallback only without snapshots.
 - [x] Verify 15 tests and preview Swat/Bannu/map/mobile; authenticated refresh saved all 12 districts, both APIs returned 200, visitors made no provider calls.
