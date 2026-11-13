@@ -10,16 +10,18 @@ import { cn } from "@/lib/utils";
 import { DemoBanner, PageHeader } from "@/components/site/Demo";
 import { Panel, StatCard } from "@/components/dashboard/Panel";
 import { RainfallChart, RiverChart } from "@/components/dashboard/Charts";
-import { FEATURED_DISTRICTS, getDistrict } from "@/lib/data/districts";
-import { getMonitoringSnapshot } from "@/lib/api/monitoring";
+import { districtListOptions } from "@/lib/api/district-query";
 
 export const Route = createFileRoute("/dashboard")({
   validateSearch: (s: Record<string, unknown>): { district?: string | undefined } => {
     const d = s["district"];
-    return { district: typeof d === "string" && getDistrict(d) ? d : undefined };
+    return { district: typeof d === "string" && /^[a-z0-9-]{1,40}$/.test(d) ? d : undefined };
   },
   loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(liveMonitoringOptions());
+    await Promise.all([
+      context.queryClient.ensureQueryData(liveMonitoringOptions()),
+      context.queryClient.ensureQueryData(districtListOptions()),
+    ]);
   },
   pendingComponent: MonitoringPending,
   errorComponent: MonitoringError,
@@ -45,10 +47,12 @@ export const Route = createFileRoute("/dashboard")({
 });
 
 function DashboardPage() {
-  const { district: districtId } = Route.useSearch();
-  const snap = getMonitoringSnapshot(districtId);
+  const { district: searchId } = Route.useSearch();
+  const { data: districts } = useSuspenseQuery(districtListOptions());
+  const snap = { district: districts.find((d) => d.id === searchId) };
+  const districtId = snap.district?.id;
   const { data: storedData } = useSuspenseQuery(liveMonitoringOptions());
-  const { data, fallbackLoading } = useMonitoringFallback(storedData, districtId);
+  const { data, fallbackLoading } = useMonitoringFallback(storedData, districts, districtId);
   const live = liveSnapshot(data, districtId);
   const t = live.totals;
   const scope = snap.district?.name ?? "All monitored districts";
@@ -81,7 +85,7 @@ function DashboardPage() {
 
         <nav aria-label="District filter" className="flex flex-wrap gap-2">
           <FilterChip active={!districtId} label="All districts" search={{ district: undefined }} />
-          {FEATURED_DISTRICTS.map((d) => (
+          {districts.map((d) => (
             <FilterChip
               key={d.id}
               active={districtId === d.id}

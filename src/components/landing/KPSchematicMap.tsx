@@ -128,18 +128,16 @@ export function KPSchematicMap({ districts }: { districts: District[] }) {
               />
             )}
             <circle r={high ? 6 : 4.5} fill={color} stroke="var(--navy-deep)" strokeWidth="1.5" />
-            {true && (
-              <text
-                x="9"
-                y="4"
-                fontSize="11"
-                fontFamily="var(--font-mono)"
-                fill="var(--navy-foreground)"
-                fontWeight="600"
-              >
-                {d.name}
-              </text>
-            )}
+            <text
+              x="8"
+              y="4"
+              fontSize="9"
+              fontFamily="var(--font-mono)"
+              fill="var(--navy-foreground)"
+              fontWeight="600"
+            >
+              {d.name}
+            </text>
           </g>
         );
       })}

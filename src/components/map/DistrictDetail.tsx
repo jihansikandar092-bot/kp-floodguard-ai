@@ -48,6 +48,14 @@ export function DistrictDetail({
           {live?.weatherError ?? live?.floodError ?? "Data not available for this metric"}
         </p>
       )}
+      {live?.retainedMetrics?.length ? (
+        <p role="status" className="mt-2 text-xs text-muted-foreground">
+          Last good value kept for:{" "}
+          {live.retainedMetrics
+            .map((m) => `${m.metric}${m.since ? ` (from ${m.since.replace("T", " ").slice(0, 16)} UTC)` : ""}`)
+            .join(", ")}
+        </p>
+      ) : null}
       <dl className="mt-4 grid grid-cols-2 gap-3">
         <Metric
           icon={CloudRain}
@@ -76,13 +84,11 @@ export function DistrictDetail({
         Experimental estimate, not an official warning.
       </p>
 
-      {(
-        <Button asChild variant="outline" className="mt-auto pt-2">
-          <Link to="/dashboard" search={{ district: district.id }}>
-            <Gauge /> Open in dashboard
-          </Link>
-        </Button>
-      )}
+      <Button asChild variant="outline" className="mt-auto pt-2">
+        <Link to="/dashboard" search={{ district: district.id }}>
+          <Gauge /> Open in dashboard
+        </Link>
+      </Button>
     </div>
   );
 }

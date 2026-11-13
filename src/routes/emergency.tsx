@@ -8,7 +8,12 @@ import { openAssistant } from "@/lib/assistant/events";
 import { formatPkt } from "@/lib/request-display";
 import { EMERGENCY_TYPE_LABEL, type EmergencyRequest } from "@/lib/emergency";
 
+import { districtListOptions } from "@/lib/api/district-query";
+
 export const Route = createFileRoute("/emergency")({
+  loader: async ({ context }) => {
+    await context.queryClient.ensureQueryData(districtListOptions());
+  },
   head: () => ({
     meta: [
       { property: "og:type", content: "website" },
