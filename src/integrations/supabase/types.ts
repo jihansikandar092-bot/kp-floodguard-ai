@@ -50,6 +50,68 @@ export type Database = {
         }
         Relationships: []
       }
+      emergency_requests: {
+        Row: {
+          created_at: string
+          description: string
+          district_id: string | null
+          emergency_type: string
+          full_name: string
+          id: string
+          is_test: boolean
+          language: string
+          location: string
+          people_affected: number
+          phone: string
+          request_code: string
+          status: string
+          tehsil: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          district_id?: string | null
+          emergency_type: string
+          full_name: string
+          id?: string
+          is_test?: boolean
+          language?: string
+          location: string
+          people_affected: number
+          phone: string
+          request_code: string
+          status?: string
+          tehsil: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          district_id?: string | null
+          emergency_type?: string
+          full_name?: string
+          id?: string
+          is_test?: boolean
+          language?: string
+          location?: string
+          people_affected?: number
+          phone?: string
+          request_code?: string
+          status?: string
+          tehsil?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "emergency_requests_district_id_fkey"
+            columns: ["district_id"]
+            isOneToOne: false
+            referencedRelation: "districts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       monitoring_runs: {
         Row: {
           districts_failed: number
@@ -139,15 +201,57 @@ export type Database = {
         }
         Relationships: []
       }
+      submission_rate_limits: {
+        Row: {
+          created_at: string
+          id: string
+          ip_hash: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip_hash: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip_hash?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "coordinator" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -274,6 +378,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "coordinator", "user"],
+    },
   },
 } as const

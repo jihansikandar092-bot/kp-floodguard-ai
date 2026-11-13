@@ -29,6 +29,13 @@
       "when": 1794569500805,
       "tag": "0003_monitoring_run_trigger_source",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794570324238,
+      "tag": "0004_emergency_requests_and_roles",
+      "breakpoints": true
     }
   ]
 }
