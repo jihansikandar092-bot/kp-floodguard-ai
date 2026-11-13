@@ -60,6 +60,7 @@ export type Database = {
           id: string
           started_at: string
           status: string
+          trigger_source: string
         }
         Insert: {
           districts_failed?: number
@@ -70,6 +71,7 @@ export type Database = {
           id?: string
           started_at?: string
           status?: string
+          trigger_source?: string
         }
         Update: {
           districts_failed?: number
@@ -80,6 +82,7 @@ export type Database = {
           id?: string
           started_at?: string
           status?: string
+          trigger_source?: string
         }
         Relationships: []
       }
