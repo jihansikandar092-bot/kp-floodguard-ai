@@ -27,6 +27,7 @@ export async function readMonitoringSnapshots(): Promise<LiveMonitoring> {
           id: d.id,
           weatherError: parsed.data.weatherError ?? null,
           floodError: parsed.data.floodError ?? null,
+          retainedMetrics: parsed.data.retainedMetrics ?? [],
         };
       return {
         id: d.id,
