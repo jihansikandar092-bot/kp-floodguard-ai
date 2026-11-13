@@ -51,3 +51,4 @@ use the editor.
 - District references (names, coordinates) load from the `districts` table via a shared district-list query; code only supplies tehsil/river labels by id, so the table stays the single source of monitored districts.
 - Freshness labels: under 1 h Live, 1–3 h Delayed (X h), over 3 h Outdated; only Outdated uses the emergency colour, so normal readings never look like warnings.
 - Snapshot merges retain last good values per metric and record them in retainedMetrics; monitoring_runs.trigger_source distinguishes schedule from manual runs (manual calls send trigger: "manual").
+- Emergency requests are inserted only through a validated server function (per-IP hashed hourly limit, codes from a DB trigger); coordinator/admin roles gate reads and updates via has_role(), so citizen data never reaches the browser unauthenticated.
