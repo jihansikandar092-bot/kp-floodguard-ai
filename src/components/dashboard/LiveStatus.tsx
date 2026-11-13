@@ -54,7 +54,8 @@ export function LiveStatus({ data, rows }: { data: LiveMonitoring; rows: LiveDis
       </p>
       {data.origin === "browser" && updated && (
         <p className="text-xs text-muted-foreground">
-          Browser source updated: {updated.replace("T", " ").slice(0, 19)} UTC. Stored age above is unchanged.
+          Browser source updated: {updated.replace("T", " ").slice(0, 19)} UTC. Stored age above is
+          unchanged.
         </p>
       )}
       {oldest && (
