@@ -1,7 +1,7 @@
 import { rainfall24h, todayDischarge, type LiveMonitoring } from "@/lib/api/live-data";
 import { CircleMarker, MapContainer, TileLayer, Tooltip } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { DISTRICTS, RISK_COLOR_VAR, RISK_LABEL } from "@/lib/data/districts";
+import { DISTRICTS } from "@/lib/data/districts";
 
 export interface KPMapProps {
   data: LiveMonitoring;
@@ -40,13 +40,13 @@ export default function KPMapLeaflet({ data, selectedId, onSelect, className }: 
             pathOptions={{
               color: selected ? "var(--navy-deep)" : "var(--background)",
               weight: selected ? 3.5 : 2,
-              fillColor: RISK_COLOR_VAR[d.demo.riskLevel],
+              fillColor: "var(--water)",
               fillOpacity: 0.92,
             }}
             eventHandlers={{ click: () => onSelect?.(d.id) }}
           >
             <Tooltip direction="top" offset={[0, -8]}>
-              <strong>{d.name}</strong><br />Rainfall (24h): {rain ?? "—"} mm<br />River discharge: {flow ?? "—"} m³/s<br />{RISK_LABEL[d.demo.riskLevel]} (DEMO risk only)
+              <strong>{d.name}</strong><br />Rainfall (24h): {rain ?? "Not available"} mm<br />River discharge: {flow ?? "Not available"} m³/s<br />Risk: Not available
             </Tooltip>
           </CircleMarker>
         );

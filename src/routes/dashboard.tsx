@@ -4,19 +4,16 @@ import { useMonitoringFallback } from "@/lib/api/use-monitoring-fallback";
 import { liveSnapshot } from "@/lib/api/live-data";
 import { LiveStatus, MonitoringError, MonitoringPending } from "@/components/dashboard/LiveStatus";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { AlertTriangle, CloudRain, Droplets, MapPinned, Thermometer, Waves, Wind } from "lucide-react";
+import { CloudRain, Droplets, MapPinned, Thermometer, Waves, Wind } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { DemoBanner, PageHeader, RiskBadge } from "@/components/site/Demo";
+import { DemoBanner, PageHeader } from "@/components/site/Demo";
 import { Panel, StatCard } from "@/components/dashboard/Panel";
 import {
-  HistoricalChart,
   RainfallChart,
-  RiskComparisonChart,
-  RiskDistributionChart,
   RiverChart,
 } from "@/components/dashboard/Charts";
-import { FEATURED_DISTRICTS, getDistrict, RISK_COLOR_VAR } from "@/lib/data/districts";
+import { FEATURED_DISTRICTS, getDistrict } from "@/lib/data/districts";
 import { getMonitoringSnapshot } from "@/lib/api/monitoring";
 
 export const Route = createFileRoute("/dashboard")({
@@ -33,7 +30,7 @@ export const Route = createFileRoute("/dashboard")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { title: "Flood Monitoring Dashboard — KP FloodGuard AI" },
-      { name: "description", content: "District-wise rainfall, river levels, weather, flood-risk distribution and historical trends for Khyber Pakhtunkhwa with live Open-Meteo weather and GloFAS discharge, plus labelled sample risk and historical data." },
+      { name: "description", content: "District-wise rainfall, river levels, weather, flood-risk distribution and historical trends for Khyber Pakhtunkhwa with live Open-Meteo weather and GloFAS discharge, without invented risk or historical observations." },
       { property: "og:title", content: "Flood Monitoring Dashboard — KP FloodGuard AI" },
       { property: "og:description", content: "Rainfall, river levels and flood-risk comparison across KP districts." },
     ],
@@ -65,85 +62,39 @@ function DashboardPage() {
       <div className="container-page space-y-6 py-8">
         <LiveStatus data={data} rows={live.rows} />
         {fallbackLoading && <p role="status" className="text-sm text-muted-foreground">Fetching selected district directly from Open-Meteo…</p>}
-        <DemoBanner><strong>Demo flood-risk data.</strong> Risk scores, categories, sample alerts and historical events remain illustrative. Weather and river discharge below are live model data; no verified danger thresholds are available.</DemoBanner>
+        <DemoBanner>System-generated from modelled weather and river data. Experimental estimate, not an official warning.</DemoBanner>
 
         <nav aria-label="District filter" className="flex flex-wrap gap-2">
           <FilterChip active={!districtId} label="All districts" search={{ district: undefined }} />
           {FEATURED_DISTRICTS.map((d) => (
-            <FilterChip key={d.id} active={districtId === d.id} label={d.name} search={{ district: d.id }} dot={RISK_COLOR_VAR[d.demo.riskLevel]} />
+            <FilterChip key={d.id} active={districtId === d.id} label={d.name} search={{ district: d.id }} />
           ))}
         </nav>
 
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
-          <StatCard demo={false} icon={MapPinned} label="Districts monitored" value={data.districts.length} hint={`${data.districts.filter(d => d.weather && d.flood).length} with both sources`} />
-          <StatCard demo={false} icon={CloudRain} label="Rainfall (past 24h)" value={t.rainfall24h ?? "—"} unit="mm" hint={snap.district ? scope : "District average"} tone="water" />
-          <StatCard demo={false} icon={Waves} label="River discharge (today)" value={t.discharge ?? "—"} unit="m³/s" hint={snap.district ? "GloFAS model forecast" : "District average · GloFAS"} tone="water" />
-          <StatCard demo={false} icon={Thermometer} label="Temperature" value={t.temperature ?? "—"} unit="°C" />
-          <StatCard demo={false} icon={Droplets} label="Humidity" value={t.humidity ?? "—"} unit="%" />
-          <StatCard demo={false} icon={Wind} label="Wind speed" value={t.wind ?? "—"} unit="km/h" />
+          <StatCard demo={false} icon={MapPinned} label="Districts monitored" value={data.referenceCount ?? "Not available"} hint={`${data.districts.filter(d => d.weather && d.flood).length} with both sources`} />
+          <StatCard demo={false} icon={CloudRain} label="Rainfall (past 24h)" value={t.rainfall24h ?? "Not available"} unit="mm" hint={snap.district ? scope : "District average"} tone="water" />
+          <StatCard demo={false} icon={Waves} label="River discharge (today)" value={t.discharge ?? "Not available"} unit="m³/s" hint={snap.district ? "GloFAS model forecast" : "District average · GloFAS"} tone="water" />
+          <StatCard demo={false} icon={Thermometer} label="Temperature" value={t.temperature ?? "Not available"} unit="°C" />
+          <StatCard demo={false} icon={Droplets} label="Humidity" value={t.humidity ?? "Not available"} unit="%" />
+          <StatCard demo={false} icon={Wind} label="Wind speed" value={t.wind ?? "Not available"} unit="km/h" />
         </div>
 
         <div className="grid gap-6 lg:grid-cols-3">
           <Panel title="Rainfall trend" subtitle={`Past 3 days + next 7 days · ${scope} · mm`} action={<span className="text-xs text-water">Open-Meteo</span>} className="lg:col-span-2" bodyClassName="h-72">
             {live.rainfall.some(d => d.rainfall !== null) ? <RainfallChart data={live.rainfall} /> : <p role="status">{live.rows.find(d => d.weatherError)?.weatherError ?? "Rainfall data not available"}</p>}
           </Panel>
-          <Panel title="Flood-risk distribution" subtitle="Districts by risk category">
-            <div className="relative h-44">
-              <RiskDistributionChart data={snap.distribution} />
-              <div className="pointer-events-none absolute inset-0 grid place-items-center text-center">
-                <div>
-                  <p className="font-mono text-2xl font-bold">{snap.totals.districtsMonitored}</p>
-                  <p className="text-xs text-muted-foreground">districts</p>
-                </div>
-              </div>
-            </div>
-            <ul className="mt-4 space-y-2">
-              {snap.distribution.map((d) => (
-                <li key={d.level} className="flex items-center justify-between text-sm">
-                  <RiskBadge level={d.level} />
-                  <span className="font-mono font-semibold">{d.value}</span>
-                </li>
-              ))}
-            </ul>
-          </Panel>
+          <Panel title="Flood-risk distribution"><p>Not available</p></Panel>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-3">
           <Panel title="River discharge" subtitle={`Past 7 days + next 7 days · ${scope} · m³/s (UTC dates)`} action={<span className="text-xs text-water">GloFAS</span>} className="lg:col-span-2" bodyClassName="h-72">
             {live.river.some(d => d.discharge !== null) ? <RiverChart data={live.river} /> : <p role="status">{live.rows.find(d => d.floodError)?.floodError ?? "River discharge data not available"}</p>}
           </Panel>
-          <Panel title="Recent flood alerts" subtitle="Sample alerts for demonstration" bodyClassName="p-0">
-            {snap.alerts.length === 0 ? (
-              <p className="p-5 text-sm text-muted-foreground">No sample alerts for this district.</p>
-            ) : (
-              <ul className="divide-y">
-                {snap.alerts.map((a) => (
-                  <li key={a.id} className="flex gap-3 px-5 py-3.5">
-                    <AlertTriangle className="mt-0.5 size-4 shrink-0" style={{ color: RISK_COLOR_VAR[a.level] }} aria-hidden />
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium leading-snug">{a.title}</p>
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        {getDistrict(a.districtId)?.name} · {a.hoursAgo}h ago (sample)
-                      </p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </Panel>
+          <Panel title="Recent flood alerts"><p>Not available</p></Panel>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-2">
-          <Panel title="Historical flood events" subtitle={`2010–2024 · illustrative counts · ${scope}`} bodyClassName="h-72">
-            <HistoricalChart data={snap.historical} />
-          </Panel>
-          <Panel title="District-wise risk comparison" subtitle="Model-style risk score, 0–100" bodyClassName="h-[22rem]">
-            <RiskComparisonChart data={snap.comparison} highlightId={districtId} />
-          </Panel>
-        </div>
-        <p className="text-xs text-muted-foreground">
-          Red bars in the historical chart mark 2010 and 2022, widely reported major flood years in KP. Bar heights are illustrative and not a verified dataset.
-        </p>
+        <div className="grid gap-6 lg:grid-cols-2"><Panel title="Historical flood events"><p>Not available</p></Panel><Panel title="District-wise risk comparison"><p>Not available</p></Panel></div>
       </div>
     </>
   );

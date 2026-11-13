@@ -31,8 +31,7 @@ function AdminPage() {
           <div className="flex items-start gap-2">
             <ShieldAlert className="mt-0.5 size-4 shrink-0 sm:hidden" aria-hidden />
             <p>
-              <strong>Coordinator preview.</strong> Rows marked DEMO are fictional samples; rows marked
-              LOCAL were submitted from this browser. Coordinator sign-in and the shared Google Sheets
+              <strong>Coordinator preview.</strong> Rows marked LOCAL were submitted from this browser. No sample requests are provided. Coordinator sign-in and the shared Google Sheets
               database are not connected yet, so status changes are saved on this device only.
             </p>
           </div>

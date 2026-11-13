@@ -17,11 +17,17 @@ import {
 import { Button } from "@/components/ui/button";
 import { KPSchematicMap } from "@/components/landing/KPSchematicMap";
 import { MapLegend } from "@/components/map/KPMap";
-import { DemoBadge } from "@/components/site/Demo";
+import { LiveStatus, MonitoringError, MonitoringPending } from "@/components/dashboard/LiveStatus";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { liveMonitoringOptions } from "@/lib/api/monitoring-query";
+import { liveSnapshot } from "@/lib/api/live-data";
 import { DISTRICTS } from "@/lib/data/districts";
 import riverImg from "@/assets/swat-river-monitoring.jpg";
 
 export const Route = createFileRoute("/")({
+  loader: async ({ context }) => { await context.queryClient.ensureQueryData(liveMonitoringOptions()); },
+  pendingComponent: MonitoringPending,
+  errorComponent: MonitoringError,
   head: () => ({
     meta: [
       { property: "og:type", content: "website" },
@@ -61,7 +67,8 @@ const STEPS = [
 ];
 
 function Index() {
-  const high = DISTRICTS.filter((d) => d.demo.riskLevel === "high").length;
+  const { data } = useSuspenseQuery(liveMonitoringOptions());
+  const totals = liveSnapshot(data).totals;
   return (
     <>
       {/* HERO */}
@@ -93,9 +100,9 @@ function Index() {
               </Button>
             </div>
             <dl className="mt-12 grid max-w-lg grid-cols-3 gap-6 border-t border-navy-line pt-6">
-              <HeroStat k="Districts in demo network" v={String(DISTRICTS.length)} />
-              <HeroStat k="Aid categories" v="5" />
-              <HeroStat k="Languages" v="EN · اردو" />
+              <HeroStat k="Districts monitored" v={data.referenceCount ? String(data.referenceCount) : "Not available"} />
+              <HeroStat k="Rainfall (24h · mm)" v={String(totals.rainfall24h ?? "Not available")} />
+              <HeroStat k="Temperature (°C)" v={String(totals.temperature ?? "Not available")} />
             </dl>
           </div>
 
@@ -103,7 +110,7 @@ function Index() {
             <div className="relative mx-auto aspect-[3/4] max-w-md rounded-2xl border border-navy-line bg-navy-deep/60 p-5 shadow-float">
               <div className="flex items-center justify-between">
                 <p className="eyebrow text-navy-muted">KP Risk Monitor</p>
-                <DemoBadge label="DEMO DATA" />
+                <span className="text-xs text-navy-muted">District locations</span>
               </div>
               <div className="relative mt-3 h-[calc(100%-5.5rem)]">
                 <div className="pointer-events-none absolute left-1/2 top-1/2 aspect-square w-[85%] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full border border-navy-line" aria-hidden>
@@ -112,7 +119,7 @@ function Index() {
                 <KPSchematicMap />
               </div>
               <div className="absolute inset-x-5 bottom-5 flex items-center justify-between rounded-lg border border-navy-line bg-navy px-3 py-2 text-xs">
-                <span className="text-navy-muted">{high} districts at high risk (sample)</span>
+                <span className="text-navy-muted">Flood risk: Not available</span>
                 <span className="[&_li]:text-navy-foreground"><MapLegend /></span>
               </div>
             </div>
@@ -120,6 +127,7 @@ function Index() {
         </div>
       </section>
 
+      <div className="container-page py-4"><LiveStatus data={data} rows={data.districts} /></div>
       {/* ABOUT */}
       <section id="about" className="scroll-mt-28 py-20 lg:py-28">
         <div className="container-page grid items-center gap-12 lg:grid-cols-2">
@@ -246,7 +254,7 @@ function Index() {
 function HeroStat({ k, v }: { k: string; v: string }) {
   return (
     <div>
-      <dd className="font-mono text-2xl font-bold">{v}</dd>
+      <dd className="font-mono text-xl font-bold break-words">{v}</dd>
       <dt className="mt-1 text-xs text-navy-muted">{k}</dt>
     </div>
   );

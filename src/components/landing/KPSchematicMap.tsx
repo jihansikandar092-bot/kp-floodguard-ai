@@ -1,4 +1,4 @@
-import { DISTRICTS, RISK_COLOR_VAR } from "@/lib/data/districts";
+import { DISTRICTS } from "@/lib/data/districts";
 
 /** Schematic (not survey-accurate) outline of KP for the hero visual. */
 const OUTLINE: [number, number][] = [
@@ -31,15 +31,15 @@ const path = (pts: [number, number][], close = false) =>
 
 export function KPSchematicMap() {
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="h-full w-full" role="img" aria-label="Schematic map of Khyber Pakhtunkhwa with demo flood-risk indicators for 12 districts">
+    <svg viewBox={`0 0 ${W} ${H}`} className="h-full w-full" role="img" aria-label="Schematic map of Khyber Pakhtunkhwa with district reference locations">
       <path d={path(OUTLINE, true)} fill="var(--navy)" stroke="var(--navy-muted)" strokeOpacity="0.5" strokeWidth="1.2" />
       {RIVERS.map((r, i) => (
         <path key={i} d={path(r)} fill="none" stroke="var(--water)" strokeWidth={i === 0 ? 2.4 : 1.6} strokeLinecap="round" strokeLinejoin="round" opacity="0.85" />
       ))}
       {DISTRICTS.map((d) => {
         const p = project(d.lat, d.lng);
-        const color = RISK_COLOR_VAR[d.demo.riskLevel];
-        const high = d.demo.riskLevel === "high";
+        const color = "var(--water)";
+        const high = false;
         return (
           <g key={d.id} transform={`translate(${p.x} ${p.y})`}>
             {high && (
