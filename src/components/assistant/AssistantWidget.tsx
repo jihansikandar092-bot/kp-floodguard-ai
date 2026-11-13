@@ -18,10 +18,7 @@ import {
 import { EMERGENCY_TYPE_LABEL } from "@/lib/emergency";
 import { submitEmergencyRequest } from "@/lib/api/requests";
 
-export const OPEN_ASSISTANT_EVENT = "kpfg:open-assistant";
-export function openAssistant() {
-  window.dispatchEvent(new CustomEvent(OPEN_ASSISTANT_EVENT));
-}
+import { OPEN_ASSISTANT_EVENT } from "@/lib/assistant/events";
 
 interface ChatMessage extends BotMessage {
   id: number;
@@ -74,7 +71,8 @@ export function AssistantWidget() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
-  const sessionIdRef = useRef(crypto.randomUUID());
+  const sessionIdRef = useRef("");
+  useEffect(() => { sessionIdRef.current = crypto.randomUUID(); }, []);
   const [chatMode, setChatMode] = useState<"intake" | "ai">("intake");
   const idRef = useRef(0);
   const listRef = useRef<HTMLDivElement>(null);

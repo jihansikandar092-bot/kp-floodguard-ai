@@ -17,32 +17,8 @@ import {
 } from "@/lib/emergency";
 import { updateRequestStatus, useEmergencyRequests } from "@/lib/api/requests";
 
-const fmt = new Intl.DateTimeFormat("en-GB", {
-  timeZone: "Asia/Karachi",
-  day: "2-digit",
-  month: "short",
-  year: "numeric",
-  hour: "2-digit",
-  minute: "2-digit",
-  hour12: false,
-});
-export const formatPkt = (iso: string) => `${fmt.format(new Date(iso))} PKT`;
-
+import { formatPkt, filterRequests } from "@/lib/request-display";
 const ALL = "all";
-
-export function filterRequests(
-  list: EmergencyRequest[],
-  f: { district: string; type: string; status: string; q: string },
-) {
-  const q = f.q.trim().toLowerCase();
-  return list.filter(
-    (r) =>
-      (f.district === ALL || r.district === f.district) &&
-      (f.type === ALL || r.type === f.type) &&
-      (f.status === ALL || r.status === f.status) &&
-      (!q || r.id.toLowerCase().includes(q) || r.fullName.toLowerCase().includes(q) || r.location.toLowerCase().includes(q)),
-  );
-}
 
 export function RequestsTable() {
   const requests = useEmergencyRequests();

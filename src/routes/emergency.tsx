@@ -4,8 +4,8 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { DemoBadge, PageHeader } from "@/components/site/Demo";
 import { EmergencyForm } from "@/components/emergency/EmergencyForm";
-import { openAssistant } from "@/components/assistant/AssistantWidget";
-import { formatPkt } from "@/components/admin/RequestsTable";
+import { openAssistant } from "@/lib/assistant/events";
+import { formatPkt } from "@/lib/request-display";
 import { EMERGENCY_TYPE_LABEL, type EmergencyRequest } from "@/lib/emergency";
 
 export const Route = createFileRoute("/emergency")({
