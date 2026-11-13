@@ -1,4 +1,4 @@
-import { DISTRICTS } from "@/lib/data/districts";
+import type { District } from "@/lib/data/districts";
 
 /** Schematic (not survey-accurate) outline of KP for the hero visual. */
 const OUTLINE: [number, number][] = [
@@ -86,7 +86,7 @@ const path = (pts: [number, number][], close = false) =>
     })
     .join(" ") + (close ? " Z" : "");
 
-export function KPSchematicMap() {
+export function KPSchematicMap({ districts }: { districts: District[] }) {
   return (
     <svg
       viewBox={`0 0 ${W} ${H}`}
@@ -113,7 +113,7 @@ export function KPSchematicMap() {
           opacity="0.85"
         />
       ))}
-      {DISTRICTS.map((d) => {
+      {districts.map((d) => {
         const p = project(d.lat, d.lng);
         const color = "var(--water)";
         const high = false;
@@ -128,7 +128,7 @@ export function KPSchematicMap() {
               />
             )}
             <circle r={high ? 6 : 4.5} fill={color} stroke="var(--navy-deep)" strokeWidth="1.5" />
-            {d.featured && (
+            {true && (
               <text
                 x="9"
                 y="4"

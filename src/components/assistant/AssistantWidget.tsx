@@ -14,7 +14,10 @@ import {
   type BotMessage,
   type IntakeState,
   type Lang,
+  setIntakeDistricts,
 } from "@/lib/assistant/intake";
+import { useQuery } from "@tanstack/react-query";
+import { districtListOptions } from "@/lib/api/district-query";
 import { EMERGENCY_TYPE_LABEL } from "@/lib/emergency";
 import { submitEmergencyRequest } from "@/lib/api/requests";
 
@@ -94,6 +97,10 @@ export function AssistantWidget() {
     sessionIdRef.current = crypto.randomUUID();
   }, []);
   const [chatMode, setChatMode] = useState<"intake" | "ai">("intake");
+  const { data: districtList } = useQuery(districtListOptions());
+  useEffect(() => {
+    if (districtList) setIntakeDistricts(districtList);
+  }, [districtList]);
   const idRef = useRef(0);
   const listRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);

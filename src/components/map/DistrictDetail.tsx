@@ -33,7 +33,7 @@ export function DistrictDetail({
       <div className="mt-6 rounded-lg border p-4">
         <div className="flex items-center justify-between text-sm">
           <span className="inline-flex items-center gap-2 font-semibold">
-            <Waves className="size-4 text-water" aria-hidden /> {district.river}
+            <Waves className="size-4 text-water" aria-hidden /> {district.river ?? "River: Not available"}
           </span>
           <span className="font-mono">{flow ?? "Not available"} m³/s</span>
         </div>
@@ -76,7 +76,7 @@ export function DistrictDetail({
         Experimental estimate, not an official warning.
       </p>
 
-      {district.featured && (
+      {(
         <Button asChild variant="outline" className="mt-auto pt-2">
           <Link to="/dashboard" search={{ district: district.id }}>
             <Gauge /> Open in dashboard

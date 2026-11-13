@@ -19,7 +19,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { DemoBadge } from "@/components/site/Demo";
-import { DISTRICTS } from "@/lib/data/districts";
+import { useQuery } from "@tanstack/react-query";
+import { districtListOptions } from "@/lib/api/district-query";
 import {
   EMERGENCY_TYPES,
   EMERGENCY_TYPE_LABEL,
@@ -40,12 +41,13 @@ export function RequestsTable() {
   const [status, setStatus] = useState(ALL);
   const [q, setQ] = useState("");
 
+  const { data: districtList } = useQuery(districtListOptions());
   const districtOptions = useMemo(
     () =>
       Array.from(
-        new Set([...DISTRICTS.map((d) => d.name), ...requests.map((r) => r.district)]),
+        new Set([...(districtList ?? []).map((d) => d.name), ...requests.map((r) => r.district)]),
       ).sort(),
-    [requests],
+    [requests, districtList],
   );
   const rows = useMemo(
     () => filterRequests(requests, { district, type, status, q }),
