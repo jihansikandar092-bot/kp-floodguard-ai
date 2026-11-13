@@ -3,10 +3,10 @@ import { AlertTriangle, Bot, CheckCircle2, Phone } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { DemoBadge, PageHeader } from "@/components/site/Demo";
-import { EmergencyForm } from "@/components/emergency/EmergencyForm";
+import { EmergencyForm, type SubmittedRequest } from "@/components/emergency/EmergencyForm";
 import { openAssistant } from "@/lib/assistant/events";
 import { formatPkt } from "@/lib/request-display";
-import { EMERGENCY_TYPE_LABEL, type EmergencyRequest } from "@/lib/emergency";
+import { EMERGENCY_TYPE_LABEL } from "@/lib/emergency";
 
 import { districtListOptions } from "@/lib/api/district-query";
 
@@ -35,7 +35,7 @@ export const Route = createFileRoute("/emergency")({
 });
 
 function EmergencyPage() {
-  const [submitted, setSubmitted] = useState<EmergencyRequest | null>(null);
+  const [submitted, setSubmitted] = useState<SubmittedRequest | null>(null);
 
   return (
     <>
@@ -95,9 +95,9 @@ function EmergencyPage() {
   );
 }
 
-function Confirmation({ request, onReset }: { request: EmergencyRequest; onReset: () => void }) {
+function Confirmation({ request, onReset }: { request: SubmittedRequest; onReset: () => void }) {
   const rows: [string, React.ReactNode][] = [
-    ["Request ID", <span className="font-mono font-semibold">{request.id}</span>],
+    ["Request ID", <span className="font-mono font-semibold">{request.code}</span>],
     ["Recorded", formatPkt(request.createdAt)],
     ["Emergency type", EMERGENCY_TYPE_LABEL[request.type].en],
     ["Name", request.fullName],
@@ -116,7 +116,7 @@ function Confirmation({ request, onReset }: { request: EmergencyRequest; onReset
         <div>
           <h2 className="text-2xl font-extrabold">Request recorded</h2>
           <p className="mt-1 text-muted-foreground">
-            Reference <span className="font-mono font-semibold text-foreground">{request.id}</span>
+            Reference <span className="font-mono font-semibold text-foreground">{request.code}</span>
           </p>
         </div>
       </div>
@@ -124,9 +124,9 @@ function Confirmation({ request, onReset }: { request: EmergencyRequest; onReset
       <div className="mt-6 flex gap-3 rounded-lg border border-demo-foreground/20 bg-demo p-4 text-sm text-demo-foreground">
         <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden />
         <p>
-          <strong>Prototype notice:</strong> this request is saved on this device as a demo record
-          and has <strong>not</strong> been sent to rescue teams. The coordination system (n8n and
-          Google Sheets) is not connected yet. If anyone is in danger, call Rescue 1122 now.
+          In a life-threatening emergency call Rescue 1122 immediately. This request is recorded
+          for coordinators to review; it does not guarantee dispatch.
+          {request.isTest && <strong> Marked as a test request.</strong>}
         </p>
       </div>
 
@@ -149,9 +149,9 @@ function Confirmation({ request, onReset }: { request: EmergencyRequest; onReset
           Submit another request
         </Button>
         <Button asChild variant="ghost">
-          <Link to="/admin">View in coordinator preview</Link>
+          <Link to="/admin">Coordinator dashboard</Link>
         </Button>
-        <DemoBadge className="ml-auto" label="STATUS: PENDING · NOT DISPATCHED" />
+        <DemoBadge className="ml-auto" label="STATUS: PENDING REVIEW" />
       </div>
     </div>
   );

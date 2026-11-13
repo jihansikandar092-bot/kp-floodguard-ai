@@ -19,7 +19,8 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { districtListOptions } from "@/lib/api/district-query";
 import { EMERGENCY_TYPE_LABEL } from "@/lib/emergency";
-import { submitEmergencyRequest } from "@/lib/api/requests";
+import { useServerFn } from "@tanstack/react-start";
+import { submitEmergencyRequest } from "@/lib/api/requests.functions";
 
 import { OPEN_ASSISTANT_EVENT } from "@/lib/assistant/events";
 
@@ -43,7 +44,7 @@ const UI = {
     reset: "Start over",
     summaryTitle: "Request summary",
     saved: (id: string) =>
-      `Your request has been recorded as ${id}. Important: it is saved on this device only as a demo record and has NOT been sent to rescue teams — the coordination system is not connected yet. If anyone is in danger, call Rescue 1122 immediately.`,
+      `Your request has been recorded as ${id}. It is recorded for coordinators to review; this does not guarantee dispatch. In a life-threatening emergency call Rescue 1122 immediately.`,
     newReq: "Start a new request",
   },
   ur: {
@@ -57,7 +58,7 @@ const UI = {
     reset: "دوبارہ شروع کریں",
     summaryTitle: "درخواست کا خلاصہ",
     saved: (id: string) =>
-      `آپ کی درخواست ${id} کے طور پر درج ہو گئی ہے۔ اہم: یہ صرف اس ڈیوائس پر ڈیمو ریکارڈ کے طور پر محفوظ ہے اور ریسکیو ٹیموں کو نہیں بھیجی گئی — رابطہ نظام ابھی منسلک نہیں۔ خطرے کی صورت میں فوراً 1122 پر کال کریں۔`,
+      `آپ کی درخواست ${id} کے طور پر درج ہو گئی ہے۔ یہ کوآرڈینیٹرز کے جائزے کے لیے درج ہے؛ اس سے امداد بھیجنے کی ضمانت نہیں ملتی۔ جان کو خطرہ ہو تو فوراً ریسکیو 1122 پر کال کریں۔`,
     newReq: "نئی درخواست شروع کریں",
   },
 } as const;
@@ -88,6 +89,7 @@ const FIELD_LABELS = {
 export function AssistantWidget() {
   const [open, setOpen] = useState(false);
   const [lang, setLang] = useState<Lang>("en");
+  const submitFn = useServerFn(submitEmergencyRequest);
   const [state, setState] = useState<IntakeState>(initialIntake);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
@@ -214,16 +216,21 @@ export function AssistantWidget() {
     } else {
       setBusy(true);
       try {
-        const { request } = await submitEmergencyRequest(result.data, "assistant");
+        const res = await submitFn({ data: { ...result.data, language: lang, isTest: false } });
         setState(result.state);
         push([
-          {
-            role: "bot",
-            text: UI[lang].saved(request.id),
-            requestId: request.id,
-            chips: [{ label: UI[lang].newReq, value: "__new" }],
-          },
+          res.ok
+            ? {
+                role: "bot",
+                text: UI[lang].saved(res.code),
+                requestId: res.code,
+                chips: [{ label: UI[lang].newReq, value: "__new" }],
+              }
+            : { role: "bot", text: res.message },
         ]);
+      } catch (e) {
+        console.error("assistant submit failed", e);
+        push([{ role: "bot", text: lang === "ur" ? "درخواست نہیں بھیجی جا سکی۔ دوبارہ کوشش کریں یا 1122 پر کال کریں۔" : "Could not send the request. Try again or call Rescue 1122." }]);
       } finally {
         setBusy(false);
       }
@@ -386,7 +393,7 @@ export function AssistantWidget() {
                       className="mt-2 block text-xs font-semibold underline"
                       onClick={() => setOpen(false)}
                     >
-                      View in coordinator preview →
+                      Coordinator dashboard →
                     </Link>
                   )}
                 </div>
