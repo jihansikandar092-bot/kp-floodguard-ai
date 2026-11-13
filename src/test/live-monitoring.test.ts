@@ -51,7 +51,7 @@ describe("Live monitoring rules", () => {
     expect(data.districts[0]?.weather?.current.temperature_2m).toBe(24);
     expect(data.districts[2]?.weather).toBeNull();
     expect(liveSnapshot(data).totals.temperature).toBe(24);
-    expect(liveSnapshot(data, "bannu").totals.temperature).toBeNull();
+    expect(liveSnapshot(data, "di-khan").totals.temperature).toBeNull();
   });
   it("accepts a single object response as well as multi-coordinate arrays", async () => {
     const weather = {
