@@ -18,7 +18,7 @@ export function LiveStatus({ data, rows }: { data: LiveMonitoring; rows: LiveDis
     .flatMap((d) => [d.weatherUpdatedAt, d.floodUpdatedAt])
     .filter((t): t is string => Boolean(t) && Date.now() - Date.parse(t ?? "") > SNAPSHOT_INTERVAL);
   const oldest = retained.sort()[0];
-  const stale = updated && Date.now() - Date.parse(updated) > STALE_SNAPSHOT_AGE;
+  const stale = data.fetchedAt && Date.now() - Date.parse(data.fetchedAt) > STALE_SNAPSHOT_AGE;
   return (
     <div className="space-y-2 border-b pb-4 text-sm">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -52,6 +52,11 @@ export function LiveStatus({ data, rows }: { data: LiveMonitoring; rows: LiveDis
           ? "Selected district: direct browser fallback. Other districts use stored readings."
           : "Stored readings · scheduled refresh every 30 minutes."}
       </p>
+      {data.origin === "browser" && updated && (
+        <p className="text-xs text-muted-foreground">
+          Browser source updated: {updated.replace("T", " ").slice(0, 19)} UTC. Stored age above is unchanged.
+        </p>
+      )}
       {oldest && (
         <p role="status" className="text-emergency">
           Retained readings: oldest source is{" "}

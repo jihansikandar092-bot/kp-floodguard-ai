@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { DISTRICTS } from "@/lib/data/districts";
 import { fetchLiveData, LIVE_STALE_TIME, type LiveMonitoring } from "./live-data";
-import { needsBrowserFallback } from "./snapshot-rules";
+import { mergeSnapshot, needsBrowserFallback } from "./snapshot-rules";
 
 export function useMonitoringFallback(snapshot: LiveMonitoring, selectedId?: string) {
   const district = DISTRICTS.find((d) => d.id === selectedId);
@@ -26,7 +26,9 @@ export function useMonitoringFallback(snapshot: LiveMonitoring, selectedId?: str
       ...snapshot,
       origin: "browser" as const,
       districts: snapshot.districts.map((d) =>
-        d.id === selectedId ? (fallback.data.districts[0] ?? d) : d,
+        d.id === selectedId && fallback.data.districts[0]
+          ? mergeSnapshot(d, fallback.data.districts[0])
+          : d,
       ),
     },
     fallbackLoading: false,

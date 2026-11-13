@@ -77,7 +77,7 @@ export function SiteFooter() {
             © {new Date().getFullYear()} KP FloodGuard AI · Prototype for research and demonstration
           </p>
           <p>
-            Live weather &amp; discharge: Open-Meteo / GloFAS · Risk &amp; historical figures: DEMO.
+            Weather &amp; discharge: Open-Meteo / GloFAS · Risk &amp; historical records: Not available.
           </p>
         </div>
       </div>
