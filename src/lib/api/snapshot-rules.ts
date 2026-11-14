@@ -84,11 +84,17 @@ export function startOfUtcDay(now: Date): string {
   ).toISOString();
 }
 
-export function hasDailyLimit429(runs: { http_status: unknown }[]): boolean {
+// Only the provider's daily-quota 429 pauses; minutely/hourly 429s just fail this run.
+const DAILY_LIMIT_TEXT = /daily api request limit exceeded/i;
+export function hasDailyLimit429(
+  runs: { http_status: unknown; error_text?: string | null }[],
+): boolean {
   return runs.some((run) => {
     const status = run.http_status;
     if (status === null || typeof status !== "object" || Array.isArray(status)) return false;
-    return Object.values(status).some((s) => s === 429);
+    return (
+      Object.values(status).some((s) => s === 429) && DAILY_LIMIT_TEXT.test(run.error_text ?? "")
+    );
   });
 }
 

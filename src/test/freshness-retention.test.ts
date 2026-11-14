@@ -102,13 +102,36 @@ describe("browser fallback device cache", () => {
 });
 
 describe("daily-limit pause", () => {
-  it("detects a 429 in any provider status", () => {
-    expect(hasDailyLimit429([{ http_status: { "Open-Meteo": 429, GloFAS: 200 } }])).toBe(true);
-    expect(hasDailyLimit429([{ http_status: { GloFAS: 429 } }])).toBe(true);
+  const daily =
+    "Open-Meteo: Open-Meteo returned 429: Daily API request limit exceeded. Please try again tomorrow.";
+  it("pauses only on the daily-limit 429", () => {
+    expect(
+      hasDailyLimit429([{ http_status: { "Open-Meteo": 429, GloFAS: 200 }, error_text: daily }]),
+    ).toBe(true);
+  });
+  it("minutely or hourly 429s do not pause", () => {
+    expect(
+      hasDailyLimit429([
+        {
+          http_status: { "Open-Meteo": 429 },
+          error_text: "Open-Meteo returned 429: Minutely API request limit exceeded.",
+        },
+      ]),
+    ).toBe(false);
+    expect(
+      hasDailyLimit429([
+        {
+          http_status: { GloFAS: 429 },
+          error_text: "GloFAS returned 429: Hourly API request limit exceeded.",
+        },
+      ]),
+    ).toBe(false);
+    expect(hasDailyLimit429([{ http_status: { GloFAS: 429 }, error_text: null }])).toBe(false);
   });
   it("does not pause on other failures or success", () => {
-    expect(hasDailyLimit429([{ http_status: { "Open-Meteo": 500 } }])).toBe(false);
-    expect(hasDailyLimit429([{ http_status: { "Open-Meteo": 200, GloFAS: 200 } }])).toBe(false);
+    expect(hasDailyLimit429([{ http_status: { "Open-Meteo": 500 }, error_text: daily }])).toBe(
+      false,
+    );
     expect(hasDailyLimit429([{ http_status: null }, { http_status: {} }])).toBe(false);
     expect(hasDailyLimit429([])).toBe(false);
   });
