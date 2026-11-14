@@ -75,7 +75,10 @@ function DashboardPage() {
       value: riskRows.filter((x) => x.r.level === level).length,
     }))
     .filter((x) => x.value > 0);
-  const latestRisk = riskRows.map((x) => x.r.computedAt).sort().at(-1);
+  const latestRisk = riskRows
+    .map((x) => x.r.computedAt)
+    .sort()
+    .at(-1);
   const scope = snap.district?.name ?? "All monitored districts";
 
   return (

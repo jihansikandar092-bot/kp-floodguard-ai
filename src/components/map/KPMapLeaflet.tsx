@@ -63,7 +63,10 @@ export default function KPMapLeaflet({
               <br />
               River discharge: {flow ?? "Not available"} m³/s
               <br />
-              Risk: {risk ? `${RISK_LABEL[risk.level]} (${risk.score}/100, experimental)` : "Not available"}
+              Risk:{" "}
+              {risk
+                ? `${RISK_LABEL[risk.level]} (${risk.score}/100, experimental)`
+                : "Not available"}
             </Tooltip>
           </CircleMarker>
         );
