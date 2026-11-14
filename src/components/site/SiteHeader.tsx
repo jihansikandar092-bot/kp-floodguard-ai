@@ -8,7 +8,6 @@ import { Logo } from "./Logo";
 const NAV = [
   { to: "/dashboard", label: "Dashboard" },
   { to: "/map", label: "Flood Map" },
-  { to: "/admin", label: "Coordinators" },
   { to: "/integrations", label: "Integrations" },
   { to: "/contact", label: "Contact" },
 ] as const;

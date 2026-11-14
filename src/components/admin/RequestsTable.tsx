@@ -34,7 +34,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { listEmergencyRequests, updateEmergencyStatus } from "@/lib/api/requests.functions";
 import { useCoordinator } from "@/lib/api/use-coordinator";
 
-import { formatPkt, filterRequests } from "@/lib/request-display";
+import { formatPkt, filterRequests, maskPhone } from "@/lib/request-display";
 const ALL = "all";
 
 export function RequestsTable() {
@@ -207,9 +207,7 @@ function RequestsView({ requests }: { requests: EmergencyRequest[] }) {
                   </TableCell>
                   <TableCell className="font-medium">{r.fullName}</TableCell>
                   <TableCell className="font-mono text-xs">
-                    <a href={`tel:${r.phone}`} className="hover:underline">
-                      {r.phone}
-                    </a>
+                    <PhoneReveal phone={r.phone} code={r.code} />
                   </TableCell>
                   <TableCell>
                     {r.district}
@@ -252,14 +250,7 @@ function RequestsView({ requests }: { requests: EmergencyRequest[] }) {
               </div>
               <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
                 <Item k="Name" v={r.fullName} />
-                <Item
-                  k="Phone"
-                  v={
-                    <a href={`tel:${r.phone}`} className="font-mono underline">
-                      {r.phone}
-                    </a>
-                  }
-                />
+                <Item k="Phone" v={<PhoneReveal phone={r.phone} code={r.code} />} />
                 <Item k="District / Tehsil" v={`${r.district} · ${r.tehsil}`} />
                 <Item k="People affected" v={r.peopleAffected} />
                 <div className="col-span-2">
@@ -285,6 +276,29 @@ function RequestsView({ requests }: { requests: EmergencyRequest[] }) {
         )}
       </div>
     </div>
+  );
+}
+
+function PhoneReveal({ phone, code }: { phone: string; code: string }) {
+  const [shown, setShown] = useState(false);
+  if (shown)
+    return (
+      <a href={`tel:${phone}`} className="font-mono underline">
+        {phone}
+      </a>
+    );
+  return (
+    <span className="inline-flex items-center gap-2 font-mono">
+      {maskPhone(phone)}
+      <button
+        type="button"
+        onClick={() => setShown(true)}
+        className="rounded border px-1.5 py-0.5 font-sans text-[11px] hover:bg-muted"
+        aria-label={`Reveal phone for ${code}`}
+      >
+        Reveal
+      </button>
+    </span>
   );
 }
 
