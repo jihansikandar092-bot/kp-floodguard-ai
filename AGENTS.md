@@ -52,3 +52,4 @@ use the editor.
 - Freshness labels: under 1 h Live, 1–3 h Delayed (X h), over 3 h Outdated; only Outdated uses the emergency colour, so normal readings never look like warnings.
 - Snapshot merges retain last good values per metric and record them in retainedMetrics; monitoring_runs.trigger_source distinguishes schedule from manual runs (manual calls send trigger: "manual").
 - Emergency requests are inserted only through a validated server function (per-IP hashed hourly limit, codes from a DB trigger); coordinator/admin roles gate reads and updates via has_role(), so citizen data never reaches the browser unauthenticated.
+- /admin is guarded client-side (ssr:false beforeLoad: getUser → /login, then server has_role via getCoordinatorStatus); public sign-up is disabled in auth settings, so coordinator accounts are created manually.
