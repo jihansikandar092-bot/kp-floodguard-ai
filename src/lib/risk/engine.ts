@@ -179,11 +179,11 @@ function reason(f: Record<FactorKey, RiskFactor>, hasHistory: boolean, complete:
   if (f.pastRain3d.value !== null && s("pastRain3d") >= 40)
     parts.push(`wet past 3 days (${f.pastRain3d.value} mm)`);
   if (f.dischargePeak.score !== null) {
-    const ref = hasHistory
-      ? "the district's historical annual maximum"
-      : "its range over the past 7 days";
+    const p = s("dischargePeak");
     parts.push(
-      `discharge forecast ${s("dischargePeak") >= 70 ? "near or above" : s("dischargePeak") >= 30 ? "approaching" : "well below"} ${ref}`,
+      hasHistory
+        ? `discharge forecast ${p >= 70 ? "near or above" : p >= 30 ? "approaching" : "well below"} the district's historical annual maximum`
+        : `discharge forecast ${p >= 70 ? "well above" : p >= 30 ? "above" : "within or close to"} its range over the past 7 days`,
     );
   }
   if (f.dischargeTrend.value !== null)
