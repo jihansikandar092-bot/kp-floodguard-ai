@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { freshness, hasDailyLimit429, mergeSnapshot, startOfUtcDay } from "@/lib/api/snapshot-rules";
+import {
+  freshness,
+  hasDailyLimit429,
+  mergeSnapshot,
+  startOfUtcDay,
+} from "@/lib/api/snapshot-rules";
 import { readFallbackCache, writeFallbackCache } from "@/lib/api/fallback-cache";
 import type { LiveDistrict, LiveMonitoring } from "@/lib/api/live-data";
 
