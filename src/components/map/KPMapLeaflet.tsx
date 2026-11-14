@@ -1,10 +1,12 @@
 import { rainfall24h, todayDischarge, type LiveMonitoring } from "@/lib/api/live-data";
 import { CircleMarker, MapContainer, TileLayer, Tooltip } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import type { District } from "@/lib/data/districts";
+import { RISK_COLOR_VAR, RISK_LABEL, type District } from "@/lib/data/districts";
+import type { StoredRiskAssessment } from "@/lib/risk/types";
 
 export interface KPMapProps {
   data: LiveMonitoring;
+  risks: StoredRiskAssessment[];
   districts: District[];
   selectedId?: string | undefined;
   onSelect?: ((id: string) => void) | undefined;
@@ -13,6 +15,7 @@ export interface KPMapProps {
 
 export default function KPMapLeaflet({
   data,
+  risks,
   districts,
   selectedId,
   onSelect,
@@ -38,6 +41,7 @@ export default function KPMapLeaflet({
         const live = data.districts.find((row) => row.id === d.id);
         const rain = rainfall24h(live?.weather ?? null);
         const flow = todayDischarge(live?.flood ?? null, live?.floodUpdatedAt ?? data.fetchedAt);
+        const risk = risks.find((r) => r.districtId === d.id);
         const radius = rain === null ? 9 : 9 + Math.min(12, rain / 5);
         return (
           <CircleMarker
@@ -47,7 +51,7 @@ export default function KPMapLeaflet({
             pathOptions={{
               color: selected ? "var(--navy-deep)" : "var(--background)",
               weight: selected ? 3.5 : 2,
-              fillColor: "var(--water)",
+              fillColor: risk ? RISK_COLOR_VAR[risk.level] : "var(--water)",
               fillOpacity: 0.92,
             }}
             eventHandlers={{ click: () => onSelect?.(d.id) }}
@@ -59,7 +63,7 @@ export default function KPMapLeaflet({
               <br />
               River discharge: {flow ?? "Not available"} m³/s
               <br />
-              Risk: Not available
+              Risk: {risk ? `${RISK_LABEL[risk.level]} (${risk.score}/100, experimental)` : "Not available"}
             </Tooltip>
           </CircleMarker>
         );

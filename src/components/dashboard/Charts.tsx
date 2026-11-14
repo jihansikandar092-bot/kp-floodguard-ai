@@ -120,7 +120,7 @@ export function RiskComparisonChart({
         <Tooltip
           {...tooltipStyle}
           cursor={{ fill: "var(--muted)" }}
-          formatter={(v: number) => [`${v}/100`, "Risk score (demo)"]}
+          formatter={(v: number) => [`${v}/100`, "Risk score (experimental)"]}
         />
         <Bar dataKey="score" radius={[0, 4, 4, 0]} barSize={14}>
           {data.map((d) => (

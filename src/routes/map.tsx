@@ -10,12 +10,16 @@ import { KPMap, MapLegend } from "@/components/map/KPMap";
 import { DistrictDetail } from "@/components/map/DistrictDetail";
 import { DemoBanner, PageHeader } from "@/components/site/Demo";
 import { districtListOptions } from "@/lib/api/district-query";
+import { riskAssessmentOptions } from "@/lib/risk/risk-query";
+import { RISK_COLOR_VAR } from "@/lib/data/districts";
+import { RISK_DISCLAIMER } from "@/components/risk/RiskExplain";
 
 export const Route = createFileRoute("/map")({
   loader: async ({ context }) => {
     await Promise.all([
       context.queryClient.ensureQueryData(liveMonitoringOptions()),
       context.queryClient.ensureQueryData(districtListOptions()),
+      context.queryClient.ensureQueryData(riskAssessmentOptions()),
     ]);
   },
   pendingComponent: MonitoringPending,
@@ -29,7 +33,7 @@ export const Route = createFileRoute("/map")({
       {
         name: "description",
         content:
-          "Interactive map of Khyber Pakhtunkhwa with district flood-risk markers. Click a district for rainfall, live Open-Meteo weather and GloFAS river discharge (risk estimates are not available).",
+          "Interactive map of Khyber Pakhtunkhwa with district flood-risk markers. Click a district for rainfall, live Open-Meteo weather and GloFAS river discharge and experimental risk estimates.",
       },
       { property: "og:title", content: "Interactive KP Flood Map — KP FloodGuard AI" },
       {
@@ -46,6 +50,7 @@ function MapPage() {
   const [chosenId, setSelectedId] = useState<string>();
   const district = DISTRICTS.find((d) => d.id === chosenId) ?? DISTRICTS[0];
   const selectedId = district?.id;
+  const { data: risks } = useSuspenseQuery(riskAssessmentOptions());
   const { data: storedData } = useSuspenseQuery(liveMonitoringOptions());
   const { data, fallbackLoading } = useMonitoringFallback(storedData, DISTRICTS, selectedId);
   if (!district) return <p className="container-page py-12">No monitored districts available.</p>;
@@ -64,10 +69,7 @@ function MapPage() {
             Fetching selected district directly from Open-Meteo…
           </p>
         )}
-        <DemoBanner>
-          System-generated from modelled weather and river data. Experimental estimate, not an
-          official warning.
-        </DemoBanner>
+        <DemoBanner>{RISK_DISCLAIMER}</DemoBanner>
         <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
           <div className="overflow-hidden rounded-xl border bg-card shadow-card">
             <div className="flex flex-wrap items-center justify-between gap-3 border-b px-4 py-3">
@@ -79,6 +81,7 @@ function MapPage() {
             <div className="relative z-0 h-[460px] md:h-[600px]">
               <KPMap
                 data={data}
+                risks={risks}
                 districts={DISTRICTS}
                 selectedId={selectedId}
                 onSelect={setSelectedId}
@@ -90,6 +93,7 @@ function MapPage() {
               district={district}
               live={data.districts.find((d) => d.id === district.id)}
               fetchedAt={data.fetchedAt}
+              risk={risks.find((r) => r.districtId === district.id)}
             />
           </aside>
         </div>
@@ -111,7 +115,14 @@ function MapPage() {
                   d.id === selectedId && "border-primary bg-secondary",
                 )}
               >
-                <span className="size-2.5 shrink-0 rounded-full bg-water" aria-hidden />
+                <span
+                  className="size-2.5 shrink-0 rounded-full bg-water"
+                  style={(() => {
+                    const r = risks.find((x) => x.districtId === d.id);
+                    return r ? { background: RISK_COLOR_VAR[r.level] } : undefined;
+                  })()}
+                  aria-hidden
+                />
                 <span className="truncate">{d.name}</span>
               </Button>
             ))}

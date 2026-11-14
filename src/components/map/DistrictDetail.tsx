@@ -4,15 +4,20 @@ import { Button } from "@/components/ui/button";
 import { rainfall24h, todayDischarge, type LiveDistrict } from "@/lib/api/live-data";
 
 import type { District } from "@/lib/data/districts";
+import type { StoredRiskAssessment } from "@/lib/risk/types";
+import { RiskBadge } from "@/components/site/Demo";
+import { WhyRisk } from "@/components/risk/RiskExplain";
 
 export function DistrictDetail({
   district,
   live,
   fetchedAt,
+  risk,
 }: {
   district: District;
   live: LiveDistrict | undefined;
   fetchedAt: string;
+  risk?: StoredRiskAssessment | undefined;
 }) {
   const w = live?.weather;
   const flow = todayDischarge(live?.flood ?? null, live?.floodUpdatedAt ?? fetchedAt);
@@ -27,7 +32,15 @@ export function DistrictDetail({
         </div>
       </div>
       <div className="mt-3 flex items-center gap-3">
-        <span className="text-sm text-muted-foreground">Flood risk: Not available</span>
+        {risk ? (
+          <>
+            <RiskBadge level={risk.level} />
+            <span className="font-mono text-sm">{risk.score}/100</span>
+            <span className="text-xs text-muted-foreground">Confidence {risk.confidence}</span>
+          </>
+        ) : (
+          <span className="text-sm text-muted-foreground">Flood risk: Not available</span>
+        )}
       </div>
 
       <div className="mt-6 rounded-lg border p-4">
@@ -60,6 +73,7 @@ export function DistrictDetail({
             .join(", ")}
         </p>
       ) : null}
+      {risk && <WhyRisk assessment={risk} />}
       <dl className="mt-4 grid grid-cols-2 gap-3">
         <Metric
           icon={CloudRain}
