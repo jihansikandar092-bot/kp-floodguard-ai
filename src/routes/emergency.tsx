@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { AlertTriangle, Bot, CheckCircle2, Phone } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
