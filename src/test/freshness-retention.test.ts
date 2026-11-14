@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { freshness, mergeSnapshot } from "@/lib/api/snapshot-rules";
+import {
+  freshness,
+  hasDailyLimit429,
+  mergeSnapshot,
+  startOfUtcDay,
+} from "@/lib/api/snapshot-rules";
 import { readFallbackCache, writeFallbackCache } from "@/lib/api/fallback-cache";
 import type { LiveDistrict, LiveMonitoring } from "@/lib/api/live-data";
 
@@ -93,5 +98,22 @@ describe("browser fallback device cache", () => {
     } as unknown as Storage;
     expect(readFallbackCache("swat", broken)).toBeNull();
     expect(writeFallbackCache("swat", data, broken)).toBeNull();
+  });
+});
+
+describe("daily-limit pause", () => {
+  it("detects a 429 in any provider status", () => {
+    expect(hasDailyLimit429([{ http_status: { "Open-Meteo": 429, GloFAS: 200 } }])).toBe(true);
+    expect(hasDailyLimit429([{ http_status: { GloFAS: 429 } }])).toBe(true);
+  });
+  it("does not pause on other failures or success", () => {
+    expect(hasDailyLimit429([{ http_status: { "Open-Meteo": 500 } }])).toBe(false);
+    expect(hasDailyLimit429([{ http_status: { "Open-Meteo": 200, GloFAS: 200 } }])).toBe(false);
+    expect(hasDailyLimit429([{ http_status: null }, { http_status: {} }])).toBe(false);
+    expect(hasDailyLimit429([])).toBe(false);
+  });
+  it("day window starts at 00:00 UTC so runs resume automatically after midnight", () => {
+    expect(startOfUtcDay(new Date("2026-11-14T17:30:00Z"))).toBe("2026-11-14T00:00:00.000Z");
+    expect(startOfUtcDay(new Date("2026-11-14T00:00:00Z"))).toBe("2026-11-14T00:00:00.000Z");
   });
 });

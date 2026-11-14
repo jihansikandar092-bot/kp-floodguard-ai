@@ -1,7 +1,12 @@
 import type { Json } from "@/integrations/supabase/types";
 import { fetchLiveData, storedDistrictSchema, type LiveMonitoring } from "./live-data";
 import { publicDbClient, readDistricts } from "./public-db.server";
-import { mergeSnapshot, retryingMonitoringFetch } from "./snapshot-rules";
+import {
+  hasDailyLimit429,
+  mergeSnapshot,
+  retryingMonitoringFetch,
+  startOfUtcDay,
+} from "./snapshot-rules";
 
 export async function readMonitoringSnapshots(): Promise<LiveMonitoring> {
   const client = publicDbClient();
@@ -52,6 +57,27 @@ export async function refreshMonitoringSnapshots(triggerSource: "schedule" | "ma
     .select("id")
     .single();
   if (startError || !run) throw new Error("Monitoring run logging unavailable");
+  // After a 429 daily-limit answer, scheduled runs pause until 00:00 UTC and resume
+  // automatically once the day window resets. Manual runs are unaffected.
+  if (triggerSource === "schedule") {
+    const { data: todaysRuns } = await supabaseAdmin
+      .from("monitoring_runs")
+      .select("http_status")
+      .gte("started_at", startOfUtcDay(new Date()))
+      .neq("id", run.id);
+    if (hasDailyLimit429(todaysRuns ?? [])) {
+      await supabaseAdmin
+        .from("monitoring_runs")
+        .update({
+          status: "paused",
+          finished_at: new Date().toISOString(),
+          error_text: "paused until 00:00 UTC",
+        })
+        .eq("id", run.id);
+      console.info("Monitoring refresh paused until 00:00 UTC (daily limit reached)");
+      return { saved: 0, paused: true };
+    }
+  }
   let total = 0;
   try {
     const [previous, districts] = await Promise.all([readMonitoringSnapshots(), readDistricts()]);
