@@ -76,6 +76,20 @@ export function freshness(
   return { level: "outdated", label: "Outdated" };
 }
 
+// Daily-limit pause: after any provider answers 429, scheduled runs stop calling
+// providers until 00:00 UTC, then resume automatically (the window resets at midnight).
+export function startOfUtcDay(now: Date): string {
+  return new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
+  ).toISOString();
+}
+
+export function hasDailyLimit429(
+  runs: { http_status: Record<string, unknown> | null }[],
+): boolean {
+  return runs.some((run) => Object.values(run.http_status ?? {}).some((s) => s === 429));
+}
+
 // Three total tries per source; rate limits wait until the next scheduled run.
 export function retryingMonitoringFetch(
   fetcher: typeof fetch = fetch,

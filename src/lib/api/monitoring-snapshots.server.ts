@@ -1,7 +1,7 @@
 import type { Json } from "@/integrations/supabase/types";
 import { fetchLiveData, storedDistrictSchema, type LiveMonitoring } from "./live-data";
 import { publicDbClient, readDistricts } from "./public-db.server";
-import { mergeSnapshot, retryingMonitoringFetch } from "./snapshot-rules";
+import { hasDailyLimit429, mergeSnapshot, retryingMonitoringFetch, startOfUtcDay } from "./snapshot-rules";
 
 export async function readMonitoringSnapshots(): Promise<LiveMonitoring> {
   const client = publicDbClient();
