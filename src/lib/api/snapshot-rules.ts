@@ -84,10 +84,12 @@ export function startOfUtcDay(now: Date): string {
   ).toISOString();
 }
 
-export function hasDailyLimit429(
-  runs: { http_status: Record<string, unknown> | null }[],
-): boolean {
-  return runs.some((run) => Object.values(run.http_status ?? {}).some((s) => s === 429));
+export function hasDailyLimit429(runs: { http_status: unknown }[]): boolean {
+  return runs.some((run) => {
+    const status = run.http_status;
+    if (status === null || typeof status !== "object" || Array.isArray(status)) return false;
+    return Object.values(status).some((s) => s === 429);
+  });
 }
 
 // Three total tries per source; rate limits wait until the next scheduled run.
