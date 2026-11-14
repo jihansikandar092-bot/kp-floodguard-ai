@@ -110,6 +110,11 @@ export async function refreshMonitoringSnapshots(triggerSource: "schedule" | "ma
         .from("monitoring_snapshots")
         .upsert(rows, { onConflict: "district" });
       if (error) throw new Error("Monitoring snapshot write failed");
+      // Assess risk right after every successful snapshot write.
+      const { assessStoredSnapshots } = await import("@/lib/risk/assessments.server");
+      await assessStoredSnapshots(supabaseAdmin).catch((e) =>
+        console.error("Risk assessment failed", e),
+      );
     }
     const finishedAt = new Date().toISOString();
     const ok = latest.districts.filter((d) => d.weather && d.flood).length;
