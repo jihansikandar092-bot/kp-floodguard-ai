@@ -9,8 +9,16 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { DemoBanner, PageHeader } from "@/components/site/Demo";
 import { Panel, StatCard } from "@/components/dashboard/Panel";
-import { RainfallChart, RiverChart } from "@/components/dashboard/Charts";
+import {
+  RainfallChart,
+  RiskComparisonChart,
+  RiskDistributionChart,
+  RiverChart,
+} from "@/components/dashboard/Charts";
 import { districtListOptions } from "@/lib/api/district-query";
+import { riskAssessmentOptions } from "@/lib/risk/risk-query";
+import { RISK_COLOR_VAR, RISK_LABEL } from "@/lib/data/districts";
+import { HowScoreWorks, RISK_DISCLAIMER } from "@/components/risk/RiskExplain";
 
 export const Route = createFileRoute("/dashboard")({
   validateSearch: (s: Record<string, unknown>): { district?: string | undefined } => {
@@ -21,6 +29,7 @@ export const Route = createFileRoute("/dashboard")({
     await Promise.all([
       context.queryClient.ensureQueryData(liveMonitoringOptions()),
       context.queryClient.ensureQueryData(districtListOptions()),
+      context.queryClient.ensureQueryData(riskAssessmentOptions()),
     ]);
   },
   pendingComponent: MonitoringPending,
@@ -55,6 +64,21 @@ function DashboardPage() {
   const { data, fallbackLoading } = useMonitoringFallback(storedData, districts, districtId);
   const live = liveSnapshot(data, districtId);
   const t = live.totals;
+  const { data: risks } = useSuspenseQuery(riskAssessmentOptions());
+  const riskRows = districts
+    .map((d) => ({ d, r: risks.find((r) => r.districtId === d.id) }))
+    .filter((x): x is { d: typeof x.d; r: NonNullable<typeof x.r> } => Boolean(x.r));
+  const distribution = (["low", "medium", "high"] as const)
+    .map((level) => ({
+      level,
+      name: RISK_LABEL[level],
+      value: riskRows.filter((x) => x.r.level === level).length,
+    }))
+    .filter((x) => x.value > 0);
+  const latestRisk = riskRows
+    .map((x) => x.r.computedAt)
+    .sort()
+    .at(-1);
   const scope = snap.district?.name ?? "All monitored districts";
 
   return (
@@ -78,10 +102,8 @@ function DashboardPage() {
             Fetching selected district directly from Open-Meteo…
           </p>
         )}
-        <DemoBanner>
-          System-generated from modelled weather and river data. Experimental estimate, not an
-          official warning.
-        </DemoBanner>
+        <DemoBanner>{RISK_DISCLAIMER}</DemoBanner>
+        <HowScoreWorks />
 
         <nav aria-label="District filter" className="flex flex-wrap gap-2">
           <FilterChip active={!districtId} label="All districts" search={{ district: undefined }} />
@@ -161,8 +183,32 @@ function DashboardPage() {
               </p>
             )}
           </Panel>
-          <Panel title="Flood-risk distribution">
-            <p>Not available</p>
+          <Panel
+            title="Flood-risk distribution"
+            subtitle={`${riskRows.length} of ${districts.length} districts assessed`}
+            bodyClassName="h-72"
+          >
+            {distribution.length ? (
+              <div className="flex h-full flex-col">
+                <div className="min-h-0 flex-1">
+                  <RiskDistributionChart data={distribution} />
+                </div>
+                <ul className="mt-2 flex flex-wrap gap-3 text-xs">
+                  {distribution.map((x) => (
+                    <li key={x.level} className="flex items-center gap-1.5">
+                      <span
+                        className="size-2 rounded-full"
+                        style={{ background: RISK_COLOR_VAR[x.level] }}
+                        aria-hidden
+                      />
+                      {x.name}: {x.value}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              <p>Not available</p>
+            )}
           </Panel>
         </div>
 
@@ -192,8 +238,25 @@ function DashboardPage() {
           <Panel title="Historical flood events">
             <p>Not available</p>
           </Panel>
-          <Panel title="District-wise risk comparison">
-            <p>Not available</p>
+          <Panel
+            title="District-wise risk comparison"
+            subtitle={
+              latestRisk
+                ? `Score 0–100 · computed ${latestRisk.replace("T", " ").slice(0, 16)} UTC · risk_assessments`
+                : "Score 0–100"
+            }
+            bodyClassName="h-96"
+          >
+            {riskRows.length ? (
+              <RiskComparisonChart
+                highlightId={districtId}
+                data={riskRows
+                  .map(({ d, r }) => ({ id: d.id, name: d.name, score: r.score, level: r.level }))
+                  .sort((a, b) => b.score - a.score)}
+              />
+            ) : (
+              <p>Not available</p>
+            )}
           </Panel>
         </div>
       </div>
