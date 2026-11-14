@@ -62,7 +62,7 @@ export async function refreshMonitoringSnapshots(triggerSource: "schedule" | "ma
   if (triggerSource === "schedule") {
     const { data: todaysRuns } = await supabaseAdmin
       .from("monitoring_runs")
-      .select("http_status")
+      .select("http_status,error_text")
       .gte("started_at", startOfUtcDay(new Date()))
       .neq("id", run.id);
     if (hasDailyLimit429(todaysRuns ?? [])) {
