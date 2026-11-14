@@ -112,6 +112,38 @@ export type Database = {
           },
         ]
       }
+      historical_stats: {
+        Row: {
+          annual_max_discharge: number
+          district_id: string
+          id: string
+          source: string
+          year: number
+        }
+        Insert: {
+          annual_max_discharge: number
+          district_id: string
+          id?: string
+          source: string
+          year: number
+        }
+        Update: {
+          annual_max_discharge?: number
+          district_id?: string
+          id?: string
+          source?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "historical_stats_district_id_fkey"
+            columns: ["district_id"]
+            isOneToOne: false
+            referencedRelation: "districts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       monitoring_runs: {
         Row: {
           districts_failed: number
@@ -173,6 +205,50 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "monitoring_snapshot_district_ref"
+            columns: ["district_id"]
+            isOneToOne: false
+            referencedRelation: "districts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      risk_assessments: {
+        Row: {
+          computed_at: string
+          confidence: string
+          district_id: string
+          factors: Json
+          id: string
+          level: string
+          reason_text: string
+          score: number
+          snapshot_id: string | null
+        }
+        Insert: {
+          computed_at?: string
+          confidence: string
+          district_id: string
+          factors: Json
+          id?: string
+          level: string
+          reason_text: string
+          score: number
+          snapshot_id?: string | null
+        }
+        Update: {
+          computed_at?: string
+          confidence?: string
+          district_id?: string
+          factors?: Json
+          id?: string
+          level?: string
+          reason_text?: string
+          score?: number
+          snapshot_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "risk_assessments_district_id_fkey"
             columns: ["district_id"]
             isOneToOne: false
             referencedRelation: "districts"

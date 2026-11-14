@@ -43,6 +43,13 @@
       "when": 1794570511015,
       "tag": "0005_tighten_request_grants",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794679648801,
+      "tag": "0006_migration",
+      "breakpoints": true
     }
   ]
 }
