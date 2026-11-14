@@ -13,3 +13,5 @@
 - [x] Fetch and validate key-free weather and GloFAS forecasts.
 - [x] Connect dashboard and map with real stored values, timestamps and unavailable states instead of sample observations.
 - [x] Update integrations and verify data flow and failure behavior.
+- [ ] Coordinator role for jihansikandar092@gmail.com — waiting for user to create the account under Users
+- [ ] Then: grant role, publish, test on published site (redirect, login, masked phones, Reveal, status change, no-role Access denied with throwaway account, delete it)
