@@ -149,9 +149,6 @@ function Confirmation({ request, onReset }: { request: SubmittedRequest; onReset
         <Button variant="outline" onClick={onReset}>
           Submit another request
         </Button>
-        <Button asChild variant="ghost">
-          <Link to="/admin">Coordinator dashboard</Link>
-        </Button>
         <DemoBadge className="ml-auto" label="STATUS: PENDING REVIEW" />
       </div>
     </div>

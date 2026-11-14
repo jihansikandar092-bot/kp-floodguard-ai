@@ -395,15 +395,6 @@ export function AssistantWidget() {
                 >
                   {m.text}
                   {m.summary && <Summary data={m.summary} lang={lang} title={ui.summaryTitle} />}
-                  {m.requestId && (
-                    <Link
-                      to="/admin"
-                      className="mt-2 block text-xs font-semibold underline"
-                      onClick={() => setOpen(false)}
-                    >
-                      Coordinator dashboard →
-                    </Link>
-                  )}
                 </div>
                 {m.chips && m.id === lastBotId && (
                   <div className="mt-2 flex max-w-full flex-wrap gap-1.5" dir={rtl ? "rtl" : "ltr"}>
