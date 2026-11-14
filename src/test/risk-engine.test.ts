@@ -56,8 +56,9 @@ describe("risk engine", () => {
     expect(r.factors.forecastRain72h.score).toBe(100);
     expect(r.factors.pastRain3d.value).toBe(72);
     expect(r.factors.dischargePeak.score).toBe(100); // 190 / 190
-    expect(r.factors.dischargeTrend.score).toBe(80); // +40%
-    expect(r.score).toBe(85.9);
+    expect(r.factors.dischargeTrend.score).toBe(100); // +60% in 3 days
+    expect(r.factors.pastRain3d.score).toBe(89);
+    expect(r.score).toBe(98.4);
     expect(r.level).toBe("high");
     expect(r.confidence).toBe("Medium");
     expect(r.reasonText).toMatch(/Heavy rain forecast \(144 mm in 72 h\)/);
