@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Menu, Phone, Siren } from "lucide-react";
+import { LogIn, Menu, Phone, Siren } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -52,6 +52,11 @@ export function SiteHeader() {
             ))}
           </nav>
           <div className="flex items-center gap-2">
+            <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex">
+              <Link to="/login">
+                <LogIn /> Coordinator login
+              </Link>
+            </Button>
             <Button asChild variant="emergency" className="hidden sm:inline-flex">
               <Link to="/emergency">
                 <Siren /> Request Help
@@ -90,6 +95,13 @@ export function SiteHeader() {
                       {item.label}
                     </Link>
                   ))}
+                  <Link
+                    to="/login"
+                    onClick={() => setOpen(false)}
+                    className="mt-2 inline-flex items-center gap-2 rounded-md px-3 py-2.5 font-medium hover:bg-muted"
+                  >
+                    <LogIn className="size-4" aria-hidden /> Coordinator login
+                  </Link>
                   <Button asChild variant="emergency" className="mt-4">
                     <Link to="/emergency" onClick={() => setOpen(false)}>
                       <Siren /> Request Emergency Help
