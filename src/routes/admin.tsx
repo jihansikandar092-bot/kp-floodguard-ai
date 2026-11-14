@@ -1,5 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { ShieldAlert } from "lucide-react";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
+import { LogOut, ShieldAlert } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { getCoordinatorStatus } from "@/lib/api/requests.functions";
 import { DemoBanner, PageHeader } from "@/components/site/Demo";
 import { RequestsTable } from "@/components/admin/RequestsTable";
 
@@ -22,12 +26,53 @@ export const Route = createFileRoute("/admin")({
       { name: "robots", content: "noindex" },
     ],
   }),
+  ssr: false,
+  beforeLoad: async () => {
+    const { data } = await supabase.auth.getUser();
+    if (!data.user) throw redirect({ to: "/login", replace: true });
+    // Role is decided on the server with has_role(); nothing is read from client storage.
+    const { coordinator } = await getCoordinatorStatus();
+    return { coordinator, email: data.user.email ?? "" };
+  },
   component: AdminPage,
 });
 
 function AdminPage() {
+  const { coordinator, email } = Route.useRouteContext();
+  const navigate = useNavigate();
+  const qc = useQueryClient();
+  async function logout() {
+    await qc.cancelQueries();
+    qc.clear();
+    await supabase.auth.signOut();
+    void navigate({ to: "/login", replace: true });
+  }
+  const bar = (
+    <div className="container-page flex items-center justify-end gap-3 pt-4 text-sm">
+      <span className="text-muted-foreground">{email}</span>
+      <Button variant="outline" size="sm" onClick={logout}>
+        <LogOut /> Logout
+      </Button>
+    </div>
+  );
+  if (!coordinator)
+    return (
+      <>
+        {bar}
+        <div className="container-page py-16">
+          <p role="alert" className="rounded-xl border bg-card p-10 text-center shadow-card">
+            <strong className="block text-lg">Access denied</strong>
+            <span className="text-sm text-muted-foreground">
+              Your account does not have the coordinator or admin role. In an emergency call Rescue
+              1122.
+            </span>
+          </p>
+        </div>
+      </>
+    );
   return (
     <>
+      {bar}
       <PageHeader
         eyebrow="Authorized coordinators"
         title="Rescue Coordination Dashboard"

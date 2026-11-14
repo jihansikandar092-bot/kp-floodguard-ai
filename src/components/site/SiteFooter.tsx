@@ -32,7 +32,7 @@ export function SiteFooter() {
 
           <FooterCol title="Assistance">
             <FooterLink to="/emergency">Emergency Assistance</FooterLink>
-            <FooterLink to="/admin">Coordinator Dashboard</FooterLink>
+            <FooterLink to="/login">Coordinator login</FooterLink>
             <FooterLink to="/integrations">Integrations</FooterLink>
             <FooterLink to="/contact">Contact</FooterLink>
           </FooterCol>
@@ -100,7 +100,7 @@ function FooterLink({
   hash,
   children,
 }: {
-  to: "/" | "/dashboard" | "/map" | "/emergency" | "/admin" | "/integrations" | "/contact";
+  to: "/" | "/dashboard" | "/map" | "/emergency" | "/login" | "/integrations" | "/contact";
   hash?: string | undefined;
   children: React.ReactNode;
 }) {

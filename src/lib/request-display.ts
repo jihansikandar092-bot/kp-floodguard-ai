@@ -25,3 +25,8 @@ export function filterRequests(
         r.location.toLowerCase().includes(q)),
   );
 }
+/** Masks all but the last 4 digits of a phone number. */
+export function maskPhone(phone: string) {
+  const digits = phone.replace(/\D/g, "");
+  return digits.length <= 4 ? "••••" : `•••• ${digits.slice(-4)}`;
+}

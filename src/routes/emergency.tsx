@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { AlertTriangle, Bot, CheckCircle2, Phone } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -148,9 +148,6 @@ function Confirmation({ request, onReset }: { request: SubmittedRequest; onReset
         </Button>
         <Button variant="outline" onClick={onReset}>
           Submit another request
-        </Button>
-        <Button asChild variant="ghost">
-          <Link to="/admin">Coordinator dashboard</Link>
         </Button>
         <DemoBadge className="ml-auto" label="STATUS: PENDING REVIEW" />
       </div>
