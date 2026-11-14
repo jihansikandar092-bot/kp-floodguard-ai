@@ -14,5 +14,6 @@
 - [x] Connect dashboard and map with real stored values, timestamps and unavailable states instead of sample observations.
 - [x] Update integrations and verify data flow and failure behavior.
 - [x] Coordinator role for jihansikandar092@gmail.com — account created by user, role granted 2026-11-14
-- [ ] Fix blank /admin render in signed-in preview test, then: publish, test on published site (redirect, login, masked phones, Reveal, status change, no-role Access denied with throwaway account, delete it)
-- [ ] On HTTP 429 daily-limit: pause all scheduled provider calls until 00:00 UTC, record 'paused until 00:00 UTC' in monitoring_runs, auto-resume after; re-test with proof table
+- [x] Signed-in preview test passed: 3 requests visible, phones masked with Reveal, status change saved (restored to pending); blank render was slow first load
+- [ ] Publish and test coordinator login on the published site (redirect, login, no-role Access denied with throwaway account, delete it)
+- [x] On HTTP 429 daily-limit: scheduled runs pause until 00:00 UTC, record 'paused until 00:00 UTC' in monitoring_runs, auto-resume at midnight; verified with live trigger and 37 passing tests
