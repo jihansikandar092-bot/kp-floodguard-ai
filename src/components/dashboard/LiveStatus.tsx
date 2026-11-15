@@ -51,9 +51,9 @@ export function LiveStatus({ data, rows }: { data: LiveMonitoring; rows: LiveDis
         </Button>
       </div>
       {fresh.level === "outdated" && (
-        <p role="alert" className="text-emergency">
-          Outdated: newest stored reading is older than 3 hours. After 6 hours the selected district
-          is fetched directly in your browser.
+        <p className="text-xs text-muted-foreground">
+          Showing the last saved readings (older than 3 hours). Fresh data loads automatically when
+          available.
         </p>
       )}
       <p className="text-xs text-muted-foreground">
@@ -75,19 +75,22 @@ export function LiveStatus({ data, rows }: { data: LiveMonitoring; rows: LiveDis
       )}
       {hydrated && <RetainedDetails rows={retained} />}
       {unavailable && (
-        <div role="alert" className="space-y-1 text-emergency">
+        <div className="rounded-md border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
           <p>
-            Live data temporarily unavailable or outdated for{" "}
+            Some live readings are temporarily unavailable for{" "}
             {rows.filter((d) => !d.weather || !d.flood || d.weatherError || d.floodError).length}{" "}
-            district(s).
+            district(s); last saved values are shown. Missing values show Not available.
           </p>
-          {reasons.map((reason) => (
-            <p key={reason}>{reason}</p>
-          ))}
-          <p>
-            Available metrics are still displayed; unavailable metrics show Not available. Retained
-            values use their last successful timestamp.
-          </p>
+          {reasons.length > 0 && (
+            <details className="mt-1">
+              <summary className="cursor-pointer">Technical details</summary>
+              <div className="mt-1 space-y-0.5">
+                {reasons.map((reason) => (
+                  <p key={reason}>{reason}</p>
+                ))}
+              </div>
+            </details>
+          )}
         </div>
       )}
       {rows.length > 1 && (
