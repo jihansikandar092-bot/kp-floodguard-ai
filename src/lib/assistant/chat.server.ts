@@ -6,7 +6,15 @@ import { compactChatContext } from "./context";
 import { chatBody, chatFallback, chatLimitReply } from "./chat";
 import { recordServiceHealth } from "@/lib/api/service-health.server";
 
-const SYSTEM_PROMPT = `You are the KP FloodGuard AI assistant for Khyber Pakhtunkhwa, Pakistan. Answer in the language given in the language field (en, ur or ps), in short and simple sentences. Use ONLY the context for current flood conditions; if it does not contain the answer, say you do not have that information. Never claim that rescue has been sent. In any life-threatening situation tell the person to call Rescue 1122 immediately and offer to record an emergency request. Say that risk levels are experimental estimates and not official warnings. Never invent weather, river levels or alerts.`;
+const SYSTEM_PROMPT = `You are the KP FloodGuard AI assistant for Khyber Pakhtunkhwa, Pakistan. Answer in the language given in the language field (en, ur or ps), in short and simple sentences. Use ONLY the context for current flood conditions; if it does not contain the answer, say you do not have that information. Never claim that rescue has been sent. In any life-threatening situation tell the person to call Rescue 1122 immediately and offer to record an emergency request. Say that risk levels are experimental estimates and not official warnings. Never invent weather, river levels or alerts, You are FloodGuard AI for Khyber Pakhtunkhwa.
+Your name is Jiya.
+Rules:
+- Reply in maximum 2 to 3 short sentences.
+- Ask only ONE question at a time, never a long list.
+- Use simple language, no bullet lists unless asked.
+- Reply in the user's language (English, Urdu, Roman Urdu or Pashto).
+- If there is danger, first say: "Call Rescue 1122 now."
+- For emergencies, collect details step by step: help type, then location, then number of people, then name and phone..`;
 
 /** Pulls the assistant text out of a Responses API result. */
 function extractText(response: unknown): string | undefined {
@@ -32,13 +40,8 @@ export async function handleChatRequest(request: Request) {
   if (!parsed.success) return Response.json({ error: "invalid_input" }, { status: 400 });
   const { language } = parsed.data;
   const fallback = async (message: string) => {
-    await recordServiceHealth("AI chat", false, message).catch(() =>
-      console.error("Chat health record unavailable"),
-    );
-    return Response.json(
-      { reply: chatFallback[language], fallback: true, mode: "intake" },
-      { status: 503 },
-    );
+    await recordServiceHealth("AI chat", false, message).catch(() => console.error("Chat health record unavailable"));
+    return Response.json({ reply: chatFallback[language], fallback: true, mode: "intake" }, { status: 503 });
   };
   try {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -46,13 +49,8 @@ export async function handleChatRequest(request: Request) {
       request.headers.get("cf-connecting-ip") ??
       request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
       "unknown";
-    const digest = await crypto.subtle.digest(
-      "SHA-256",
-      new TextEncoder().encode(`kpfg-chat:${ip}`),
-    );
-    const hash = Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, "0")).join(
-      "",
-    );
+    const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(`kpfg-chat:${ip}`));
+    const hash = Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, "0")).join("");
     const { data: allowed, error } = await supabaseAdmin.rpc("consume_chat_limit", {
       _ip_hash: hash,
     });
@@ -62,17 +60,8 @@ export async function handleChatRequest(request: Request) {
         { reply: chatLimitReply[language], error: "rate_limited", fallback: false },
         { status: 429, headers: { "Retry-After": "60" } },
       );
-    const [risks, districts, alerts] = await Promise.all([
-      readLatestAssessments(),
-      readDistricts(),
-      readAlerts(),
-    ]);
-    const context = compactChatContext(
-      risks,
-      districts,
-      [...alerts.active, ...alerts.expected],
-      language,
-    );
+    const [risks, districts, alerts] = await Promise.all([readLatestAssessments(), readDistricts(), readAlerts()]);
+    const context = compactChatContext(risks, districts, [...alerts.active, ...alerts.expected], language);
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 20000);
     try {
@@ -93,9 +82,7 @@ export async function handleChatRequest(request: Request) {
       );
       const reply = extractText(response);
       if (!reply) return fallback("AI chat returned no reply");
-      await recordServiceHealth("AI chat", true).catch(() =>
-        console.error("Chat health record unavailable"),
-      );
+      await recordServiceHealth("AI chat", true).catch(() => console.error("Chat health record unavailable"));
       return Response.json({
         reply,
         fallback: false,
