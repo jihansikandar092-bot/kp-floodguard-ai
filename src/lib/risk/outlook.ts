@@ -58,7 +58,7 @@ export function translatedReasons(
   return Object.fromEntries(
     Object.entries(labels).map(([lang, t]) => [
       lang,
-      `${t[r.level]} ${lang === "en" ? "risk expected" : lang === "ur" ? "خطرہ متوقع ہے" : "خطر اټکل شوی"} ${horizon ? (lang === 'en' ? `within ${horizon} hours` : `${horizon} ${t.hours} ${t.within}`) : t.now}: ${t.rain} (${r.factors.forecastRain72h.value ?? t.missing} mm), ${t.flow} (${r.factors.dischargePeak.value ?? t.missing} m³/s). ${hasHistory ? (lang === 'en' ? r.factors.dischargePeak.detail : lang === 'ur' ? 'بہاؤ کا موازنہ سالانہ زیادہ سے زیادہ تاریخی بہاؤ سے کیا گیا ہے۔' : 'جریان د تاریخي کلني تر ټولو لوړ جریان سره پرتله شوی.') : t.history}`,
+      `${t[r.level]} ${lang === "en" ? "risk expected" : lang === "ur" ? "خطرہ متوقع ہے" : "خطر اټکل شوی"} ${horizon ? (lang === "en" ? `within ${horizon} hours` : `${horizon} ${t.hours} ${t.within}`) : t.now}: ${t.rain} (${r.factors.forecastRain72h.value ?? t.missing} mm), ${t.flow} (${r.factors.dischargePeak.value ?? t.missing} m³/s). ${hasHistory ? (lang === "en" ? r.factors.dischargePeak.detail : lang === "ur" ? "بہاؤ کا موازنہ سالانہ زیادہ سے زیادہ تاریخی بہاؤ سے کیا گیا ہے۔" : "جریان د تاریخي کلني تر ټولو لوړ جریان سره پرتله شوی.") : t.history}`,
     ]),
   ) as Record<RiskLanguage, string>;
 }
