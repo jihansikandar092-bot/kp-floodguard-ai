@@ -49,7 +49,9 @@ describe("AI chat proxy", () => {
       input: { content: string }[];
     };
     expect(payload.model).toBe("openai/gpt-6-astra");
-    expect(payload.instructions).toContain("KP FloodGuard AI assistant");
+    expect(payload.instructions).toContain("FloodGuard AI for Khyber Pakhtunkhwa");
+    expect(payload.instructions).toContain("Jiya");
+    expect(payload.instructions).toContain("can only help with flood-related questions");
     expect(payload.tools).toBeUndefined();
     expect(payload.input[0]?.content).toContain("language: en");
   });
