@@ -64,6 +64,13 @@
       "when": 1794736634225,
       "tag": "0008_predictive_risk_outlook",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1794738569454,
+      "tag": "0009_partial_score_alert_safety",
+      "breakpoints": true
     }
   ]
 }

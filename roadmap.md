@@ -1,4 +1,8 @@
 # Live monitoring
+## Partial-score safety
+- [x] Store factor coverage and translated partial notes without changing score calculation; 168 stored assessments checked, zero coverage mismatches.
+- [x] Prevent partial batches from resolving alerts; partial creation/resolution tests pass in isolated PostgreSQL, 66 total tests passed.
+- [x] Verify real stored scores in preview and on the published dashboard/map, including English/Urdu/Pashto RTL notes for Swat and Bannu, 7-day map details, no browser errors or narrow-screen overflow; lint and automatic type-check/build passed. Alerts remain genuinely empty; no test alerts added to the app database.
 ## Predictive Risk Outlook
 - [x] Audit current forecasts, alerts and pages.
 - [x] Store and compute five horizons with translated reasons and snapshot freshness; 60 rows for 12 districts. Existing retained weather lacks full 168-hour coverage, shown as unavailable; future scheduled requests cover eight calendar days.

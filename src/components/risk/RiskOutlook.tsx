@@ -14,6 +14,7 @@ import { HORIZONS, horizonLabel, type RiskLanguage } from "@/lib/risk/outlook";
 import type { StoredRiskAssessment } from "@/lib/risk/types";
 import { RISK_DISCLAIMER } from "./RiskExplain";
 import { RISK_CONFIG } from "@/lib/risk/engine";
+import { PartialScoreNote } from "./PartialScoreNote";
 
 export function RiskOutlook({
   risks,
@@ -64,6 +65,10 @@ export function RiskOutlook({
                     <p className="mt-1 font-mono text-sm capitalize">
                       {rows[i]?.level} · {rows[i]?.score}/100
                     </p>
+                    <PartialScoreNote
+                      availableFactors={rows[i]?.availableFactors ?? 0}
+                      language={language}
+                    />
                     <p className="mt-2 text-xs text-muted-foreground">
                       {rows[i]?.reasonTemplates[language] ?? rows[i]?.reasonText}
                     </p>

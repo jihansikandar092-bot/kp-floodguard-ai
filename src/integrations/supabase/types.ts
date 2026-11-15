@@ -312,6 +312,7 @@ export type Database = {
       }
       risk_assessments: {
         Row: {
+          available_factors: number
           computed_at: string
           confidence: string
           district_id: string
@@ -326,6 +327,7 @@ export type Database = {
           snapshot_id: string | null
         }
         Insert: {
+          available_factors?: number
           computed_at?: string
           confidence: string
           district_id: string
@@ -340,6 +342,7 @@ export type Database = {
           snapshot_id?: string | null
         }
         Update: {
+          available_factors?: number
           computed_at?: string
           confidence?: string
           district_id?: string
@@ -431,6 +434,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      partial_score_note: {
+        Args: { _available: number; _language: string }
+        Returns: string
       }
       sync_predictive_alert: {
         Args: {

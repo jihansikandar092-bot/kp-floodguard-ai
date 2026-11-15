@@ -4,6 +4,7 @@ export interface StoredRiskAssessment {
   districtId: string;
   snapshotId: string | null;
   score: number;
+  availableFactors: number;
   level: RiskLevel;
   confidence: Confidence;
   factors: Record<FactorKey, RiskFactor>;
