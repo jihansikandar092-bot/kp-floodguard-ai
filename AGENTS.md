@@ -62,4 +62,4 @@ use the editor.
 - Chat uses server-only webhook configuration, atomic hashed-IP limits and compact stored five-horizon/alert context; include context in the Chat Trigger input so the existing n8n agent receives it, and fall back to translated guided intake without exposing internal errors.
 - Responsible-AI explanations reuse RISK_CONFIG and HORIZONS so displayed rules match the engine.
 - Service worker caches static files and the /emergency shell only, never API data.
-- Offline requests carry a client_request_id key so a resend is stored once.
+- Offline requests carry a client_request_id so resends store once.
