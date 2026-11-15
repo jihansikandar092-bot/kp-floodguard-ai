@@ -13,6 +13,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { SiteHeader } from "@/components/site/SiteHeader";
+import { SiteLanguageProvider } from "@/lib/i18n/site-language";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { AssistantWidget } from "@/components/assistant/AssistantWidget";
 import { Toaster } from "@/components/ui/sonner";
@@ -151,6 +152,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <SiteLanguageProvider>
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground"
@@ -166,6 +168,7 @@ function RootComponent() {
       </div>
       <AssistantWidget />
       <Toaster position="top-center" />
+      </SiteLanguageProvider>
     </QueryClientProvider>
   );
 }

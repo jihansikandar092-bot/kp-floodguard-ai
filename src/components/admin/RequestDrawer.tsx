@@ -34,6 +34,7 @@ import {
   type RequestStatus,
 } from "@/lib/emergency";
 import { formatPkt, maskPhone } from "@/lib/request-display";
+import { buildDispatchSlip, whatsappShareUrl } from "@/lib/dispatch";
 
 /** Coordinator-only detail drawer: full request, assignment fields and status history. */
 export function RequestDrawer({
@@ -54,6 +55,7 @@ export function RequestDrawer({
   const [note, setNote] = useState("");
   const [team, setTeam] = useState<string | null>(null);
   const [internal, setInternal] = useState<string | null>(null);
+  const [fullPhone, setFullPhone] = useState(false);
 
   const events = useQuery({
     queryKey: ["request-events", request?.id],
@@ -131,6 +133,40 @@ export function RequestDrawer({
               <Item k="Description" v={request.description} />
             </div>
           </dl>
+
+          <section className="mt-6 space-y-3 rounded-xl border p-4" aria-label="Rescue 1122 dispatch slip">
+            <h3 className="font-semibold">Rescue 1122 dispatch slip</h3>
+            <p className="text-xs text-muted-foreground">
+              Copy a summary to hand over to a field team. Verify the request first; this app does not dispatch rescue.
+            </p>
+            <label className="flex items-center gap-2 text-sm">
+              <input type="checkbox" checked={fullPhone} onChange={(e) => setFullPhone(e.target.checked)} />
+              Include full phone number
+            </label>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() =>
+                  navigator.clipboard
+                    .writeText(buildDispatchSlip(request, fullPhone))
+                    .then(() => toast.success("Dispatch slip copied"))
+                    .catch(() => toast.error("Could not copy. Please select and copy manually."))
+                }
+              >
+                Copy dispatch slip
+              </Button>
+              <Button asChild size="sm" variant="outline">
+                <a href={whatsappShareUrl(buildDispatchSlip(request, fullPhone))} target="_blank" rel="noopener noreferrer">
+                  Share on WhatsApp
+                </a>
+              </Button>
+              <Button size="sm" variant="outline" onClick={() => window.print()}>
+                Print
+              </Button>
+            </div>
+            <pre className="whitespace-pre-wrap rounded-md bg-muted p-3 text-xs">{buildDispatchSlip(request, fullPhone)}</pre>
+          </section>
 
           <section className="mt-6 space-y-3 rounded-xl border p-4" aria-label="Assignment">
             <h3 className="font-semibold">Assignment (coordinators only)</h3>

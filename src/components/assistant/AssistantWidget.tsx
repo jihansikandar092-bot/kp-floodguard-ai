@@ -1,4 +1,4 @@
-import { Bot, Phone, RotateCcw, Send, X } from "lucide-react";
+import { Bot, Mic, Phone, RotateCcw, Send, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -110,7 +110,12 @@ const FIELD_LABELS = {
   },
 } as const;
 
+import { useSiteLanguage } from "@/lib/i18n/site-language";
+
+const VOICE_SOON = { en: "Voice agent — coming soon", ur: "وائس ایجنٹ — جلد آ رہا ہے", ps: "غږیز مرستیال — ژر راځي" } as const;
+
 export function AssistantWidget() {
+  const { lang: siteLang } = useSiteLanguage();
   const [open, setOpen] = useState(false);
   const [lang, setLang] = useState<Lang>("en");
   const submitFn = useServerFn(submitEmergencyRequest);
@@ -145,6 +150,10 @@ export function AssistantWidget() {
     if (open && messages.length === 0) push([{ role: "bot", ...greeting(lang) }]);
     if (open) setTimeout(() => inputRef.current?.focus(), 50);
   }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    setLang(siteLang);
+  }, [siteLang]);
 
   useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
@@ -504,6 +513,14 @@ export function AssistantWidget() {
               maxLength={chatMode === "ai" ? 1000 : undefined}
               className="h-9 min-w-0 flex-1 rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
             />
+            <span
+              className="inline-flex shrink-0 items-center gap-1 rounded-md border border-dashed px-2 py-1 text-[10px] font-semibold text-muted-foreground"
+              title={VOICE_SOON[lang]}
+              aria-label={VOICE_SOON[lang]}
+            >
+              <Mic className="size-3.5" aria-hidden />
+              <span>{lang === "ur" ? "جلد" : lang === "ps" ? "ژر" : "Soon"}</span>
+            </span>
             <Button type="submit" size="icon" disabled={!input.trim() || busy} aria-label={ui.send}>
               <Send />
             </Button>
