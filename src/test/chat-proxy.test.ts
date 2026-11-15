@@ -42,7 +42,12 @@ describe("AI chat proxy", () => {
       fallback: false,
     });
     expect(records.health).toHaveBeenCalledWith("AI chat", true);
-    const payload = records.generate.mock.calls[0][0];
+    const payload = records.generate.mock.calls[0]?.[0] as {
+      model: string;
+      instructions: string;
+      tools?: unknown;
+      input: { content: string }[];
+    };
     expect(payload.model).toBe("openai/gpt-6-astra");
     expect(payload.instructions).toContain("KP FloodGuard AI assistant");
     expect(payload.tools).toBeUndefined();
