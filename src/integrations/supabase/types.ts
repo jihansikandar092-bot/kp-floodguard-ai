@@ -210,26 +210,79 @@ export type Database = {
           },
         ]
       }
+      historical_job_progress: {
+        Row: {
+          district_id: string
+          last_error: string | null
+          lease_until: string | null
+          next_request_at: string
+          phase: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          district_id: string
+          last_error?: string | null
+          lease_until?: string | null
+          next_request_at?: string
+          phase?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          district_id?: string
+          last_error?: string | null
+          lease_until?: string | null
+          next_request_at?: string
+          phase?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "historical_job_progress_district_id_fkey"
+            columns: ["district_id"]
+            isOneToOne: true
+            referencedRelation: "districts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       historical_stats: {
         Row: {
           annual_max_discharge: number
           district_id: string
+          fetched_at: string | null
           id: string
+          max_discharge_m3s: number | null
+          max_rain_1d_mm: number | null
+          max_rain_3d_mm: number | null
           source: string
+          total_rain_mm: number | null
           year: number
         }
         Insert: {
           annual_max_discharge: number
           district_id: string
+          fetched_at?: string | null
           id?: string
+          max_discharge_m3s?: number | null
+          max_rain_1d_mm?: number | null
+          max_rain_3d_mm?: number | null
           source: string
+          total_rain_mm?: number | null
           year: number
         }
         Update: {
           annual_max_discharge?: number
           district_id?: string
+          fetched_at?: string | null
           id?: string
+          max_discharge_m3s?: number | null
+          max_rain_1d_mm?: number | null
+          max_rain_3d_mm?: number | null
           source?: string
+          total_rain_mm?: number | null
           year?: number
         }
         Relationships: [
@@ -428,6 +481,24 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_historical_district: {
+        Args: { _last_year: number }
+        Returns: {
+          district_id: string
+          last_error: string | null
+          lease_until: string | null
+          next_request_at: string
+          phase: string
+          status: string
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "historical_job_progress"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
