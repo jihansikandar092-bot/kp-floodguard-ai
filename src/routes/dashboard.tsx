@@ -32,7 +32,7 @@ export const Route = createFileRoute("/dashboard")({
       context.queryClient.ensureQueryData(liveMonitoringOptions()),
       context.queryClient.ensureQueryData(districtListOptions()),
       context.queryClient.ensureQueryData(riskAssessmentOptions()),
-       context.queryClient.prefetchQuery(alertsOptions()),
+      context.queryClient.prefetchQuery(alertsOptions()),
     ]);
   },
   pendingComponent: MonitoringPending,
