@@ -65,7 +65,10 @@ export function RiskOutlook({
                     <p className="mt-1 font-mono text-sm capitalize">
                       {rows[i]?.level} · {rows[i]?.score}/100
                     </p>
-                    <PartialScoreNote availableFactors={rows[i]?.availableFactors ?? 0} language={language} />
+                    <PartialScoreNote
+                      availableFactors={rows[i]?.availableFactors ?? 0}
+                      language={language}
+                    />
                     <p className="mt-2 text-xs text-muted-foreground">
                       {rows[i]?.reasonTemplates[language] ?? rows[i]?.reasonText}
                     </p>

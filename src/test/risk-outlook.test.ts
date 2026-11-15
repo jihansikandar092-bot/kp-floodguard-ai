@@ -50,7 +50,16 @@ describe("risk outlook horizons", () => {
   });
   it("stores three available factors and preserves renormalisation when 168-hour rain is missing", () => {
     if (!input.weather) throw new Error("weather fixture missing");
-    const r = assessOutlook({...input, weather: {...input.weather, hourly: {time: times.slice(0, 145), precipitation: times.slice(0, 145).map(() => 1)}}}, 168);
+    const r = assessOutlook(
+      {
+        ...input,
+        weather: {
+          ...input.weather,
+          hourly: { time: times.slice(0, 145), precipitation: times.slice(0, 145).map(() => 1) },
+        },
+      },
+      168,
+    );
     if (!r) throw new Error("assessment missing");
     expect(r.availableFactors).toBe(3);
     expect(r.factors.forecastRain72h.score).toBeNull();

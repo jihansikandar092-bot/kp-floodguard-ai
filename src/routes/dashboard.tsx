@@ -252,7 +252,11 @@ function DashboardPage() {
                 ? `Score 0–100 · computed ${latestRisk.replace("T", " ").slice(0, 16)} UTC · risk_assessments`
                 : "Score 0–100"
             }
-            action={riskRows.some(({ r }) => r.availableFactors < 4) ? <span className="text-xs text-muted-foreground">Partial scores below</span> : undefined}
+            action={
+              riskRows.some(({ r }) => r.availableFactors < 4) ? (
+                <span className="text-xs text-muted-foreground">Partial scores below</span>
+              ) : undefined
+            }
             bodyClassName="h-96"
           >
             {riskRows.length ? (
@@ -267,12 +271,16 @@ function DashboardPage() {
             )}
           </Panel>
         </div>
-        {riskRows.filter(({ r }) => r.availableFactors < 4).map(({ d, r }) => (
-          <div key={d.id} className="text-sm">
-            <span>{d.name} · {r.score}/100</span>
-            <PartialScoreNote availableFactors={r.availableFactors} />
-          </div>
-        ))}
+        {riskRows
+          .filter(({ r }) => r.availableFactors < 4)
+          .map(({ d, r }) => (
+            <div key={d.id} className="text-sm">
+              <span>
+                {d.name} · {r.score}/100
+              </span>
+              <PartialScoreNote availableFactors={r.availableFactors} />
+            </div>
+          ))}
       </div>
     </>
   );

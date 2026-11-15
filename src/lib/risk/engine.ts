@@ -170,7 +170,9 @@ export function assessRisk(input: RiskInput): RiskAssessment | null {
     level: levelFor(score),
     confidence,
     factors,
-    reasonText: reason(factors, histMedian !== null, complete) + (complete ? "" : ` ${partialScoreNote(available.length)}`),
+    reasonText:
+      reason(factors, histMedian !== null, complete) +
+      (complete ? "" : ` ${partialScoreNote(available.length)}`),
   };
 }
 
