@@ -163,8 +163,6 @@ function RootComponent() {
           <Outlet />
         </main>
         <SiteFooter />
-        {/* Room for the floating assistant button so it never covers footer text. */}
-        <div aria-hidden className="h-24 shrink-0" />
       </div>
       <AssistantWidget />
       <Toaster position="top-center" />
