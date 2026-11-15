@@ -99,9 +99,9 @@ export async function assessStoredSnapshots(admin: Admin, supersedeDegenerate = 
             reason_text: `${alert.reason_text} ${note}`,
             reason_templates: {
               ...templates,
-              en: `${templates.en ?? alert.reason_text} ${note}`,
-              ur: `${templates.ur ?? ""} درست کردہ اسکورنگ اصول کی وجہ سے سابقہ انتباہ بند کر دیا گیا۔`,
-              ps: `${templates.ps ?? ""} د سم شوي نمرې اصولو له امله پخوانی خبرداری وتړل شو.`,
+              en: `${templates["en"] ?? alert.reason_text} ${note}`,
+              ur: `${templates["ur"] ?? ""} درست کردہ اسکورنگ اصول کی وجہ سے سابقہ انتباہ بند کر دیا گیا۔`,
+              ps: `${templates["ps"] ?? ""} د سم شوي نمرې اصولو له امله پخوانی خبرداری وتړل شو.`,
             },
           })
           .eq("id", alert.id)
