@@ -4,7 +4,7 @@
 - [x] Store and compute five horizons with translated reasons and snapshot freshness; 60 rows for 12 districts. Existing retained weather lacks full 168-hour coverage, shown as unavailable; future scheduled requests cover eight calendar days.
 - [x] Predictive alert escalation, quiet de-escalation, two-run resolution and stale protection; isolated PostgreSQL tests pass.
 - [x] Outlook strip/chart, map selector and grouped /alerts page; desktop/mobile preview verified.
-- [ ] Published verification awaiting deployment completion; publication requested. Real Swat/Bannu rows checked; 62 tests, lint and automatic type-check/build pass.
+- [x] Published and tested Swat/Bannu dashboard, map (12 markers, 48 h selected), /alerts and mobile width: HTTP 200, no browser errors. Real stored factors checked; 62 tests, lint and automatic type-check/build pass. Published error-log search returned no Worker entries.
 ## System-generated alerts
 - [x] Audit existing risk assessments and alert panel; no sample list remains.
 - [x] Add public-read/server-write alerts and atomic assessment transition trigger.
