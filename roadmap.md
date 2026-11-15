@@ -1,4 +1,8 @@
 # Live monitoring
+## Discharge false-alarm correction
+- [ ] Guard unreliable low-flow/reference-range scores across all horizons; test thresholds and partial safety.
+- [ ] Recompute stored snapshots and close only superseded degenerate alerts without deleting rows.
+- [ ] Verify Bajaur/Shangla before-after on preview and published site.
 ## Request follow-ups
 - [x] Mark the five retained requests as tests and restore 0005 to pending with a status event; delete nothing.
 - [x] Verify published tracking attempt 11 using a nonexistent code and remove only its temporary rate-limit records.
