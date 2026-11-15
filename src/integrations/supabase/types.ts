@@ -14,6 +14,63 @@ export type Database = {
   }
   public: {
     Tables: {
+      alert_deliveries: {
+        Row: {
+          alert_id: string | null
+          attempt: number
+          channel: string
+          district_id: string | null
+          error: string | null
+          event_key: string | null
+          id: string
+          is_test: boolean
+          sent_at: string
+          status: string
+          subscription_id: string | null
+        }
+        Insert: {
+          alert_id?: string | null
+          attempt?: number
+          channel: string
+          district_id?: string | null
+          error?: string | null
+          event_key?: string | null
+          id?: string
+          is_test?: boolean
+          sent_at?: string
+          status: string
+          subscription_id?: string | null
+        }
+        Update: {
+          alert_id?: string | null
+          attempt?: number
+          channel?: string
+          district_id?: string | null
+          error?: string | null
+          event_key?: string | null
+          id?: string
+          is_test?: boolean
+          sent_at?: string
+          status?: string
+          subscription_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alert_deliveries_alert_id_fkey"
+            columns: ["alert_id"]
+            isOneToOne: false
+            referencedRelation: "alerts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "alert_deliveries_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "alert_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       alert_run_state: {
         Row: {
           district_id: string
@@ -42,6 +99,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      alert_subscriptions: {
+        Row: {
+          channel: string
+          contact: string
+          contact_hash: string
+          created_at: string
+          district_ids: string[]
+          id: string
+          language: string
+          min_level: string
+          unsubscribe_token: string
+          unsubscribed_at: string | null
+          verified_at: string | null
+          verify_expires_at: string | null
+          verify_token: string | null
+        }
+        Insert: {
+          channel: string
+          contact: string
+          contact_hash: string
+          created_at?: string
+          district_ids: string[]
+          id?: string
+          language?: string
+          min_level?: string
+          unsubscribe_token?: string
+          unsubscribed_at?: string | null
+          verified_at?: string | null
+          verify_expires_at?: string | null
+          verify_token?: string | null
+        }
+        Update: {
+          channel?: string
+          contact?: string
+          contact_hash?: string
+          created_at?: string
+          district_ids?: string[]
+          id?: string
+          language?: string
+          min_level?: string
+          unsubscribe_token?: string
+          unsubscribed_at?: string | null
+          verified_at?: string | null
+          verify_expires_at?: string | null
+          verify_token?: string | null
+        }
+        Relationships: []
       }
       alerts: {
         Row: {
@@ -465,6 +570,24 @@ export type Database = {
         Relationships: []
       }
       submission_rate_limits: {
+        Row: {
+          created_at: string
+          id: string
+          ip_hash: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip_hash: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip_hash?: string
+        }
+        Relationships: []
+      }
+      subscription_rate_limits: {
         Row: {
           created_at: string
           id: string

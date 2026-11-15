@@ -117,6 +117,9 @@ export async function refreshMonitoringSnapshots(triggerSource: "schedule" | "ma
       await assessStoredSnapshots(supabaseAdmin).catch((e) =>
         console.error("Risk assessment failed", e),
       );
+      // Notify subscribers about new/escalated alerts; never throws, so monitoring continues.
+      const { dispatchAlertNotifications } = await import("@/lib/subscriptions/sender.server");
+      await dispatchAlertNotifications(supabaseAdmin);
     }
     const finishedAt = new Date().toISOString();
     const ok = latest.districts.filter((d) => d.weather && d.flood).length;

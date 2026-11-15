@@ -31,6 +31,8 @@ export default defineConfig({
         // The build emits browser files under client/, but they are served from the site root.
         modifyURLPrefix: { "client/": "" },
         cleanupOutdatedCaches: true,
+        // Push and notification-click handlers only; no caching logic.
+        importScripts: ["/push-handler.js"],
         runtimeCaching: [
           {
             urlPattern: ({ request, url }) =>

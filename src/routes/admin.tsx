@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { getCoordinatorStatus } from "@/lib/api/requests.functions";
 import { SafetyNotice, PageHeader } from "@/components/site/Status";
 import { RequestsTable } from "@/components/admin/RequestsTable";
+import { SubscriptionStats } from "@/components/admin/SubscriptionStats";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -91,6 +92,7 @@ function AdminPage() {
           </div>
         </SafetyNotice>
         <RequestsTable />
+        <SubscriptionStats />
       </div>
     </>
   );

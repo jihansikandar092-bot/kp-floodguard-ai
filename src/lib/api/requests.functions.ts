@@ -132,7 +132,7 @@ async function callerIsCoordinator(token: string) {
   return c.data === true || a.data === true;
 }
 
-async function isCoordinator(ctx: {
+export async function isCoordinator(ctx: {
   supabase: {
     rpc: (
       fn: "has_role",
