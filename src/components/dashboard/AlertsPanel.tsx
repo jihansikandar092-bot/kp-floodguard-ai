@@ -3,8 +3,9 @@ import { alertsOptions } from "@/lib/alerts/alerts-query";
 import { Panel } from "./Panel";
 import { RISK_DISCLAIMER } from "@/components/risk/RiskExplain";
 import { cn } from "@/lib/utils";
+import type { getAlerts } from "@/lib/alerts/alerts.functions";
 
-type Alert = Awaited<ReturnType<ReturnType<typeof alertsOptions>["queryFn"] & (() => never)>>;
+type Alert = Awaited<ReturnType<typeof getAlerts>>["active"][number];
 
 const utc = (value: string) => `${value.replace("T", " ").slice(0, 16)} UTC`;
 
@@ -32,7 +33,7 @@ export function AlertsPanel({ districts }: { districts: { id: string; name: stri
 
 function AlertList({ title, rows, districts, empty }: {
   title: string;
-  rows: NonNullable<ReturnType<typeof useQuery<Awaited<ReturnType<typeof import("@/lib/alerts/alerts.functions").getAlerts>>>>["data"]>["active"];
+  rows: Alert[];
   districts: { id: string; name: string }[];
   empty: string;
 }) {
