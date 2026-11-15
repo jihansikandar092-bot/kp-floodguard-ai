@@ -51,7 +51,7 @@ describe("AI chat proxy", () => {
     expect(payload.model).toBe("openai/gpt-6-astra");
     expect(payload.instructions).toContain("KP FloodGuard AI assistant");
     expect(payload.tools).toBeUndefined();
-    expect(payload.input[0].content).toContain("language: en");
+    expect(payload.input[0]?.content).toContain("language: en");
   });
   it("falls back to guided intake when the AI call fails", async () => {
     records.generate.mockRejectedValue(new Error("private failure"));
