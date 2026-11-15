@@ -62,6 +62,8 @@ export type EmergencyRequestInput = z.infer<typeof emergencyRequestSchema>;
 export const submitRequestSchema = emergencyRequestSchema.extend({
   language: z.enum(REQUEST_LANGUAGES).default("en"),
   isTest: z.boolean().default(false),
+  /** Device-generated key; re-sending the same queued request returns the stored row. */
+  clientRequestId: z.string().uuid().optional(),
 });
 export type SubmitRequestInput = z.input<typeof submitRequestSchema>;
 
