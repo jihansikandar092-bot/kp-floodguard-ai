@@ -32,7 +32,7 @@ interface ChatMessage extends BotMessage {
   source?: string;
   disclaimer?: string;
 }
-// Server-side relay to the n8n Chat Agent (avoids CORS, keeps the webhook off the client).
+// Server-side relay to the built-in AI assistant (keeps model access off the client).
 const AI_CHAT_PROXY = "/api/public/ai-chat";
 
 const UI = {
@@ -192,7 +192,7 @@ export function AssistantWidget() {
       setInput("");
       setBusy(true);
       try {
-        const response = await fetch(N8N_CHAT_PROXY, {
+        const response = await fetch(AI_CHAT_PROXY, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
