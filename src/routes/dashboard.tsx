@@ -26,6 +26,7 @@ import { PartialScoreNote } from "@/components/risk/PartialScoreNote";
 import { HistoricalStatistics } from "@/components/dashboard/HistoricalStatistics";
 import { historicalOptions } from "@/lib/history/history-query";
 import { useState } from "react";
+import { OfflineBanner } from "@/components/dashboard/OfflineBanner";
 import { Input } from "@/components/ui/input";
 import { filterDistricts } from "@/lib/data/district-filter";
 
@@ -124,6 +125,7 @@ function DashboardPage() {
         }
       />
       <div className="container-page space-y-6 py-8">
+        <OfflineBanner fetchedAt={data.fetchedAt} />
         <LiveStatus data={data} rows={live.rows} />
         {fallbackLoading && (
           <p role="status" className="text-sm text-muted-foreground">
