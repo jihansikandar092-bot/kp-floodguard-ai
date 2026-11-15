@@ -15,7 +15,7 @@ export function OfflinePending({
 }) {
   if (!pending.length) return null;
   return (
-    <div role="status" className="space-y-3 rounded-lg border-2 border-risk-medium bg-risk-medium/10 p-4">
+    <div role="status" className="space-y-3 rounded-lg border-2 border-risk-medium bg-risk-medium-soft p-4">
       <p className="flex items-start gap-2 font-semibold">
         <CloudOff className="mt-0.5 size-5 shrink-0" aria-hidden />
         Saved on your phone, it will be sent automatically when you are back online.

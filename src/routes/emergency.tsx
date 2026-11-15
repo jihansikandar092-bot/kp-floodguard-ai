@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AlertTriangle, Bot, CheckCircle2, Phone } from "lucide-react";
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import { OfflinePending } from "@/components/emergency/OfflinePending";
+import { useOfflineQueue, useOnline } from "@/lib/offline/use-offline-queue";
+import type { FlushOutcome } from "@/lib/offline/request-queue";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/site/Status";
@@ -37,6 +40,17 @@ export const Route = createFileRoute("/emergency")({
 
 function EmergencyPage() {
   const [submitted, setSubmitted] = useState<SubmittedRequest | null>(null);
+  const [rejected, setRejected] = useState<string | null>(null);
+  const online = useOnline();
+  const onSent = useCallback((o: FlushOutcome) => {
+    const last = o.sent.at(-1);
+    if (last) {
+      const { clientRequestId: _id, language: _l, isTest, ...values } = last.item.payload;
+      setSubmitted({ ...values, code: last.code, createdAt: last.createdAt, isTest: !!isTest } as SubmittedRequest);
+    }
+    if (o.rejected[0]) setRejected(o.rejected[0].message);
+  }, []);
+  const queue = useOfflineQueue(onSent);
 
   return (
     <>
@@ -47,10 +61,28 @@ function EmergencyPage() {
       />
       <div className="container-page grid gap-8 py-8 lg:grid-cols-[1fr_340px]">
         <div className="rounded-xl border bg-card p-5 shadow-card sm:p-8">
+          <div className="mb-6 space-y-3 empty:hidden">
+            <OfflinePending
+              pending={queue.pending}
+              sending={queue.sending}
+              online={online}
+              onRetry={() => void queue.retry()}
+            />
+            {rejected && (
+              <p role="alert" className="text-sm font-semibold text-emergency">
+                A saved request could not be accepted: {rejected} Please submit again or call
+                Rescue 1122.
+              </p>
+            )}
+          </div>
           {submitted ? (
             <Confirmation request={submitted} onReset={() => setSubmitted(null)} />
           ) : (
             <EmergencyForm
+              onQueued={() => {
+                queue.refresh();
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
               onSubmitted={(r) => {
                 setSubmitted(r);
                 window.scrollTo({ top: 0, behavior: "smooth" });

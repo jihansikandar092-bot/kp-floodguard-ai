@@ -28,6 +28,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { submitEmergencyRequest } from "@/lib/api/requests.functions";
 import { useCoordinator } from "@/lib/api/use-coordinator";
 import { Link } from "@tanstack/react-router";
+import { enqueueRequest, isNetworkFailure } from "@/lib/offline/request-queue";
 
 export interface SubmittedRequest extends EmergencyRequestInput {
   code: string;
@@ -43,7 +44,13 @@ const TYPE_ICON: Record<EmergencyType, typeof LifeBuoy> = {
   shelter: Home,
 };
 
-export function EmergencyForm({ onSubmitted }: { onSubmitted: (r: SubmittedRequest) => void }) {
+export function EmergencyForm({
+  onSubmitted,
+  onQueued,
+}: {
+  onSubmitted: (r: SubmittedRequest) => void;
+  onQueued?: () => void;
+}) {
   const {
     register,
     control,
@@ -73,10 +80,27 @@ export function EmergencyForm({ onSubmitted }: { onSubmitted: (r: SubmittedReque
 
   const onSubmit = handleSubmit(async (values) => {
     setSubmitError(null);
-    try {
-      const res = await submit({
-        data: { ...values, language: "en", isTest: coordinator && isTest },
+    const clientRequestId = crypto.randomUUID();
+    const payload = {
+      ...values,
+      language: "en" as const,
+      isTest: coordinator && isTest,
+      clientRequestId,
+    };
+    const queue = () => {
+      const saved = enqueueRequest({
+        clientRequestId,
+        queuedAt: new Date().toISOString(),
+        payload,
       });
+      if (saved) return onQueued?.();
+      setSubmitError(
+        "You are offline and this phone could not save the request. Call Rescue 1122 now.",
+      );
+    };
+    if (!navigator.onLine) return queue();
+    try {
+      const res = await submit({ data: payload });
       if (!res.ok) return setSubmitError(res.message);
       onSubmitted({
         ...values,
@@ -86,6 +110,7 @@ export function EmergencyForm({ onSubmitted }: { onSubmitted: (r: SubmittedReque
       });
     } catch (e) {
       console.error("submit failed", e);
+      if (isNetworkFailure(e, navigator.onLine)) return queue();
       setSubmitError(
         "Could not send your request. Check your connection and try again, or call Rescue 1122.",
       );
