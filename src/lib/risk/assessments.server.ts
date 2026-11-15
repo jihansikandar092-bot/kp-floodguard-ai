@@ -57,33 +57,55 @@ export async function assessStoredSnapshots(admin: Admin, supersedeDegenerate = 
     if (writeError) throw new Error("Risk assessment write failed");
     if (supersedeDegenerate) {
       // Explicit operator-only correction; never relax normal partial-resolution safety.
-      const { data: active, error: activeError } = await admin.from("alerts")
+      const { data: active, error: activeError } = await admin
+        .from("alerts")
         .select("id,district_id,risk_assessment_id,reason_text,reason_templates")
         .is("resolved_at", null);
       if (activeError) throw new Error("Correction could not read active alerts");
       for (const alert of active ?? []) {
-        const corrected = rows.filter((r) => r.district_id === alert.district_id && r.horizon_hours <= RISK_CONFIG.alerts.maxHorizonHours);
+        const corrected = rows.filter(
+          (r) =>
+            r.district_id === alert.district_id &&
+            r.horizon_hours <= RISK_CONFIG.alerts.maxHorizonHours,
+        );
         if (!corrected.length || corrected.some((r) => r.level !== "low")) continue;
-        const { data: original, error: originalError } = await admin.from("risk_assessments")
-          .select("snapshot_id,horizon_hours,factors").eq("id", alert.risk_assessment_id).maybeSingle();
+        const { data: original, error: originalError } = await admin
+          .from("risk_assessments")
+          .select("snapshot_id,horizon_hours,factors")
+          .eq("id", alert.risk_assessment_id)
+          .maybeSingle();
         if (originalError) throw new Error("Correction could not read original assessment");
         if (!original) continue;
-        const replacement = corrected.find((r) => r.horizon_hours === original.horizon_hours && r.snapshot_id === original.snapshot_id);
+        const replacement = corrected.find(
+          (r) =>
+            r.horizon_hours === original.horizon_hours && r.snapshot_id === original.snapshot_id,
+        );
         const oldFactors = original.factors as unknown as StoredRiskAssessment["factors"];
-        const newFactors = replacement?.factors as unknown as StoredRiskAssessment["factors"] | undefined;
-        if (!newFactors || oldFactors.dischargePeak.score === null || newFactors.dischargePeak.score !== null || !newFactors.dischargePeak.detail.includes("heuristic reliability floor")) continue;
+        const newFactors = replacement?.factors as unknown as
+          StoredRiskAssessment["factors"] | undefined;
+        if (
+          !newFactors ||
+          oldFactors.dischargePeak.score === null ||
+          newFactors.dischargePeak.score !== null ||
+          !newFactors.dischargePeak.detail.includes("heuristic reliability floor")
+        )
+          continue;
         const note = "superseded by corrected scoring rule";
         const templates = (alert.reason_templates ?? {}) as Record<string, string>;
-        const { error: closeError } = await admin.from("alerts").update({
-          resolved_at: computedAt,
-          reason_text: `${alert.reason_text} ${note}`,
-          reason_templates: {
-            ...templates,
-            en: `${templates.en ?? alert.reason_text} ${note}`,
-            ur: `${templates.ur ?? ""} درست کردہ اسکورنگ اصول کی وجہ سے سابقہ انتباہ بند کر دیا گیا۔`,
-            ps: `${templates.ps ?? ""} د سم شوي نمرې اصولو له امله پخوانی خبرداری وتړل شو.`,
-          },
-        }).eq("id", alert.id).is("resolved_at", null);
+        const { error: closeError } = await admin
+          .from("alerts")
+          .update({
+            resolved_at: computedAt,
+            reason_text: `${alert.reason_text} ${note}`,
+            reason_templates: {
+              ...templates,
+              en: `${templates.en ?? alert.reason_text} ${note}`,
+              ur: `${templates.ur ?? ""} درست کردہ اسکورنگ اصول کی وجہ سے سابقہ انتباہ بند کر دیا گیا۔`,
+              ps: `${templates.ps ?? ""} د سم شوي نمرې اصولو له امله پخوانی خبرداری وتړل شو.`,
+            },
+          })
+          .eq("id", alert.id)
+          .is("resolved_at", null);
         if (closeError) throw new Error("Correction could not supersede alert");
       }
     }

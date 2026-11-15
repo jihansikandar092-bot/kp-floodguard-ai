@@ -30,7 +30,12 @@ const rising = flood([90, 92, 94, 96, 98, 99, 100, 100, 120, 140, 160, 170, 180,
 
 describe("risk engine", () => {
   it("a 0–0 fallback range cannot generate a discharge score even with a large future peak", () => {
-    const r = assessRisk({ weather: weather(0, 0), flood: flood([0,0,0,0,0,0,0,20,20,20,20,20,20,20]), floodUpdatedAt: "2026-01-08T00:00:00Z", historicalAnnualMax: [] });
+    const r = assessRisk({
+      weather: weather(0, 0),
+      flood: flood([0, 0, 0, 0, 0, 0, 0, 20, 20, 20, 20, 20, 20, 20]),
+      floodUpdatedAt: "2026-01-08T00:00:00Z",
+      historicalAnnualMax: [],
+    });
     expect(r?.factors.dischargePeak.score).toBeNull();
     expect(r?.factors.dischargeTrend.score).toBeNull();
     expect(r?.availableFactors).toBe(2);
@@ -39,14 +44,26 @@ describe("risk engine", () => {
   });
   it("tiny absolute peak is unavailable even with history or a nonzero range", () => {
     for (const history of [[], [0.02]]) {
-      const r = assessRisk({ weather: weather(0, 0), flood: flood([0.01,0.02,0.01,0.02,0.01,0.02,0.02,0.03,0.03,0.03,0.03,0.03,0.03,0.03]), floodUpdatedAt: "2026-01-08T00:00:00Z", historicalAnnualMax: history });
+      const r = assessRisk({
+        weather: weather(0, 0),
+        flood: flood([
+          0.01, 0.02, 0.01, 0.02, 0.01, 0.02, 0.02, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03,
+        ]),
+        floodUpdatedAt: "2026-01-08T00:00:00Z",
+        historicalAnnualMax: history,
+      });
       expect(r?.factors.dischargePeak.value).toBe(0.03);
       expect(r?.factors.dischargePeak.score).toBeNull();
       expect(r?.level).toBe("low");
     }
   });
   it("valid discharge alone still reaches the exact 35.0 Medium boundary", () => {
-    const r = assessRisk({ weather: weather(0,0), flood: flood([90,92,94,96,98,99,100,150,150,150,150,150,150,150]), floodUpdatedAt: "2026-01-08T00:00:00Z", historicalAnnualMax: [] });
+    const r = assessRisk({
+      weather: weather(0, 0),
+      flood: flood([90, 92, 94, 96, 98, 99, 100, 150, 150, 150, 150, 150, 150, 150]),
+      floodUpdatedAt: "2026-01-08T00:00:00Z",
+      historicalAnnualMax: [],
+    });
     expect(r?.factors.dischargePeak.score).toBe(100);
     expect(r?.score).toBe(35);
     expect(r?.level).toBe("medium");

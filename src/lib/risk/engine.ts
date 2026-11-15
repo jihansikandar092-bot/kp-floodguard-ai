@@ -72,11 +72,18 @@ export function levelFor(score: number): RiskLevel {
 }
 
 /** Reject tiny peaks; own-range fallback also needs a non-degenerate last-seven-day range. */
-export function reliableDischargeReference(peak: number | null, past: number[], history: number | null) {
+export function reliableDischargeReference(
+  peak: number | null,
+  past: number[],
+  history: number | null,
+) {
   if (peak === null || peak < RISK_CONFIG.dischargeFloors.peakM3s) return false;
   if (history !== null && history > 0) return true;
-  return past.length > 0 && Math.max(...past) > 0 &&
-    Math.max(...past) - Math.min(...past) >= RISK_CONFIG.dischargeFloors.fallbackRangeM3s;
+  return (
+    past.length > 0 &&
+    Math.max(...past) > 0 &&
+    Math.max(...past) - Math.min(...past) >= RISK_CONFIG.dischargeFloors.fallbackRangeM3s
+  );
 }
 
 /** Sum of hourly precipitation in (from, to]; null unless every hour is present. */
@@ -106,7 +113,9 @@ export function assessRisk(input: RiskInput): RiskAssessment | null {
       : [];
   const pastFlow =
     daily && todayIdx > 0
-      ? daily.river_discharge.slice(Math.max(0, todayIdx - 7), todayIdx).filter((v): v is number => v !== null)
+      ? daily.river_discharge
+          .slice(Math.max(0, todayIdx - 7), todayIdx)
+          .filter((v): v is number => v !== null)
       : [];
   const peak = future.length ? Math.max(...future) : null;
   const histMedian = median(input.historicalAnnualMax.filter((v) => v > 0));
@@ -133,11 +142,16 @@ export function assessRisk(input: RiskInput): RiskAssessment | null {
       detail: `7-day peak ${round1(peak)} m³/s vs past 7-day range ${round1(Math.min(...pastFlow))}–${round1(pastMax)} m³/s (no historical stats)`,
     };
   }
-  if (!reliable && peak !== null) peakFactor.detail = "Discharge scoring not available: peak or fallback reference range below heuristic reliability floor (not validated).";
+  if (!reliable && peak !== null)
+    peakFactor.detail =
+      "Discharge scoring not available: peak or fallback reference range below heuristic reliability floor (not validated).";
 
   const t0 = at(todayIdx);
   const t3 = at(todayIdx + RISK_CONFIG.trendDays);
-  const change = reliable && t0 !== null && t3 !== null && t0 >= RISK_CONFIG.dischargeFloors.peakM3s ? (t3 - t0) / t0 : null;
+  const change =
+    reliable && t0 !== null && t3 !== null && t0 >= RISK_CONFIG.dischargeFloors.peakM3s
+      ? (t3 - t0) / t0
+      : null;
 
   const factors: Record<FactorKey, RiskFactor> = {
     forecastRain72h: {
