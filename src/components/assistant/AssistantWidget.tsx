@@ -63,9 +63,17 @@ const UI = {
     newReq: "نئی درخواست شروع کریں",
   },
   ps: {
-    title: "بیړنی مرستیال", status: "د بیړنۍ غوښتنې لارښود", statusAi: "AI Chat · FloodGuard AI",
-    danger: "ژوند په خطر کې دی؟ ریسکیو 1122 ته زنګ ووهئ.", placeholder: "خپل پیغام ولیکئ…", send: "ولېږئ", reset: "بیا پیل",
-    summaryTitle: "د غوښتنې لنډیز", saved: (id:string)=>`ستاسو غوښتنه ${id} ثبت شوه. همغږي کوونکي به یې وګوري؛ دا د مرستې لېږلو ضمانت نه دی. په بیړني حالت کې ریسکیو 1122 ته زنګ ووهئ.`, newReq: "نوې غوښتنه",
+    title: "بیړنی مرستیال",
+    status: "د بیړنۍ غوښتنې لارښود",
+    statusAi: "AI Chat · FloodGuard AI",
+    danger: "ژوند په خطر کې دی؟ ریسکیو 1122 ته زنګ ووهئ.",
+    placeholder: "خپل پیغام ولیکئ…",
+    send: "ولېږئ",
+    reset: "بیا پیل",
+    summaryTitle: "د غوښتنې لنډیز",
+    saved: (id: string) =>
+      `ستاسو غوښتنه ${id} ثبت شوه. همغږي کوونکي به یې وګوري؛ دا د مرستې لېږلو ضمانت نه دی. په بیړني حالت کې ریسکیو 1122 ته زنګ ووهئ.`,
+    newReq: "نوې غوښتنه",
   },
 } as const;
 
@@ -90,7 +98,16 @@ const FIELD_LABELS = {
     peopleAffected: "افراد",
     description: "تفصیل",
   },
-  ps: { type:"ډول", district:"ولسوالۍ", tehsil:"تحصیل", location:"ځای", fullName:"نوم", phone:"موبایل", peopleAffected:"کسان", description:"تفصیل" },
+  ps: {
+    type: "ډول",
+    district: "ولسوالۍ",
+    tehsil: "تحصیل",
+    location: "ځای",
+    fullName: "نوم",
+    phone: "موبایل",
+    peopleAffected: "کسان",
+    description: "تفصیل",
+  },
 } as const;
 
 export function AssistantWidget() {
@@ -152,8 +169,9 @@ export function AssistantWidget() {
           text:
             lang === "ur"
               ? "السلام علیکم! میں FloodGuard AI ہوں۔ آپ سیلاب، موسم، پانی کی سطح یا حفاظتی اقدامات کے بارے میں پوچھ سکتے ہیں۔"
-              : lang === "ps" ? "السلام علیکم! زه FloodGuard AI یم. د سیلاب، موسم او خوندیتوب په اړه پوښتنه وکړئ."
-              : "Hello! I am FloodGuard AI. Ask me about floods, weather, river levels, or safety guidance.",
+              : lang === "ps"
+                ? "السلام علیکم! زه FloodGuard AI یم. د سیلاب، موسم او خوندیتوب په اړه پوښتنه وکړئ."
+                : "Hello! I am FloodGuard AI. Ask me about floods, weather, river levels, or safety guidance.",
         },
       ]);
     } else {
@@ -177,7 +195,11 @@ export function AssistantWidget() {
         const response = await fetch(N8N_CHAT_PROXY, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ sessionId: sessionIdRef.current, chatInput: text, language: lang }),
+          body: JSON.stringify({
+            sessionId: sessionIdRef.current,
+            chatInput: text,
+            language: lang,
+          }),
         });
         const data = (await response.json().catch(() => ({}))) as {
           reply?: string;
@@ -188,16 +210,27 @@ export function AssistantWidget() {
           disclaimer?: string;
         };
         if (data.reply) {
-          push([{ role: "bot", text: data.reply, ...(data.dataTime ? {dataTime:data.dataTime} : {}), ...(data.source ? {source:data.source} : {}), ...(data.disclaimer ? {disclaimer:data.disclaimer} : {}) }]);
+          push([
+            {
+              role: "bot",
+              text: data.reply,
+              ...(data.dataTime ? { dataTime: data.dataTime } : {}),
+              ...(data.source ? { source: data.source } : {}),
+              ...(data.disclaimer ? { disclaimer: data.disclaimer } : {}),
+            },
+          ]);
           if (data.fallback) {
             setChatMode("intake");
-            push([{role:"bot",...promptFor(state.step,state,lang)}]);
+            push([{ role: "bot", ...promptFor(state.step, state, lang) }]);
           }
           return;
         }
         throw new Error("Chat unavailable");
       } catch {
-        push([{role:"bot",text:chatFallback[lang]},{role:"bot",...promptFor(state.step,state,lang)}]);
+        push([
+          { role: "bot", text: chatFallback[lang] },
+          { role: "bot", ...promptFor(state.step, state, lang) },
+        ]);
         setChatMode("intake");
       } finally {
         setBusy(false);
@@ -331,7 +364,9 @@ export function AssistantWidget() {
               <LangButton active={lang === "ur"} onClick={() => changeLang("ur")} lang="ur">
                 اردو
               </LangButton>
-              <LangButton active={lang === "ps"} onClick={() => changeLang("ps")} lang="ps">پښتو</LangButton>
+              <LangButton active={lang === "ps"} onClick={() => changeLang("ps")} lang="ps">
+                پښتو
+              </LangButton>
             </div>
             <div className="mt-3 flex gap-2">
               <button
@@ -388,8 +423,15 @@ export function AssistantWidget() {
                   )}
                 >
                   {m.text}
-                  {m.dataTime && <p className="mt-2 text-xs text-muted-foreground" dir={rtl ? "rtl" : "ltr"}>{chatDataLabel[lang]}: {m.dataTime.replace("T"," ").slice(0,19)} UTC · {m.source}</p>}
-                  {m.disclaimer && <p className="mt-2 text-xs text-muted-foreground">{m.disclaimer}</p>}
+                  {m.dataTime && (
+                    <p className="mt-2 text-xs text-muted-foreground" dir={rtl ? "rtl" : "ltr"}>
+                      {chatDataLabel[lang]}: {m.dataTime.replace("T", " ").slice(0, 19)} UTC ·{" "}
+                      {m.source}
+                    </p>
+                  )}
+                  {m.disclaimer && (
+                    <p className="mt-2 text-xs text-muted-foreground">{m.disclaimer}</p>
+                  )}
                   {m.summary && <Summary data={m.summary} lang={lang} title={ui.summaryTitle} />}
                 </div>
                 {m.chips && m.id === lastBotId && (

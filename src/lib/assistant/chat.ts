@@ -1,6 +1,12 @@
 import { z } from "zod";
 
-export const chatBody = z.object({ sessionId: z.string().uuid(), chatInput: z.string().trim().min(1).max(1000), language: z.enum(["en", "ur", "ps"]) }).strict();
+export const chatBody = z
+  .object({
+    sessionId: z.string().uuid(),
+    chatInput: z.string().trim().min(1).max(1000),
+    language: z.enum(["en", "ur", "ps"]),
+  })
+  .strict();
 export type ChatLanguage = z.infer<typeof chatBody>["language"];
 export const chatFallback = {
   en: "The AI assistant is temporarily unavailable. In an emergency call Rescue 1122 or use the emergency request form.",
