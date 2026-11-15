@@ -17,9 +17,9 @@ export const INTEGRATIONS = [
       "District references, monitoring snapshots, risk assessments and coordinator-reviewed requests.",
   },
   {
-    service: "n8n chat",
-    name: "n8n chat",
-    purpose: "Natural-language flood safety questions through the existing chat agent.",
+    service: "AI chat",
+    name: "AI chat",
+    purpose: "Natural-language flood safety questions answered by the built-in AI assistant.",
   },
   {
     service: "Historical data",

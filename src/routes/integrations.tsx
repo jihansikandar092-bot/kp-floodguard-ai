@@ -16,7 +16,7 @@ export const Route = createFileRoute("/integrations")({
       {
         name: "description",
         content:
-          "Recorded service health for Open-Meteo, GloFAS, database, n8n chat and historical data, with last success and error times.",
+          "Recorded service health for Open-Meteo, GloFAS, database, AI chat and historical data, with last success and error times.",
       },
       { property: "og:title", content: "Service Status & Integrations — KP FloodGuard AI" },
       {

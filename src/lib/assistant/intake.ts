@@ -2,7 +2,7 @@
  * Guided emergency intake for the assistant widget.
  *
  * This is a deterministic, rule-based flow (keyword classification + one question
- * at a time), separate from the n8n natural-language chat mode.
+ * at a time), separate from the AI natural-language chat mode.
  */
 import type { District } from "@/lib/data/districts";
 import {

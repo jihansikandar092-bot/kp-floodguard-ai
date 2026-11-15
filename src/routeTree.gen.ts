@@ -23,8 +23,8 @@ import { Route as SubscribeRouteImport } from './routes/subscribe'
 import { Route as TrackRouteImport } from './routes/track'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as VerifySubscriptionRouteImport } from './routes/verify-subscription'
+import { Route as ApiPublicAiChatRouteImport } from './routes/api/public/ai-chat'
 import { Route as ApiPublicMonitoringStatusRouteImport } from './routes/api/public/monitoring-status'
-import { Route as ApiPublicN8nChatRouteImport } from './routes/api/public/n8n-chat'
 import { Route as ApiPublicJobsCollectHistoryRouteImport } from './routes/api/public/jobs/collect-history'
 import { Route as ApiPublicJobsRefreshMonitoringRouteImport } from './routes/api/public/jobs/refresh-monitoring'
 
@@ -98,17 +98,17 @@ const VerifySubscriptionRoute = VerifySubscriptionRouteImport.update({
   path: '/verify-subscription',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicAiChatRoute = ApiPublicAiChatRouteImport.update({
+  id: '/api/public/ai-chat',
+  path: '/api/public/ai-chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicMonitoringStatusRoute =
   ApiPublicMonitoringStatusRouteImport.update({
     id: '/api/public/monitoring-status',
     path: '/api/public/monitoring-status',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiPublicN8nChatRoute = ApiPublicN8nChatRouteImport.update({
-  id: '/api/public/n8n-chat',
-  path: '/api/public/n8n-chat',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiPublicJobsCollectHistoryRoute =
   ApiPublicJobsCollectHistoryRouteImport.update({
     id: '/api/public/jobs/collect-history',
@@ -137,8 +137,8 @@ export interface FileRoutesByFullPath {
   '/track': typeof TrackRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/verify-subscription': typeof VerifySubscriptionRoute
+  '/api/public/ai-chat': typeof ApiPublicAiChatRoute
   '/api/public/monitoring-status': typeof ApiPublicMonitoringStatusRoute
-  '/api/public/n8n-chat': typeof ApiPublicN8nChatRoute
   '/api/public/jobs/collect-history': typeof ApiPublicJobsCollectHistoryRoute
   '/api/public/jobs/refresh-monitoring': typeof ApiPublicJobsRefreshMonitoringRoute
 }
@@ -157,8 +157,8 @@ export interface FileRoutesByTo {
   '/track': typeof TrackRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/verify-subscription': typeof VerifySubscriptionRoute
+  '/api/public/ai-chat': typeof ApiPublicAiChatRoute
   '/api/public/monitoring-status': typeof ApiPublicMonitoringStatusRoute
-  '/api/public/n8n-chat': typeof ApiPublicN8nChatRoute
   '/api/public/jobs/collect-history': typeof ApiPublicJobsCollectHistoryRoute
   '/api/public/jobs/refresh-monitoring': typeof ApiPublicJobsRefreshMonitoringRoute
 }
@@ -178,8 +178,8 @@ export interface FileRoutesById {
   '/track': typeof TrackRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/verify-subscription': typeof VerifySubscriptionRoute
+  '/api/public/ai-chat': typeof ApiPublicAiChatRoute
   '/api/public/monitoring-status': typeof ApiPublicMonitoringStatusRoute
-  '/api/public/n8n-chat': typeof ApiPublicN8nChatRoute
   '/api/public/jobs/collect-history': typeof ApiPublicJobsCollectHistoryRoute
   '/api/public/jobs/refresh-monitoring': typeof ApiPublicJobsRefreshMonitoringRoute
 }
@@ -200,8 +200,8 @@ export interface FileRouteTypes {
     | '/track'
     | '/unsubscribe'
     | '/verify-subscription'
+    | '/api/public/ai-chat'
     | '/api/public/monitoring-status'
-    | '/api/public/n8n-chat'
     | '/api/public/jobs/collect-history'
     | '/api/public/jobs/refresh-monitoring'
   fileRoutesByTo: FileRoutesByTo
@@ -220,8 +220,8 @@ export interface FileRouteTypes {
     | '/track'
     | '/unsubscribe'
     | '/verify-subscription'
+    | '/api/public/ai-chat'
     | '/api/public/monitoring-status'
-    | '/api/public/n8n-chat'
     | '/api/public/jobs/collect-history'
     | '/api/public/jobs/refresh-monitoring'
   id:
@@ -240,8 +240,8 @@ export interface FileRouteTypes {
     | '/track'
     | '/unsubscribe'
     | '/verify-subscription'
+    | '/api/public/ai-chat'
     | '/api/public/monitoring-status'
-    | '/api/public/n8n-chat'
     | '/api/public/jobs/collect-history'
     | '/api/public/jobs/refresh-monitoring'
   fileRoutesById: FileRoutesById
@@ -261,8 +261,8 @@ export interface RootRouteChildren {
   TrackRoute: typeof TrackRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
   VerifySubscriptionRoute: typeof VerifySubscriptionRoute
+  ApiPublicAiChatRoute: typeof ApiPublicAiChatRoute
   ApiPublicMonitoringStatusRoute: typeof ApiPublicMonitoringStatusRoute
-  ApiPublicN8nChatRoute: typeof ApiPublicN8nChatRoute
   ApiPublicJobsCollectHistoryRoute: typeof ApiPublicJobsCollectHistoryRoute
   ApiPublicJobsRefreshMonitoringRoute: typeof ApiPublicJobsRefreshMonitoringRoute
 }
@@ -367,18 +367,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VerifySubscriptionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/ai-chat': {
+      id: '/api/public/ai-chat'
+      path: '/api/public/ai-chat'
+      fullPath: '/api/public/ai-chat'
+      preLoaderRoute: typeof ApiPublicAiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/monitoring-status': {
       id: '/api/public/monitoring-status'
       path: '/api/public/monitoring-status'
       fullPath: '/api/public/monitoring-status'
       preLoaderRoute: typeof ApiPublicMonitoringStatusRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/n8n-chat': {
-      id: '/api/public/n8n-chat'
-      path: '/api/public/n8n-chat'
-      fullPath: '/api/public/n8n-chat'
-      preLoaderRoute: typeof ApiPublicN8nChatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/jobs/collect-history': {
@@ -413,8 +413,8 @@ const rootRouteChildren: RootRouteChildren = {
   TrackRoute: TrackRoute,
   UnsubscribeRoute: UnsubscribeRoute,
   VerifySubscriptionRoute: VerifySubscriptionRoute,
+  ApiPublicAiChatRoute: ApiPublicAiChatRoute,
   ApiPublicMonitoringStatusRoute: ApiPublicMonitoringStatusRoute,
-  ApiPublicN8nChatRoute: ApiPublicN8nChatRoute,
   ApiPublicJobsCollectHistoryRoute: ApiPublicJobsCollectHistoryRoute,
   ApiPublicJobsRefreshMonitoringRoute: ApiPublicJobsRefreshMonitoringRoute,
 }

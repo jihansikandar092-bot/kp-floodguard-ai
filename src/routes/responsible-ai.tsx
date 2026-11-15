@@ -178,8 +178,9 @@ function ResponsibleAIPage() {
           <h3 className="font-semibold">Assistant, sign-in and abuse prevention</h3>
           <p>
             AI chat sends your message, a session identifier, language and compact public risk/alert
-            context to the configured n8n workflow. That workflow may use additional AI services;
-            its downstream providers and retention are not established in this site's configuration.
+            context to the built-in AI provider (through the Lovable AI Gateway) to generate an
+            answer. Chat text is not stored in this site's database; the AI provider's own
+            processing and retention apply to the text sent to it.
             Avoid sharing sensitive details in AI chat; use the emergency form for a
             coordinator-reviewed request. Guided intake stays in the current browser session until
             submitted.
