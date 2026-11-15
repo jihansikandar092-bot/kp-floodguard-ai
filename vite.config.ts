@@ -8,6 +8,7 @@
 // hosting already compresses at the edge.
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
+import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
   tanstackStart: {
@@ -15,4 +16,32 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  plugins: [
+    // Minimal service worker: precaches hashed static assets and keeps a network-first copy of
+    // the /emergency page shell only. It never caches server functions or API responses.
+    VitePWA({
+      registerType: "autoUpdate",
+      injectRegister: null,
+      manifest: false, // served from public/manifest.webmanifest
+      filename: "sw.js",
+      devOptions: { enabled: false },
+      workbox: {
+        globPatterns: ["**/*.{js,css,woff2,png,svg,ico,webmanifest}"],
+        navigateFallback: null,
+        cleanupOutdatedCaches: true,
+        runtimeCaching: [
+          {
+            urlPattern: ({ request, url }) =>
+              request.mode === "navigate" && url.pathname === "/emergency",
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "emergency-shell",
+              networkTimeoutSeconds: 5,
+              expiration: { maxEntries: 1 },
+            },
+          },
+        ],
+      },
+    }),
+  ],
 });
