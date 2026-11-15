@@ -161,12 +161,7 @@ function DashboardPage() {
             value={t.humidity ?? "Not available"}
             unit="%"
           />
-          <StatCard
-            icon={Wind}
-            label="Wind speed"
-            value={t.wind ?? "Not available"}
-            unit="km/h"
-          />
+          <StatCard icon={Wind} label="Wind speed" value={t.wind ?? "Not available"} unit="km/h" />
         </div>
 
         <div className="grid gap-6 lg:grid-cols-3">

@@ -116,7 +116,7 @@ const STEPS = [
 function Index() {
   const { data } = useSuspenseQuery(liveMonitoringOptions());
   const { data: districts } = useSuspenseQuery(districtListOptions());
-  const {data: platform} = useSuspenseQuery(platformHealthOptions());
+  const { data: platform } = useSuspenseQuery(platformHealthOptions());
   return (
     <>
       {/* HERO */}
@@ -137,7 +137,8 @@ function Index() {
               <span className="text-emergency">Safer</span> Communities.
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-navy-muted">
-              AI-assisted risk scoring, stored environmental monitoring and emergency request review for Khyber Pakhtunkhwa.
+              AI-assisted risk scoring, stored environmental monitoring and emergency request review
+              for Khyber Pakhtunkhwa.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button asChild size="lg" variant="navy-solid">
@@ -156,9 +157,14 @@ function Index() {
                 k="Districts monitored"
                 v={String(platform.districtCount ?? "Not available")}
               />
-              <HeroStat k="Stored snapshots" v={String(platform.snapshotCount ?? "Not available")} />
+              <HeroStat
+                k="Stored snapshots"
+                v={String(platform.snapshotCount ?? "Not available")}
+              />
             </dl>
-            <p className="mt-3 text-xs text-navy-muted">Source: database reference and snapshot records.</p>
+            <p className="mt-3 text-xs text-navy-muted">
+              Source: database reference and snapshot records.
+            </p>
           </div>
 
           <div className="relative animate-fade-up [animation-delay:150ms]">
@@ -310,7 +316,8 @@ function Index() {
               <BarChart3 className="size-7" aria-hidden />
               <h2 className="mt-4 text-2xl font-extrabold">Explore district risk</h2>
               <p className="mt-2 text-primary-foreground/75">
-                Stored rainfall, modelled river discharge and experimental risk comparisons across monitored districts.
+                Stored rainfall, modelled river discharge and experimental risk comparisons across
+                monitored districts.
               </p>
             </div>
             <div className="flex flex-wrap gap-2">

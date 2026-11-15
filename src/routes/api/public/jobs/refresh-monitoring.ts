@@ -20,7 +20,7 @@ export const Route = createFileRoute("/api/public/jobs/refresh-monitoring")({
         if (!body.success)
           return Response.json({ error: "Invalid schedule payload" }, { status: 400 });
         if (body.data.kind === "health") {
-          const {checkStoredServices} = await import("@/lib/api/service-health.server");
+          const { checkStoredServices } = await import("@/lib/api/service-health.server");
           return Response.json(await checkStoredServices());
         }
         // Operator-only: assess the currently stored snapshots without calling providers.

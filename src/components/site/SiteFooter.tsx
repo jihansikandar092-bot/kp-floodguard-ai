@@ -9,7 +9,7 @@ export const DISCLAIMER =
   "This platform is an AI-assisted prototype for flood monitoring and emergency coordination. It does not replace official emergency services. In immediate danger, contact the relevant official rescue authorities.";
 
 export function SiteFooter() {
-  const {data} = useSuspenseQuery(platformHealthOptions());
+  const { data } = useSuspenseQuery(platformHealthOptions());
   return (
     <footer className="bg-navy-deep text-navy-foreground">
       <div className="container-page grid gap-10 py-14 md:grid-cols-12">
@@ -77,13 +77,19 @@ export function SiteFooter() {
       <div className="border-t border-navy-line">
         <div className="container-page flex flex-col gap-2 py-5 text-xs text-navy-muted sm:flex-row sm:justify-between">
           <p>
-            © {new Date().getFullYear()} KP FloodGuard AI · Experimental estimates, not official warnings
+            © {new Date().getFullYear()} KP FloodGuard AI · Experimental estimates, not official
+            warnings
           </p>
           <div aria-label="Data sources" className="space-y-1">
             <p>Weather: Open-Meteo · Last updated {healthTime(data.sourceTimes.weather)}</p>
             <p>Modelled discharge: GloFAS · Last updated {healthTime(data.sourceTimes.flood)}</p>
-            <p>AI-assisted risk scoring: stored assessments · Last updated {healthTime(data.sourceTimes.risk)}</p>
-            <p>Historical records: {data.historicalCount ? data.historicalSource : "Not available"}</p>
+            <p>
+              AI-assisted risk scoring: stored assessments · Last updated{" "}
+              {healthTime(data.sourceTimes.risk)}
+            </p>
+            <p>
+              Historical records: {data.historicalCount ? data.historicalSource : "Not available"}
+            </p>
           </div>
         </div>
       </div>

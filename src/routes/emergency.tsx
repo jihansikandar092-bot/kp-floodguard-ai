@@ -150,7 +150,9 @@ function Confirmation({ request, onReset }: { request: SubmittedRequest; onReset
         <Button variant="outline" onClick={onReset}>
           Submit another request
         </Button>
-        <Badge className="ml-auto" variant="pending">Pending review</Badge>
+        <Badge className="ml-auto" variant="pending">
+          Pending review
+        </Badge>
       </div>
     </div>
   );

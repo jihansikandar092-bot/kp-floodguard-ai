@@ -1,69 +1,31 @@
-/**
- * Integration registry. Every integration is "not_connected" until it has been
- * wired up AND tested. The UI reads this to show honest status labels.
- */
-export type IntegrationStatus = "not_connected" | "connected";
-
-export interface Integration {
-  id: string;
-  name: string;
-  purpose: string;
-  powers: string;
-  status: IntegrationStatus;
-}
-
-export const INTEGRATIONS: Integration[] = [
+// Service labels only. Live status is read from stored health records, never this registry.
+export const INTEGRATIONS = [
   {
-    id: "open-meteo",
-    name: "Open-Meteo Weather API",
-    purpose: "Rainfall, temperature, humidity and wind per district.",
-    powers: "Dashboard weather cards, rainfall charts, map details",
-    status: "connected",
+    service: "Open-Meteo",
+    name: "Open-Meteo weather",
+    purpose: "Stored rainfall, temperature, humidity and wind.",
   },
   {
-    id: "glofas",
-    name: "GloFAS River Flood Data",
-    purpose: "River discharge and flood forecasts for KP river basins.",
-    powers: "River discharge forecasts and map details (no gauge depths or danger thresholds)",
-    status: "connected",
+    service: "GloFAS",
+    name: "GloFAS modelled discharge",
+    purpose: "River discharge forecasts, not gauge depths or official danger marks.",
   },
   {
-    id: "ml-api",
-    name: "Python ML Prediction API",
-    purpose: "Flood-risk scores trained on weather and historical flood data.",
-    powers: "District risk categories, risk comparison chart",
-    status: "not_connected",
+    service: "Database",
+    name: "Database",
+    purpose:
+      "District references, monitoring snapshots, risk assessments and coordinator-reviewed requests.",
   },
   {
-    id: "openai",
-    name: "OpenAI Emergency Chatbot",
-    purpose: "Natural-language understanding of emergency messages.",
-    powers: "AI Emergency Assistant (currently a guided intake flow)",
-    status: "not_connected",
+    service: "n8n chat",
+    name: "n8n chat",
+    purpose: "Natural-language flood safety questions through the existing chat agent.",
   },
   {
-    id: "retell",
-    name: "Retell AI Voice Agent",
-    purpose: "Voice calls and spoken emergency reporting.",
-    powers: "Microphone button in the assistant",
-    status: "not_connected",
+    service: "Historical data",
+    name: "Historical data",
+    purpose:
+      "Verified historical discharge records when available. No historical import job is connected.",
   },
-  {
-    id: "n8n",
-    name: "n8n Automation Workflows",
-    purpose: "Routes new requests to coordinators, SMS and alert channels.",
-    powers: "Emergency request submission pipeline",
-    status: "not_connected",
-  },
-  {
-    id: "google-sheets",
-    name: "Google Sheets Request Database",
-    purpose: "Shared storage of rescue requests for coordinators.",
-    powers: "Rescue Coordination Dashboard",
-    status: "not_connected",
-  },
-];
-
-export function isConnected(id: string) {
-  return INTEGRATIONS.find((i) => i.id === id)?.status === "connected";
-}
+] as const;
+export const PLANNED_SERVICES = ["Retell AI", "SMS", "ML model"] as const;

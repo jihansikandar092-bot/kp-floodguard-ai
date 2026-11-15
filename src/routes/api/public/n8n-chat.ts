@@ -59,7 +59,11 @@ export const Route = createFileRoute("/api/public/n8n-chat")({
           return Response.json({ reply });
         } catch (e) {
           console.error("n8n chat network error", e instanceof Error ? e.name : "Unknown error");
-          await recordServiceHealth("n8n chat", false, "n8n chat network request failed or timed out");
+          await recordServiceHealth(
+            "n8n chat",
+            false,
+            "n8n chat network request failed or timed out",
+          );
           return Response.json({ error: "network_error" }, { status: 502 });
         }
       },

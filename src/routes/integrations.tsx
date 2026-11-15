@@ -1,107 +1,94 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ArrowDown, CircleDashed, CircleCheck } from "lucide-react";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
 import { PageHeader } from "@/components/site/Status";
-import { INTEGRATIONS } from "@/lib/api/integrations";
+import { INTEGRATIONS, PLANNED_SERVICES } from "@/lib/api/integrations";
+import { platformHealthOptions } from "@/lib/api/service-health-query";
+import { healthTime, serviceStatus } from "@/lib/api/service-health";
 
 export const Route = createFileRoute("/integrations")({
+  loader: async ({ context }) => {
+    await context.queryClient.ensureQueryData(platformHealthOptions());
+  },
   head: () => ({
     meta: [
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { title: "Integrations & Architecture — KP FloodGuard AI" },
+      { title: "Service Status & Integrations — KP FloodGuard AI" },
       {
         name: "description",
         content:
-          "Planned data and AI integrations for KP FloodGuard AI: Open-Meteo, GloFAS, ML prediction API, OpenAI, Retell AI, n8n and Google Sheets.",
+          "Recorded service health for Open-Meteo, GloFAS, database, n8n chat and historical data, with last success and error times.",
       },
-      { property: "og:title", content: "Integrations & Architecture — KP FloodGuard AI" },
+      { property: "og:title", content: "Service Status & Integrations — KP FloodGuard AI" },
       {
         property: "og:description",
-        content: "How weather, river, ML and AI services plug into the platform.",
+        content:
+          "Evidence-based connection status and recorded successes and errors for KP FloodGuard AI services.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: IntegrationsPage,
 });
-
-const FLOW = [
-  {
-    title: "Data sources",
-    items: ["Open-Meteo weather", "GloFAS river discharge", "Historical flood records"],
-  },
-  {
-    title: "Intelligence",
-    items: ["Python ML risk model", "OpenAI emergency chatbot", "Retell AI voice agent"],
-  },
-  {
-    title: "Action",
-    items: ["Dashboard & map", "n8n request routing", "Google Sheets coordination"],
-  },
-];
-
 function IntegrationsPage() {
+  const { data } = useSuspenseQuery(platformHealthOptions());
   return (
     <>
       <PageHeader
-        eyebrow="Technology integration"
-        title="Integrations & Architecture"
-        description="The platform is modular: each service below plugs into a dedicated slot. Open-Meteo weather and GloFAS river discharge are connected. Other services retain their current status."
+        eyebrow="Service health"
+        title="Integrations"
+        description="Recorded connection status, successful checks and service errors."
       />
-      <div className="container-page space-y-12 py-10">
-        <section aria-labelledby="flow">
-          <h2 id="flow" className="text-xl font-bold">
-            Data flow
-          </h2>
-          <div className="mt-5 grid gap-4 md:grid-cols-3">
-            {FLOW.map((col, i) => (
-              <div key={col.title} className="relative rounded-xl border bg-card p-5 shadow-card">
-                <p className="eyebrow text-emergency">Layer {i + 1}</p>
-                <h3 className="mt-1 text-lg font-bold">{col.title}</h3>
-                <ul className="mt-4 space-y-2">
-                  {col.items.map((it) => (
-                    <li key={it} className="rounded-md bg-muted px-3 py-2 text-sm font-medium">
-                      {it}
-                    </li>
-                  ))}
-                </ul>
-                {i < FLOW.length - 1 && (
-                  <ArrowDown
-                    className="absolute -bottom-5 left-1/2 size-5 -translate-x-1/2 text-muted-foreground md:hidden"
-                    aria-hidden
-                  />
-                )}
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section aria-labelledby="services">
-          <h2 id="services" className="text-xl font-bold">
-            Services
-          </h2>
-          <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {INTEGRATIONS.map((i) => (
-              <article
-                key={i.id}
-                className="flex flex-col rounded-xl border bg-card p-5 shadow-card"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <h3 className="font-bold">{i.name}</h3>
-                  <Badge variant="pending" className="shrink-0 gap-1">
-                    {i.status === "connected" ? (
-                      <CircleCheck className="size-3" aria-hidden />
-                    ) : (
-                      <CircleDashed className="size-3" aria-hidden />
-                    )}{" "}
-                    {i.status === "connected" ? "Connected" : "Not connected"}
+      <div className="container-page space-y-8 py-10">
+        {data.error && <p role="alert">{data.error}</p>}
+        <section aria-label="Service status" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {INTEGRATIONS.map((service) => {
+            const health = data.health.find((h) => h.service === service.service);
+            const status = serviceStatus(health);
+            return (
+              <article key={service.service} className="rounded-lg border bg-card p-5">
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <h2 className="font-bold">{service.name}</h2>
+                  <Badge
+                    variant={
+                      status === "Connected"
+                        ? "resolved"
+                        : status === "Degraded"
+                          ? "review"
+                          : "pending"
+                    }
+                  >
+                    {status}
                   </Badge>
                 </div>
-                <p className="mt-2 text-sm text-muted-foreground">{i.purpose}</p>
-                <p className="mt-auto pt-4 text-xs">
-                  <span className="eyebrow text-muted-foreground">Powers · </span>
-                  {i.powers}
-                </p>
+                <p className="mt-3 text-sm text-muted-foreground">{service.purpose}</p>
+                <dl className="mt-4 space-y-2 text-xs">
+                  <div>
+                    <dt className="font-semibold">Last success</dt>
+                    <dd>{healthTime(health?.lastSuccessAt)}</dd>
+                  </div>
+                  <div>
+                    <dt className="font-semibold">Last error</dt>
+                    <dd className="break-words">{health?.lastErrorText ?? "Not available"}</dd>
+                    <dd>{healthTime(health?.lastErrorAt)}</dd>
+                  </div>
+                </dl>
+              </article>
+            );
+          })}
+        </section>
+        <section aria-labelledby="planned">
+          <h2 id="planned" className="text-lg font-bold">
+            Planned services
+          </h2>
+          <div className="mt-4 grid gap-4 sm:grid-cols-3">
+            {PLANNED_SERVICES.map((name) => (
+              <article
+                key={name}
+                className="flex items-center justify-between gap-3 rounded-lg border p-5"
+              >
+                <h3 className="font-semibold">{name}</h3>
+                <Badge variant="outline">Planned</Badge>
               </article>
             ))}
           </div>

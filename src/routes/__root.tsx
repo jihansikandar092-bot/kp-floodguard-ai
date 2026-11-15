@@ -81,7 +81,9 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  loader: async ({context}) => { await context.queryClient.ensureQueryData(platformHealthOptions()); },
+  loader: async ({ context }) => {
+    await context.queryClient.ensureQueryData(platformHealthOptions());
+  },
   head: () => ({
     meta: [
       { charSet: "utf-8" },
