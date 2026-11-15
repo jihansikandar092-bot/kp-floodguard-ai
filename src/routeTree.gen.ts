@@ -23,6 +23,7 @@ import { Route as SubscribeRouteImport } from './routes/subscribe'
 import { Route as TrackRouteImport } from './routes/track'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as VerifySubscriptionRouteImport } from './routes/verify-subscription'
+import { Route as ApiPublicAiChatRouteImport } from './routes/api/public/ai-chat'
 import { Route as ApiPublicMonitoringStatusRouteImport } from './routes/api/public/monitoring-status'
 import { Route as ApiPublicN8nChatRouteImport } from './routes/api/public/n8n-chat'
 import { Route as ApiPublicJobsCollectHistoryRouteImport } from './routes/api/public/jobs/collect-history'
@@ -98,6 +99,11 @@ const VerifySubscriptionRoute = VerifySubscriptionRouteImport.update({
   path: '/verify-subscription',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicAiChatRoute = ApiPublicAiChatRouteImport.update({
+  id: '/api/public/ai-chat',
+  path: '/api/public/ai-chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicMonitoringStatusRoute =
   ApiPublicMonitoringStatusRouteImport.update({
     id: '/api/public/monitoring-status',
@@ -137,6 +143,7 @@ export interface FileRoutesByFullPath {
   '/track': typeof TrackRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/verify-subscription': typeof VerifySubscriptionRoute
+  '/api/public/ai-chat': typeof ApiPublicAiChatRoute
   '/api/public/monitoring-status': typeof ApiPublicMonitoringStatusRoute
   '/api/public/n8n-chat': typeof ApiPublicN8nChatRoute
   '/api/public/jobs/collect-history': typeof ApiPublicJobsCollectHistoryRoute
@@ -157,6 +164,7 @@ export interface FileRoutesByTo {
   '/track': typeof TrackRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/verify-subscription': typeof VerifySubscriptionRoute
+  '/api/public/ai-chat': typeof ApiPublicAiChatRoute
   '/api/public/monitoring-status': typeof ApiPublicMonitoringStatusRoute
   '/api/public/n8n-chat': typeof ApiPublicN8nChatRoute
   '/api/public/jobs/collect-history': typeof ApiPublicJobsCollectHistoryRoute
@@ -178,6 +186,7 @@ export interface FileRoutesById {
   '/track': typeof TrackRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/verify-subscription': typeof VerifySubscriptionRoute
+  '/api/public/ai-chat': typeof ApiPublicAiChatRoute
   '/api/public/monitoring-status': typeof ApiPublicMonitoringStatusRoute
   '/api/public/n8n-chat': typeof ApiPublicN8nChatRoute
   '/api/public/jobs/collect-history': typeof ApiPublicJobsCollectHistoryRoute
@@ -200,6 +209,7 @@ export interface FileRouteTypes {
     | '/track'
     | '/unsubscribe'
     | '/verify-subscription'
+    | '/api/public/ai-chat'
     | '/api/public/monitoring-status'
     | '/api/public/n8n-chat'
     | '/api/public/jobs/collect-history'
@@ -220,6 +230,7 @@ export interface FileRouteTypes {
     | '/track'
     | '/unsubscribe'
     | '/verify-subscription'
+    | '/api/public/ai-chat'
     | '/api/public/monitoring-status'
     | '/api/public/n8n-chat'
     | '/api/public/jobs/collect-history'
@@ -240,6 +251,7 @@ export interface FileRouteTypes {
     | '/track'
     | '/unsubscribe'
     | '/verify-subscription'
+    | '/api/public/ai-chat'
     | '/api/public/monitoring-status'
     | '/api/public/n8n-chat'
     | '/api/public/jobs/collect-history'
@@ -261,6 +273,7 @@ export interface RootRouteChildren {
   TrackRoute: typeof TrackRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
   VerifySubscriptionRoute: typeof VerifySubscriptionRoute
+  ApiPublicAiChatRoute: typeof ApiPublicAiChatRoute
   ApiPublicMonitoringStatusRoute: typeof ApiPublicMonitoringStatusRoute
   ApiPublicN8nChatRoute: typeof ApiPublicN8nChatRoute
   ApiPublicJobsCollectHistoryRoute: typeof ApiPublicJobsCollectHistoryRoute
@@ -367,6 +380,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VerifySubscriptionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/ai-chat': {
+      id: '/api/public/ai-chat'
+      path: '/api/public/ai-chat'
+      fullPath: '/api/public/ai-chat'
+      preLoaderRoute: typeof ApiPublicAiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/monitoring-status': {
       id: '/api/public/monitoring-status'
       path: '/api/public/monitoring-status'
@@ -413,6 +433,7 @@ const rootRouteChildren: RootRouteChildren = {
   TrackRoute: TrackRoute,
   UnsubscribeRoute: UnsubscribeRoute,
   VerifySubscriptionRoute: VerifySubscriptionRoute,
+  ApiPublicAiChatRoute: ApiPublicAiChatRoute,
   ApiPublicMonitoringStatusRoute: ApiPublicMonitoringStatusRoute,
   ApiPublicN8nChatRoute: ApiPublicN8nChatRoute,
   ApiPublicJobsCollectHistoryRoute: ApiPublicJobsCollectHistoryRoute,

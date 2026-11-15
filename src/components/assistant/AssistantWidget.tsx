@@ -33,7 +33,7 @@ interface ChatMessage extends BotMessage {
   disclaimer?: string;
 }
 // Server-side relay to the n8n Chat Agent (avoids CORS, keeps the webhook off the client).
-const N8N_CHAT_PROXY = "/api/public/n8n-chat";
+const AI_CHAT_PROXY = "/api/public/ai-chat";
 
 const UI = {
   en: {
