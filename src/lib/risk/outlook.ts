@@ -4,6 +4,7 @@ import {
   levelFor,
   median,
   scale,
+  reliableDischargeReference,
   type RiskInput,
   type RiskAssessment,
 } from "./engine";
@@ -102,10 +103,17 @@ export function assessOutlook(input: RiskInput, horizon: Horizon): RiskAssessmen
       : [];
   const historical = median(input.historicalAnnualMax.filter((v) => v > 0));
   const reference = historical ?? (past.length ? Math.max(...past) : null);
+  const reliable = reliableDischargeReference(peak, past, historical);
   const first = values[0];
   const last = values.at(-1);
   const trend =
-    complete && first != null && first > 0 && last != null ? (last - first) / first : null;
+    reliable &&
+    complete &&
+    first != null &&
+    first >= RISK_CONFIG.dischargeFloors.peakM3s &&
+    last != null
+      ? (last - first) / first
+      : null;
   const factors = {
     ...base.factors,
     forecastRain72h: {
@@ -121,7 +129,7 @@ export function assessOutlook(input: RiskInput, horizon: Horizon): RiskAssessmen
       ...base.factors.dischargePeak,
       value: peak,
       score:
-        peak === null || reference === null || reference <= 0
+        !reliable || peak === null || reference === null || reference <= 0
           ? null
           : scale(
               peak / reference,
@@ -129,8 +137,9 @@ export function assessOutlook(input: RiskInput, horizon: Horizon): RiskAssessmen
                 ? RISK_CONFIG.references.dischargePeakVsHistory
                 : RISK_CONFIG.references.dischargePeakVsOwnRange,
             ),
-      detail:
-        peak === null
+      detail: !reliable
+        ? "Discharge scoring not available: peak or fallback reference range below heuristic reliability floor (not validated)."
+        : peak === null
           ? "Discharge forecast not available"
           : `${horizon} h peak ${peak} m³/s vs ${historical !== null ? "median annual maximum" : "past 7-day maximum"} ${reference ?? "Not available"} m³/s`,
     },

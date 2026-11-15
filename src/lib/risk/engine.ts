@@ -17,6 +17,8 @@ export const RISK_CONFIG = {
     dischargeTrend: { low: 0, high: 0.5 }, // relative change today → +3 days
   },
   trendDays: 3,
+  // Heuristic, not validated: these are model-reference reliability floors, not danger marks.
+  dischargeFloors: { peakM3s: 10, fallbackRangeM3s: 0.1 },
   alerts: { maxHorizonHours: 72, freshHours: 3, lowRunsToResolve: 2 },
   thresholds: { medium: 35, high: 65 }, // Low < 35, Medium 35–65, High > 65
 } as const;
@@ -69,6 +71,21 @@ export function levelFor(score: number): RiskLevel {
   return score > t.high ? "high" : score >= t.medium ? "medium" : "low";
 }
 
+/** Reject tiny peaks; own-range fallback also needs a non-degenerate last-seven-day range. */
+export function reliableDischargeReference(
+  peak: number | null,
+  past: number[],
+  history: number | null,
+) {
+  if (peak === null || peak < RISK_CONFIG.dischargeFloors.peakM3s) return false;
+  if (history !== null && history > 0) return true;
+  return (
+    past.length > 0 &&
+    Math.max(...past) > 0 &&
+    Math.max(...past) - Math.min(...past) >= RISK_CONFIG.dischargeFloors.fallbackRangeM3s
+  );
+}
+
 /** Sum of hourly precipitation in (from, to]; null unless every hour is present. */
 function hourlySum(weather: WeatherData, fromOffsetH: number, toOffsetH: number) {
   const now = Date.parse(`${weather.current.time}+05:00`);
@@ -96,10 +113,13 @@ export function assessRisk(input: RiskInput): RiskAssessment | null {
       : [];
   const pastFlow =
     daily && todayIdx > 0
-      ? daily.river_discharge.slice(0, todayIdx).filter((v): v is number => v !== null)
+      ? daily.river_discharge
+          .slice(Math.max(0, todayIdx - 7), todayIdx)
+          .filter((v): v is number => v !== null)
       : [];
   const peak = future.length ? Math.max(...future) : null;
   const histMedian = median(input.historicalAnnualMax.filter((v) => v > 0));
+  const reliable = reliableDischargeReference(peak, pastFlow, histMedian);
 
   let peakFactor: RiskFactor = {
     score: null,
@@ -108,13 +128,13 @@ export function assessRisk(input: RiskInput): RiskAssessment | null {
     unit: "m³/s",
     detail: "Discharge forecast not available",
   };
-  if (peak !== null && histMedian !== null) {
+  if (reliable && peak !== null && histMedian !== null) {
     peakFactor = {
       ...peakFactor,
       score: scale(peak / histMedian, ref.dischargePeakVsHistory),
       detail: `7-day peak ${round1(peak)} m³/s vs median annual maximum ${round1(histMedian)} m³/s`,
     };
-  } else if (peak !== null && pastFlow.length) {
+  } else if (reliable && peak !== null && pastFlow.length) {
     const pastMax = Math.max(...pastFlow);
     peakFactor = {
       ...peakFactor,
@@ -122,10 +142,16 @@ export function assessRisk(input: RiskInput): RiskAssessment | null {
       detail: `7-day peak ${round1(peak)} m³/s vs past 7-day range ${round1(Math.min(...pastFlow))}–${round1(pastMax)} m³/s (no historical stats)`,
     };
   }
+  if (!reliable && peak !== null)
+    peakFactor.detail =
+      "Discharge scoring not available: peak or fallback reference range below heuristic reliability floor (not validated).";
 
   const t0 = at(todayIdx);
   const t3 = at(todayIdx + RISK_CONFIG.trendDays);
-  const change = t0 !== null && t3 !== null && t0 > 0 ? (t3 - t0) / t0 : null;
+  const change =
+    reliable && t0 !== null && t3 !== null && t0 >= RISK_CONFIG.dischargeFloors.peakM3s
+      ? (t3 - t0) / t0
+      : null;
 
   const factors: Record<FactorKey, RiskFactor> = {
     forecastRain72h: {
