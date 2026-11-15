@@ -1,4 +1,8 @@
 # Live monitoring
+## Historical collection
+- [ ] Extend existing yearly statistics and add resumable, exclusive hourly collection progress.
+- [ ] Add real selected-district annual discharge/rainfall charts with accurate source coverage labels.
+- [ ] Verify statistics, rate-limit/resume rules, preview and published charts; report any provider blockers.
 ## Real-data cleanup and integration health
 - [x] Audit code and database; before/after findings delivered, three owner-retained verification requests unchanged.
 - [x] Remove obsolete demo UI, unused illustrative chart and unsupported landing/footer claims; hide unimplemented voice control.

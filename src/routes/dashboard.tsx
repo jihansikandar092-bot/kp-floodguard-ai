@@ -23,6 +23,8 @@ import { AlertsPanel } from "@/components/dashboard/AlertsPanel";
 import { alertsOptions } from "@/lib/alerts/alerts-query";
 import { RiskOutlook } from "@/components/risk/RiskOutlook";
 import { PartialScoreNote } from "@/components/risk/PartialScoreNote";
+import { HistoricalStatistics } from "@/components/dashboard/HistoricalStatistics";
+import { historicalOptions } from "@/lib/history/history-query";
 
 export const Route = createFileRoute("/dashboard")({
   validateSearch: (s: Record<string, unknown>): { district?: string | undefined } => {
@@ -35,6 +37,7 @@ export const Route = createFileRoute("/dashboard")({
       context.queryClient.ensureQueryData(districtListOptions()),
       context.queryClient.ensureQueryData(riskAssessmentOptions()),
       context.queryClient.prefetchQuery(alertsOptions()),
+      context.queryClient.ensureQueryData(historicalOptions()),
     ]);
   },
   pendingComponent: MonitoringPending,
@@ -230,10 +233,8 @@ function DashboardPage() {
           <AlertsPanel districts={districts} />
         </div>
 
+        <HistoricalStatistics districtId={districtId} districtName={snap.district?.name} />
         <div className="grid gap-6 lg:grid-cols-2">
-          <Panel title="Historical flood events">
-            <p>Not available</p>
-          </Panel>
           <Panel
             title="District-wise risk comparison"
             subtitle={

@@ -25,7 +25,7 @@ export const INTEGRATIONS = [
     service: "Historical data",
     name: "Historical data",
     purpose:
-      "Verified historical discharge records when available. No historical import job is connected.",
+      "Hourly collection of annual GloFAS discharge and ERA5 rainfall statistics, with saved progress and rate-limit pauses.",
   },
 ] as const;
 export const PLANNED_SERVICES = ["Retell AI", "SMS", "ML model"] as const;

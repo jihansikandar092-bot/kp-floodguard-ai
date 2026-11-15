@@ -35,7 +35,7 @@ export async function checkStoredServices() {
     !historyError && Boolean(history?.length),
     historyError
       ? "Historical data check failed"
-      : "No historical records available; no historical import job is connected.",
+      : "No historical records available yet; historical collection is pending.",
   );
   // Recover genuine prior provider successes from stored metric timestamps, never from check time.
   if (!snapshotError)
