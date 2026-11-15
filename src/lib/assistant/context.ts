@@ -51,16 +51,14 @@ export function compactChatContext(
     disclaimer:
       "System-generated from modelled weather and river data. Experimental estimate, not an official warning.",
     districts: rows,
-    alerts: alerts
-      .slice(0, 24)
-      .map((a) => ({
-        district: districts.find((d) => d.id === a.district_id)?.name ?? a.district_id,
-        level: a.level,
-        type: a.type,
-        horizon_hours: a.horizon_hours,
-        reason: a.reason_text.slice(0, 450),
-        created_at: a.created_at,
-      })),
+    alerts: alerts.slice(0, 24).map((a) => ({
+      district: districts.find((d) => d.id === a.district_id)?.name ?? a.district_id,
+      level: a.level,
+      type: a.type,
+      horizon_hours: a.horizon_hours,
+      reason: a.reason_text.slice(0, 450),
+      created_at: a.created_at,
+    })),
     alerts_truncated: alerts.length > 24,
   };
 }
