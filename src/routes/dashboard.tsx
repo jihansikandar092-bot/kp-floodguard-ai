@@ -25,11 +25,14 @@ import { RiskOutlook } from "@/components/risk/RiskOutlook";
 import { PartialScoreNote } from "@/components/risk/PartialScoreNote";
 import { HistoricalStatistics } from "@/components/dashboard/HistoricalStatistics";
 import { historicalOptions } from "@/lib/history/history-query";
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { filterDistricts } from "@/lib/data/district-filter";
 
 export const Route = createFileRoute("/dashboard")({
-  validateSearch: (s: Record<string, unknown>): { district?: string | undefined } => {
+  validateSearch: (s: Record<string, unknown>): { district?: string | undefined; group?: "southern-merged" | undefined } => {
     const d = s["district"];
-    return { district: typeof d === "string" && /^[a-z0-9-]{1,40}$/.test(d) ? d : undefined };
+    return { district: typeof d === "string" && /^[a-z0-9-]{1,40}$/.test(d) ? d : undefined, group: s["group"] === "southern-merged" ? "southern-merged" : undefined };
   },
   loader: async ({ context }) => {
     await Promise.all([
@@ -64,16 +67,20 @@ export const Route = createFileRoute("/dashboard")({
 });
 
 function DashboardPage() {
-  const { district: searchId } = Route.useSearch();
+  const { district: searchId, group } = Route.useSearch();
+  const [search, setSearch] = useState("");
   const { data: districts } = useSuspenseQuery(districtListOptions());
+  const scopedDistricts = districts.filter((d) => !group || d.isArdc);
+  const visibleDistricts = filterDistricts(districts, search, Boolean(group));
   const snap = { district: districts.find((d) => d.id === searchId) };
   const districtId = snap.district?.id;
   const { data: storedData } = useSuspenseQuery(liveMonitoringOptions());
-  const { data, fallbackLoading } = useMonitoringFallback(storedData, districts, districtId);
+  const { data: allData, fallbackLoading } = useMonitoringFallback(storedData, districts, districtId);
+  const data = { ...allData, districts: allData.districts.filter((d) => scopedDistricts.some((ref) => ref.id === d.id)) };
   const live = liveSnapshot(data, districtId);
   const t = live.totals;
   const { data: risks } = useSuspenseQuery(riskAssessmentOptions());
-  const riskRows = districts
+  const riskRows = scopedDistricts
     .map((d) => ({ d, r: risks.find((r) => r.districtId === d.id && r.horizonHours === 0) }))
     .filter((x): x is { d: typeof x.d; r: NonNullable<typeof x.r> } => Boolean(x.r));
   const distribution = (["low", "medium", "high"] as const)
@@ -87,7 +94,7 @@ function DashboardPage() {
     .map((x) => x.r.computedAt)
     .sort()
     .at(-1);
-  const scope = snap.district?.name ?? "All monitored districts";
+  const scope = snap.district?.name ?? (group ? "Southern and Merged Districts" : "All monitored districts");
 
   return (
     <>
@@ -113,17 +120,22 @@ function DashboardPage() {
         <SafetyNotice>{RISK_DISCLAIMER}</SafetyNotice>
         <HowScoreWorks />
 
+        <Input aria-label="Search districts" placeholder="Search districts" value={search} onChange={(event) => setSearch(event.target.value)} className="max-w-md" />
         <nav aria-label="District filter" className="flex flex-wrap gap-2">
-          <FilterChip active={!districtId} label="All districts" search={{ district: undefined }} />
-          {districts.map((d) => (
+          <FilterChip active={!districtId && !group} label="All districts" search={{ district: undefined }} />
+          <FilterChip active={Boolean(group) && !districtId} label="Southern and Merged Districts" search={{ district: undefined, group: "southern-merged" }} />
+          {visibleDistricts.map((d) => (
             <FilterChip
               key={d.id}
               active={districtId === d.id}
               label={d.name}
-              search={{ district: d.id }}
+              search={{ district: d.id, group }}
             />
           ))}
         </nav>
+        {!visibleDistricts.length && <p className="text-sm text-muted-foreground">No matching districts</p>}
+        {snap.district?.coordinatesApproximate && <p className="text-xs text-muted-foreground">Approximate headquarters coordinates: {snap.district.lat}, {snap.district.lng}. Please review these coordinates.</p>}
+        {snap.district && !live.rows.some((d) => d.weather || d.flood) && <p role="status">Data not available yet</p>}
 
         <RiskOutlook
           district={snap.district?.name}
@@ -133,7 +145,7 @@ function DashboardPage() {
           <StatCard
             icon={MapPinned}
             label="Districts monitored"
-            value={data.referenceCount ?? "Not available"}
+            value={scopedDistricts.length}
             hint={`${data.districts.filter((d) => d.weather && d.flood).length} with both sources`}
           />
           <StatCard
@@ -186,7 +198,7 @@ function DashboardPage() {
           </Panel>
           <Panel
             title="Flood-risk distribution"
-            subtitle={`${riskRows.length} of ${districts.length} districts assessed`}
+            subtitle={`${riskRows.length} of ${scopedDistricts.length} districts assessed`}
             bodyClassName="h-72"
           >
             {distribution.length ? (
@@ -284,7 +296,7 @@ function FilterChip({
 }: {
   active: boolean;
   label: string;
-  search: { district?: string | undefined };
+  search: { district?: string | undefined; group?: "southern-merged" | undefined };
   dot?: string;
 }) {
   return (

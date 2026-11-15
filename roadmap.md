@@ -1,4 +1,8 @@
 # Live monitoring
+## Southern and Merged coverage
+- [ ] Preserve existing references, add requested focus districts and approximate-coordinate provenance.
+- [ ] Add district search/group filtering, map outlines and stored-risk landing focus section.
+- [ ] Verify all-district scheduled coverage and preview/published values; provider availability may block fresh readings.
 ## Chat hardening and grounding
 - [x] Enforce validated UUID/1000-character/language input and atomic approved IP limits; 400 input checks and actual preview/published 16th-call 429 verified.
 - [x] Use saved webhook configuration, compact five-horizon risk/alerts context and safe translated automatic intake fallback; timeout and wrong-URL/restoration unit tests passed.
