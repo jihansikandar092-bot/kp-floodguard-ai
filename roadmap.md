@@ -1,4 +1,10 @@
 # Live monitoring
+## Request follow-ups
+- [x] Mark the five retained requests as tests and restore 0005 to pending with a status event; delete nothing.
+- [x] Verify published tracking attempt 11 using a nonexistent code and remove only its temporary rate-limit records.
+- [x] Mask CSV phones; preview and published downloads contain five masked phones even after Reveal.
+- [x] Move database tests to Node, separate WASM startup from assertion deadlines, reuse/reset chat database; 117 tests pass in normal and CPU-constrained parallel runs.
+- [ ] Confirm the original two parallel-test failure causes: old failure traces are unavailable and five unchanged parallel/stress runs passed; startup contention mitigation is tested but original diagnosis remains unproven.
 ## Responsible AI and privacy
 - [x] Add configuration-backed responsible-AI page with Urdu RTL summary, eight sections, analytics/storage disclosures and future subscription privacy section.
 - [x] Add footer and score links, submission consent line and source/update line; links verified without adding requests.

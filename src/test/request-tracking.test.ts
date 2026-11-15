@@ -73,6 +73,11 @@ describe("request filters", () => {
 });
 
 describe("CSV export", () => {
+  it("exports only the last 4 phone digits, never the full phone number", () => {
+    const csv = requestsToCsv([base]);
+    expect(csv.split("\n")[1]?.split(",")[10]).toBe("•••• 4567");
+    expect(csv).not.toContain("+923001234567");
+  });
   it("writes a header and one line per row", () => {
     const csv = requestsToCsv([base]);
     const lines = csv.split("\n");

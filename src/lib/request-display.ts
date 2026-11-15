@@ -35,7 +35,7 @@ export function filterRequests(
   );
 }
 
-/** Coordinator-only CSV export of the filtered rows. Escapes quotes, commas and newlines. */
+/** Coordinator-only CSV export; phone masking is independent of UI Reveal state. */
 export function requestsToCsv(rows: EmergencyRequest[]): string {
   const header = [
     "code",
@@ -69,7 +69,7 @@ export function requestsToCsv(rows: EmergencyRequest[]): string {
         r.peopleAffected,
         r.language,
         r.fullName,
-        r.phone,
+        maskPhone(r.phone),
         r.assignedTeam ?? "",
       ]
         .map(esc)

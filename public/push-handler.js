@@ -1,7 +1,11 @@
 /* Loaded by the app service worker. Shows flood alert notifications; caches nothing. */
 self.addEventListener("push", (event) => {
   let data = {};
-  try { data = event.data ? event.data.json() : {}; } catch { data = { body: event.data && event.data.text() }; }
+  try {
+    data = event.data ? event.data.json() : {};
+  } catch {
+    data = { body: event.data && event.data.text() };
+  }
   const title = data.title || "KP FloodGuard AI";
   event.waitUntil(
     self.registration.showNotification(title, {
