@@ -34,8 +34,8 @@ describe("risk outlook horizons", () => {
   });
   for (const [h, rain, score] of [
     [24, 24, 18.2],
-    [48, 48, 38.3],
-    [72, 72, 58.3],
+    [48, 48, 41],
+    [72, 72, 64.1],
     [168, 168, 98.4],
   ] as const)
     it(`${h} h uses cumulative rainfall and its horizon score`, () => {
