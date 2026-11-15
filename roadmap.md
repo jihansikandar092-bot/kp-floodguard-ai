@@ -1,8 +1,8 @@
 # Live monitoring
 ## Discharge false-alarm correction
-- [ ] Guard unreliable low-flow/reference-range scores across all horizons; test thresholds and partial safety.
-- [ ] Recompute stored snapshots and close only superseded degenerate alerts without deleting rows.
-- [ ] Verify Bajaur/Shangla before-after on preview and published site.
+- [x] Guard unreliable low-flow/reference-range peak and trend scores across all horizons; 121 tests pass, lint clean, automatic type-check/build OK.
+- [x] Recompute 110 stored horizon assessments per invocation; two alerts superseded with timestamp/note, no rows deleted, ordinary partial-resolution safety unchanged.
+- [x] Preview/published Bajaur 35→0 and Shangla 44.6→21.3, both Low with 2/4-factor note; published correction returned HTTP 200/110 assessments, browser errors zero.
 ## Request follow-ups
 - [x] Mark the five retained requests as tests and restore 0005 to pending with a status event; delete nothing.
 - [x] Verify published tracking attempt 11 using a nonexistent code and remove only its temporary rate-limit records.
