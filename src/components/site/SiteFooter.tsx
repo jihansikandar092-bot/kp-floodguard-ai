@@ -36,6 +36,7 @@ export function SiteFooter() {
 
           <FooterCol title="Assistance">
             <FooterLink to="/emergency">Emergency Assistance</FooterLink>
+            <FooterLink to="/subscribe">Subscribe to alerts</FooterLink>
             <FooterLink to="/login">Coordinator login</FooterLink>
             <FooterLink to="/integrations">Integrations</FooterLink>
             <FooterLink to="/contact">Contact</FooterLink>

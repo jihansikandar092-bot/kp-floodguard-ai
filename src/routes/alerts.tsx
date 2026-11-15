@@ -1,4 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { Bell } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { alertsOptions } from "@/lib/alerts/alerts-query";
 import { districtListOptions } from "@/lib/api/district-query";
@@ -38,6 +40,13 @@ function AlertsPage() {
         eyebrow="Modelled flood outlook"
         title="Flood alerts"
         description="Expected, active and recently resolved"
+        actions={
+          <Button asChild variant="outline">
+            <Link to="/subscribe">
+              <Bell /> Subscribe to alerts
+            </Link>
+          </Button>
+        }
       />
       <div className="container-page py-8">
         <AlertsPanel districts={districts} />

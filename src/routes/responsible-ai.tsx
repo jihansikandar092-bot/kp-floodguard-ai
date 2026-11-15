@@ -226,12 +226,30 @@ function ResponsibleAIPage() {
             explains how it handles it. Other storage described above is separate from this
             cookie-free analytics.
           </p>
-          <h3 className="font-semibold">Future subscriber email and push privacy</h3>
+          <h3 className="font-semibold">Alert subscribers (email and browser notifications)</h3>
           <p>
-            Reserved for future subscription privacy details. Email subscriptions and push
-            notifications are not currently implemented. Collection purposes, recipients, retention
-            and unsubscribe/deletion controls will need to be documented before that feature is
-            offered.
+            If you subscribe on the{" "}
+            <Link to="/subscribe" className="underline">
+              subscribe page
+            </Link>
+            , we store your email address or your browser&apos;s notification address, the districts,
+            language and minimum level you chose, when you confirmed, and a random unsubscribe code.
+            We use this only to send the experimental flood-risk alerts you asked for. Email
+            subscriptions start only after you click the confirmation link we send.
+          </p>
+          <p>
+            This data cannot be read from the website by anyone. Only the server reads it to send
+            alerts. Coordinators see counts of subscribers per district and the status of each send
+            (sent, failed or skipped), never email addresses or notification addresses. Emails are
+            delivered through Resend; browser notifications go through your browser maker&apos;s push
+            service. Sign-up attempts store a one-way hash of your connection address, not the
+            address itself.
+          </p>
+          <p>
+            Every email has an unsubscribe link that works immediately without logging in.
+            Unsubscribed records are kept switched off; no automatic deletion period is configured
+            yet. To ask for full deletion, use the contact page with the email address you
+            subscribed with (a working deletion channel is not yet established, as noted above).
           </p>
         </section>
         <section className="space-y-3">
