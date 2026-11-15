@@ -13,7 +13,10 @@ export const Route = createFileRoute("/verify-subscription")({
       { title: "Confirm Subscription — KP FloodGuard AI" },
       { name: "description", content: "Confirm your KP FloodGuard AI flood alert subscription." },
       { property: "og:title", content: "Confirm Subscription — KP FloodGuard AI" },
-      { property: "og:description", content: "Confirm your KP FloodGuard AI flood alert subscription." },
+      {
+        property: "og:description",
+        content: "Confirm your KP FloodGuard AI flood alert subscription.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },

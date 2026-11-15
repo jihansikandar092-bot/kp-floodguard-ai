@@ -27,7 +27,12 @@ export function footerText(l: SubLanguage, unsubscribeToken: string) {
 
 async function deliver(sub: FullSub, subject: string, text: string, link: string) {
   if (sub.channel === "email") {
-    await sendEmail(sub.contact, subject, text, footerText(lang(sub.language), sub.unsubscribe_token));
+    await sendEmail(
+      sub.contact,
+      subject,
+      text,
+      footerText(lang(sub.language), sub.unsubscribe_token),
+    );
   } else {
     await sendPush(sub.contact, subject, text, link);
   }
@@ -55,7 +60,9 @@ export async function dispatchAlertNotifications(admin: Admin) {
     const [{ data: subs }, { data: districts }, { data: deliveries }] = await Promise.all([
       admin
         .from("alert_subscriptions")
-        .select("id,channel,contact,district_ids,language,min_level,verified_at,unsubscribed_at,unsubscribe_token")
+        .select(
+          "id,channel,contact,district_ids,language,min_level,verified_at,unsubscribed_at,unsubscribe_token",
+        )
         .not("verified_at", "is", null)
         .is("unsubscribed_at", null),
       admin.from("districts").select("id,name_en,name_ur,name_ps"),
@@ -63,7 +70,10 @@ export async function dispatchAlertNotifications(admin: Admin) {
         .from("alert_deliveries")
         .select("subscription_id,district_id,event_key,status,sent_at")
         .eq("is_test", false)
-        .gte("sent_at", new Date(Date.now() - NOTIFY_CONFIG.lookbackHours * 3600_000).toISOString()),
+        .gte(
+          "sent_at",
+          new Date(Date.now() - NOTIFY_CONFIG.lookbackHours * 3600_000).toISOString(),
+        ),
     ]);
     const history: DeliveryRow[] = [...(deliveries ?? [])];
     for (const a of alerts as AlertRow[]) {
@@ -79,11 +89,19 @@ export async function dispatchAlertNotifications(admin: Admin) {
         };
         let row;
         if (d.action === "skip-cap") {
-          row = { ...base, status: "skipped", error: `cap: one message per district per ${NOTIFY_CONFIG.capHours} h` };
+          row = {
+            ...base,
+            status: "skipped",
+            error: `cap: one message per district per ${NOTIFY_CONFIG.capHours} h`,
+          };
           summary.skipped++;
         } else {
           const l = lang(s.language);
-          const name = districtLabel(districts?.find((x) => x.id === a.district_id), l, a.district_id);
+          const name = districtLabel(
+            districts?.find((x) => x.id === a.district_id),
+            l,
+            a.district_id,
+          );
           const link = `${SITE_URL}/alerts`;
           const text = alertMessage(l, name, a.level, a.horizon_hours, link);
           try {
@@ -110,14 +128,20 @@ export async function dispatchAlertNotifications(admin: Admin) {
 export async function sendTestNotification(admin: Admin, email: string) {
   const { data: subs } = await admin
     .from("alert_subscriptions")
-    .select("id,channel,contact,district_ids,language,min_level,verified_at,unsubscribed_at,unsubscribe_token")
+    .select(
+      "id,channel,contact,district_ids,language,min_level,verified_at,unsubscribed_at,unsubscribe_token",
+    )
     .eq("channel", "email")
     .eq("contact", email.toLowerCase())
     .not("verified_at", "is", null)
     .is("unsubscribed_at", null)
     .limit(1);
   const sub = subs?.[0] as FullSub | undefined;
-  if (!sub) return { ok: false as const, message: "No verified, active email subscription for your account email." };
+  if (!sub)
+    return {
+      ok: false as const,
+      message: "No verified, active email subscription for your account email.",
+    };
   const l = lang(sub.language);
   const text = `${TEST_PREFIX}.\n\n${alertMessage(l, "TEST", "medium", 24, `${SITE_URL}/alerts`)}`;
   let status: "sent" | "failed" = "sent";
@@ -130,7 +154,14 @@ export async function sendTestNotification(admin: Admin, email: string) {
   }
   const { data: row } = await admin
     .from("alert_deliveries")
-    .insert({ subscription_id: sub.id, channel: "email", status, error, is_test: true, event_key: "test" })
+    .insert({
+      subscription_id: sub.id,
+      channel: "email",
+      status,
+      error,
+      is_test: true,
+      event_key: "test",
+    })
     .select("id,status,sent_at")
     .single();
   return { ok: status === "sent", delivery: row, message: error ?? "Test notification sent." };

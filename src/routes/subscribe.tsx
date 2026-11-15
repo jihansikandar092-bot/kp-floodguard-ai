@@ -24,12 +24,14 @@ export const Route = createFileRoute("/subscribe")({
       { title: "Subscribe to Flood Alerts — KP FloodGuard AI" },
       {
         name: "description",
-        content: "Get experimental district flood-risk alerts for Khyber Pakhtunkhwa by email or browser notification.",
+        content:
+          "Get experimental district flood-risk alerts for Khyber Pakhtunkhwa by email or browser notification.",
       },
       { property: "og:title", content: "Subscribe to Flood Alerts — KP FloodGuard AI" },
       {
         property: "og:description",
-        content: "Experimental district flood-risk alerts by email or browser notification. Not official warnings.",
+        content:
+          "Experimental district flood-risk alerts by email or browser notification. Not official warnings.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -71,17 +73,27 @@ function SubscribePage() {
     setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
 
   async function pushSubscription() {
-    if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window))
+    if (
+      !("serviceWorker" in navigator) ||
+      !("PushManager" in window) ||
+      !("Notification" in window)
+    )
       throw new Error("This browser does not support notifications.");
     const reg = await navigator.serviceWorker.getRegistration("/");
-    if (!reg) throw new Error("Browser notifications work only in the installed or published app, not in this preview.");
+    if (!reg)
+      throw new Error(
+        "Browser notifications work only in the installed or published app, not in this preview.",
+      );
     const permission = await Notification.requestPermission();
     if (permission !== "granted") throw new Error("Notification permission was not granted.");
     const { key } = await pushKey();
     if (!key) throw new Error("Browser notifications are not configured.");
     const sub =
       (await reg.pushManager.getSubscription()) ??
-      (await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToBytes(key) }));
+      (await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: b64ToBytes(key),
+      }));
     return sub.toJSON();
   }
 
@@ -142,8 +154,14 @@ function SubscribePage() {
                       <p className="mb-2 text-sm font-semibold text-muted-foreground">{g.title}</p>
                       <div className="grid grid-cols-1 gap-1 sm:grid-cols-2">
                         {g.items.map((d) => (
-                          <label key={d.id} className="flex min-h-11 items-center gap-3 rounded-md px-2 hover:bg-muted">
-                            <Checkbox checked={selected.includes(d.id)} onCheckedChange={() => toggle(d.id)} />
+                          <label
+                            key={d.id}
+                            className="flex min-h-11 items-center gap-3 rounded-md px-2 hover:bg-muted"
+                          >
+                            <Checkbox
+                              checked={selected.includes(d.id)}
+                              onCheckedChange={() => toggle(d.id)}
+                            />
                             <span className="text-sm">{d.name}</span>
                           </label>
                         ))}
@@ -166,7 +184,11 @@ function SubscribePage() {
 
               <fieldset>
                 <legend className="text-base font-bold">3. Minimum level</legend>
-                <div className="mt-3 flex flex-wrap gap-2" role="radiogroup" aria-label="Minimum level">
+                <div
+                  className="mt-3 flex flex-wrap gap-2"
+                  role="radiogroup"
+                  aria-label="Minimum level"
+                >
                   <Choice active={minLevel === "medium"} onClick={() => setMinLevel("medium")}>
                     Medium and High
                   </Choice>
@@ -189,8 +211,16 @@ function SubscribePage() {
                 {channel === "email" ? (
                   <div className="space-y-1">
                     <Label htmlFor="sub-email">Email address</Label>
-                    <Input id="sub-email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-                    <p className="text-xs text-muted-foreground">We email a confirmation link first. Nothing is sent until you confirm.</p>
+                    <Input
+                      id="sub-email"
+                      type="email"
+                      autoComplete="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      We email a confirmation link first. Nothing is sent until you confirm.
+                    </p>
                   </div>
                 ) : (
                   <p className="text-xs text-muted-foreground">
@@ -234,7 +264,15 @@ function SubscribePage() {
   );
 }
 
-function Choice({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+function Choice({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
   return (
     <button
       type="button"

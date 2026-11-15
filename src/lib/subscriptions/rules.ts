@@ -26,12 +26,19 @@ export const pushSubscriptionSchema = z.object({
 });
 
 const base = {
-  districtIds: z.array(z.string().regex(/^[a-z0-9-]{1,40}$/)).min(1, "Choose at least one district").max(40),
+  districtIds: z
+    .array(z.string().regex(/^[a-z0-9-]{1,40}$/))
+    .min(1, "Choose at least one district")
+    .max(40),
   language: z.enum(SUB_LANGUAGES),
   minLevel: z.enum(SUB_LEVELS),
 };
 export const subscribeSchema = z.discriminatedUnion("channel", [
-  z.object({ channel: z.literal("email"), email: z.string().trim().toLowerCase().email().max(254), ...base }),
+  z.object({
+    channel: z.literal("email"),
+    email: z.string().trim().toLowerCase().email().max(254),
+    ...base,
+  }),
   z.object({ channel: z.literal("webpush"), push: pushSubscriptionSchema, ...base }),
 ]);
 export type SubscribeInput = z.infer<typeof subscribeSchema>;
@@ -80,7 +87,8 @@ export function matches(s: SubscriptionRow, a: AlertRow) {
   );
 }
 
-export type Decision = { action: "send"; attempt: number } | { action: "skip-cap" } | { action: "none" };
+export type Decision =
+  { action: "send"; attempt: number } | { action: "skip-cap" } | { action: "none" };
 
 /** What to do for one subscriber and one alert event, given earlier deliveries. */
 export function decide(
@@ -93,12 +101,14 @@ export function decide(
   const key = eventKey(a);
   const mine = deliveries.filter((d) => d.subscription_id === s.id);
   const forEvent = mine.filter((d) => d.event_key === key);
-  if (forEvent.some((d) => d.status === "sent" || d.status === "skipped")) return { action: "none" };
+  if (forEvent.some((d) => d.status === "sent" || d.status === "skipped"))
+    return { action: "none" };
   const failures = forEvent.filter((d) => d.status === "failed").length;
   if (failures >= NOTIFY_CONFIG.maxAttempts) return { action: "none" };
   const capStart = now - NOTIFY_CONFIG.capHours * 3600_000;
   const recent = mine.some(
-    (d) => d.status === "sent" && d.district_id === a.district_id && Date.parse(d.sent_at) > capStart,
+    (d) =>
+      d.status === "sent" && d.district_id === a.district_id && Date.parse(d.sent_at) > capStart,
   );
   if (recent) return { action: "skip-cap" };
   return { action: "send", attempt: failures + 1 };
@@ -144,4 +154,19 @@ export function safetyNotice(lang: SubLanguage) {
   if (lang === "ps")
     return "دا د ماډل شویو وړاندوینو پر بنسټ یو تجربوي اټکل دی، رسمي خبرداری نه دی. په بیړني حالت کې ریسکیو 1122 ته زنګ ووهئ. د PDMA او د پاکستان د هواپېژندنې ریاست لارښوونې تعقیب کړئ.";
   return "This is an experimental estimate based on modelled forecasts, not an official warning. In an emergency call Rescue 1122. Follow PDMA and Pakistan Meteorological Department advisories.";
+}
+
+/** Double opt-in: what a click on the confirmation link does. */
+export function verificationOutcome(
+  sub: {
+    verified_at: string | null;
+    verify_expires_at: string | null;
+    unsubscribed_at: string | null;
+  } | null,
+  now = Date.now(),
+): "activate" | "already" | "expired" | "invalid" {
+  if (!sub || sub.unsubscribed_at) return "invalid";
+  if (sub.verified_at) return "already";
+  if (sub.verify_expires_at && Date.parse(sub.verify_expires_at) < now) return "expired";
+  return "activate";
 }

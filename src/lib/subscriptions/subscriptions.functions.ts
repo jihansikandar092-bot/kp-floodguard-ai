@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getRequestHeader } from "@tanstack/react-start/server";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { isCoordinator } from "@/lib/api/requests.functions";
-import { NOTIFY_CONFIG, subscribeSchema, tokenSchema } from "./rules";
+import { NOTIFY_CONFIG, subscribeSchema, tokenSchema, verificationOutcome } from "./rules";
 
 async function sha256(text: string) {
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
@@ -34,14 +34,28 @@ export const createSubscription = createServerFn({ method: "POST" })
       .select("id", { count: "exact", head: true })
       .eq("ip_hash", ipHash)
       .gte("created_at", since);
-    if (rlErr) return { ok: false, error: "unavailable", message: "Subscriptions are temporarily unavailable." };
+    if (rlErr)
+      return {
+        ok: false,
+        error: "unavailable",
+        message: "Subscriptions are temporarily unavailable.",
+      };
     if ((count ?? 0) >= NOTIFY_CONFIG.subscribePerHour)
-      return { ok: false, error: "rate_limited", message: "Too many subscription attempts from this connection. Please try again in an hour." };
+      return {
+        ok: false,
+        error: "rate_limited",
+        message:
+          "Too many subscription attempts from this connection. Please try again in an hour.",
+      };
     await supabaseAdmin.from("subscription_rate_limits").insert({ ip_hash: ipHash });
 
-    const { data: known } = await supabaseAdmin.from("districts").select("id").in("id", data.districtIds);
+    const { data: known } = await supabaseAdmin
+      .from("districts")
+      .select("id")
+      .in("id", data.districtIds);
     const districtIds = [...new Set((known ?? []).map((d) => d.id))];
-    if (!districtIds.length) return { ok: false, error: "invalid", message: "Choose at least one district." };
+    if (!districtIds.length)
+      return { ok: false, error: "invalid", message: "Choose at least one district." };
 
     const contact = data.channel === "email" ? data.email : JSON.stringify(data.push);
     const contactHash = await sha256(data.channel === "email" ? data.email : data.push.endpoint);
@@ -64,7 +78,12 @@ export const createSubscription = createServerFn({ method: "POST" })
       const { error } = await supabaseAdmin
         .from("alert_subscriptions")
         .insert({ ...common, verified_at: new Date().toISOString() });
-      if (error) return { ok: false, error: "unavailable", message: "Subscriptions are temporarily unavailable." };
+      if (error)
+        return {
+          ok: false,
+          error: "unavailable",
+          message: "Subscriptions are temporarily unavailable.",
+        };
       return { ok: true, channel: "webpush" };
     }
 
@@ -74,11 +93,18 @@ export const createSubscription = createServerFn({ method: "POST" })
       .insert({
         ...common,
         verify_token: verifyToken,
-        verify_expires_at: new Date(Date.now() + NOTIFY_CONFIG.verifyHours * 3600_000).toISOString(),
+        verify_expires_at: new Date(
+          Date.now() + NOTIFY_CONFIG.verifyHours * 3600_000,
+        ).toISOString(),
       })
       .select("unsubscribe_token")
       .single();
-    if (error || !row) return { ok: false, error: "unavailable", message: "Subscriptions are temporarily unavailable." };
+    if (error || !row)
+      return {
+        ok: false,
+        error: "unavailable",
+        message: "Subscriptions are temporarily unavailable.",
+      };
     const { sendEmail, SITE_URL } = await import("./channels.server");
     const { footerText } = await import("./sender.server");
     try {
@@ -90,7 +116,11 @@ export const createSubscription = createServerFn({ method: "POST" })
       );
     } catch (e) {
       console.error("verification email failed", e instanceof Error ? e.message : "unknown");
-      return { ok: false, error: "unavailable", message: "We could not send the confirmation email. Please try again later." };
+      return {
+        ok: false,
+        error: "unavailable",
+        message: "We could not send the confirmation email. Please try again later.",
+      };
     }
     return { ok: true, channel: "email" };
   });
@@ -105,9 +135,11 @@ export const verifySubscription = createServerFn({ method: "POST" })
       .select("id,contact_hash,verified_at,verify_expires_at,unsubscribed_at")
       .eq("verify_token", data.token)
       .maybeSingle();
-    if (!sub || sub.unsubscribed_at) return { ok: false as const, message: "This link is not valid." };
-    if (sub.verified_at) return { ok: true as const };
-    if (sub.verify_expires_at && Date.parse(sub.verify_expires_at) < Date.now())
+    const outcome = verificationOutcome(sub);
+    if (outcome === "invalid" || !sub)
+      return { ok: false as const, message: "This link is not valid." };
+    if (outcome === "already") return { ok: true as const };
+    if (outcome === "expired")
       return { ok: false as const, message: "This link has expired. Please subscribe again." };
     const now = new Date().toISOString();
     await supabaseAdmin
@@ -137,7 +169,9 @@ export const unsubscribe = createServerFn({ method: "POST" })
       .select("id")
       .eq("unsubscribe_token", data.token)
       .maybeSingle();
-    return existing ? { ok: true as const } : { ok: false as const, message: "This link is not valid." };
+    return existing
+      ? { ok: true as const }
+      : { ok: false as const, message: "This link is not valid." };
   });
 
 /** Public VAPID key (not secret) so the browser can create a push subscription. */
@@ -170,7 +204,12 @@ export const getSubscriptionStats = createServerFn({ method: "GET" })
         perDistrict[d][s.channel as "email" | "webpush"]++;
       }
     }
-    return { authorized: true as const, total: subs?.length ?? 0, perDistrict, deliveries: deliveries ?? [] };
+    return {
+      authorized: true as const,
+      total: subs?.length ?? 0,
+      perDistrict,
+      deliveries: deliveries ?? [],
+    };
   });
 
 /** Coordinators: one labelled test message to their own verified email subscription. */

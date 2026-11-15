@@ -29,7 +29,9 @@ export function TokenAction({
     <div className="container-page max-w-xl py-12">
       <div role="status" className="space-y-4 rounded-xl border bg-card p-6 shadow-card">
         {!state ? (
-          <p className="flex items-center gap-2"><Loader2 className="animate-spin" /> Working…</p>
+          <p className="flex items-center gap-2">
+            <Loader2 className="animate-spin" /> Working…
+          </p>
         ) : state.ok ? (
           <>
             <h1 className="text-2xl font-bold">{successTitle}</h1>
@@ -42,8 +44,14 @@ export function TokenAction({
           </>
         )}
         <div className="flex flex-wrap gap-2">
-          <Button asChild variant="outline"><Link to="/alerts">View alerts</Link></Button>
-          <Button asChild variant="emergency"><a href="tel:1122"><Phone /> Rescue 1122</a></Button>
+          <Button asChild variant="outline">
+            <Link to="/alerts">View alerts</Link>
+          </Button>
+          <Button asChild variant="emergency">
+            <a href="tel:1122">
+              <Phone /> Rescue 1122
+            </a>
+          </Button>
         </div>
       </div>
     </div>

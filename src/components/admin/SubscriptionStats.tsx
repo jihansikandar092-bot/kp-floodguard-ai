@@ -14,7 +14,10 @@ export function SubscriptionStats() {
   const stats = useServerFn(getSubscriptionStats);
   const test = useServerFn(sendMyTestNotification);
   const qc = useQueryClient();
-  const { data, isLoading, error } = useQuery({ queryKey: ["subscription-stats"], queryFn: () => stats() });
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["subscription-stats"],
+    queryFn: () => stats(),
+  });
   const send = useMutation({
     mutationFn: () => test(),
     onSuccess: (r) => {
@@ -24,16 +27,21 @@ export function SubscriptionStats() {
     },
   });
   if (isLoading) return <p className="text-sm text-muted-foreground">Loading subscriber counts…</p>;
-  if (error || !data) return <p className="text-sm text-emergency">Subscriber counts temporarily unavailable.</p>;
+  if (error || !data)
+    return <p className="text-sm text-emergency">Subscriber counts temporarily unavailable.</p>;
   if (!data.authorized) return null;
   const rows = Object.entries(data.perDistrict).sort((a, b) => a[0].localeCompare(b[0]));
   return (
-    <section className="space-y-4 rounded-xl border bg-card p-5 shadow-card" aria-label="Alert subscribers">
+    <section
+      className="space-y-4 rounded-xl border bg-card p-5 shadow-card"
+      aria-label="Alert subscribers"
+    >
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-bold">Alert subscribers</h2>
           <p className="text-sm text-muted-foreground">
-            {data.total} active verified subscriptions. Counts only; contact details are never shown.
+            {data.total} active verified subscriptions. Counts only; contact details are never
+            shown.
           </p>
         </div>
         <Button variant="outline" onClick={() => send.mutate()} disabled={send.isPending}>
@@ -61,7 +69,15 @@ export function SubscriptionStats() {
         <ul className="divide-y text-sm">
           {data.deliveries.map((d) => (
             <li key={d.id} className="flex flex-wrap items-center gap-2 py-2">
-              <Badge variant={d.status === "sent" ? "default" : d.status === "failed" ? "destructive" : "secondary"}>
+              <Badge
+                variant={
+                  d.status === "sent"
+                    ? "default"
+                    : d.status === "failed"
+                      ? "destructive"
+                      : "secondary"
+                }
+              >
                 {d.status}
               </Badge>
               {d.is_test && <Badge variant="outline">TEST</Badge>}
