@@ -14,6 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      alerts: {
+        Row: {
+          created_at: string
+          district_id: string
+          id: string
+          level: string
+          reason_text: string
+          resolved_at: string | null
+          risk_assessment_id: string
+          source: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          district_id: string
+          id?: string
+          level: string
+          reason_text: string
+          resolved_at?: string | null
+          risk_assessment_id: string
+          source?: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          district_id?: string
+          id?: string
+          level?: string
+          reason_text?: string
+          resolved_at?: string | null
+          risk_assessment_id?: string
+          source?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alerts_district_id_fkey"
+            columns: ["district_id"]
+            isOneToOne: false
+            referencedRelation: "districts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "alerts_risk_assessment_id_fkey"
+            columns: ["risk_assessment_id"]
+            isOneToOne: false
+            referencedRelation: "risk_assessments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       districts: {
         Row: {
           id: string
