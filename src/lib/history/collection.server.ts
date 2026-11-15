@@ -3,6 +3,7 @@ import {
   collectionFailure,
   historicalSource,
   historyPayload,
+  nextHourlyRun,
 } from "./statistics";
 import { recordServiceHealth } from "@/lib/api/service-health.server";
 
@@ -67,7 +68,7 @@ export async function collectHistoricalBatch() {
       await update({
         ...collectionFailure(response.status),
         ...(response.status === 429
-          ? { next_request_at: new Date(Date.now() + 3600000).toISOString() }
+          ? { next_request_at: nextHourlyRun(Date.now()) }
           : {}),
       });
       await recordServiceHealth(

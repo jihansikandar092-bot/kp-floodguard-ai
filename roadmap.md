@@ -1,8 +1,8 @@
 # Live monitoring
 ## Historical collection
-- [ ] Extend existing yearly statistics and add resumable, exclusive hourly collection progress.
-- [ ] Add real selected-district annual discharge/rainfall charts with accurate source coverage labels.
-- [ ] Verify statistics, rate-limit/resume rules, preview and published charts; report any provider blockers.
+- [x] Extend existing yearly statistics and add resumable, exclusive hourly collection progress.
+- [x] Add real selected-district annual discharge/rainfall charts with accurate source coverage labels.
+- [x] Verify statistics, rate-limit/resume rules, preview and published charts. Swat/Bannu: 16 complete years each, 2010–2025; published collection returned 202, then stored Charsadda HTTP 429 pause. Remaining districts await hourly provider availability; no invented data.
 ## Real-data cleanup and integration health
 - [x] Audit code and database; before/after findings delivered, three owner-retained verification requests unchanged.
 - [x] Remove obsolete demo UI, unused illustrative chart and unsupported landing/footer claims; hide unimplemented voice control.

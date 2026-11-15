@@ -81,3 +81,7 @@ export function collectionFailure(status: number) {
       }
     : { status: "error" as const, last_error: `Historical provider HTTP ${status}` };
 }
+
+export function nextHourlyRun(now: number) {
+  return new Date((Math.floor(now / 3600000) + 1) * 3600000).toISOString();
+}

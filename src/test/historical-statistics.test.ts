@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { annualStatistics, collectionFailure, historicalSource } from "@/lib/history/statistics";
+import { annualStatistics, collectionFailure, historicalSource, nextHourlyRun } from "@/lib/history/statistics";
 
 function days(year: number) {
   const dates = [];
@@ -50,6 +50,9 @@ describe("historical yearly statistics", () => {
   it("pauses on any historical HTTP 429 for the next hourly run", () => {
     expect(collectionFailure(429).status).toBe("paused");
     expect(collectionFailure(503).status).toBe("error");
+  });
+  it("resumes at the next scheduled hour, not an extra hour later", () => {
+    expect(nextHourlyRun(Date.parse("2026-11-15T10:59:52Z"))).toBe("2026-11-15T11:00:00.000Z");
   });
   it("does not call archived forecast years reanalysis", () => {
     expect(historicalSource(2025)).toBe("GloFAS archived forecast; Open-Meteo ERA5 reanalysis");
