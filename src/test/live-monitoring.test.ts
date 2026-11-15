@@ -70,10 +70,10 @@ describe("Live monitoring rules", () => {
     expect(data.districts[1]?.weather).toBeNull();
   });
   it("uses a 15 minute freshness window", () => expect(LIVE_STALE_TIME).toBe(900000));
-  it("requests three past weather days and seven forecast days for every district without keys", () => {
+  it("requests three past weather days and eight calendar days to cover a full 168-hour outlook without keys", () => {
     const url = weatherUrl(DISTRICTS);
     expect(url.searchParams.get("past_days")).toBe("3");
-    expect(url.searchParams.get("forecast_days")).toBe("7");
+    expect(url.searchParams.get("forecast_days")).toBe("8");
     expect(url.searchParams.get("latitude")).toBe(DISTRICTS.map((d) => d.lat).join(","));
     expect(url.searchParams.get("longitude")).toBe(DISTRICTS.map((d) => d.lng).join(","));
     expect(url.searchParams.get("hourly")).toBe(
