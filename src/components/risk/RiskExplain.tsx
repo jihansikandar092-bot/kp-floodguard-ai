@@ -2,6 +2,7 @@ import { ChevronDown } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { FACTOR_LABEL, RISK_CONFIG, type FactorKey } from "@/lib/risk/engine";
 import type { StoredRiskAssessment } from "@/lib/risk/types";
+import { PartialScoreNote } from "./PartialScoreNote";
 
 export const RISK_DISCLAIMER =
   "System-generated from modelled weather and river data. Experimental estimate, not an official warning.";
@@ -37,6 +38,7 @@ export function WhyRisk({ assessment }: { assessment: StoredRiskAssessment }) {
         Score {assessment.score}/100 · Confidence {assessment.confidence} · Computed{" "}
         {utc(assessment.computedAt)} from stored Open-Meteo / GloFAS snapshot. {RISK_DISCLAIMER}
       </p>
+      <PartialScoreNote availableFactors={assessment.availableFactors} />
     </section>
   );
 }

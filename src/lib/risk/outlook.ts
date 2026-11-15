@@ -7,6 +7,7 @@ import {
   type RiskInput,
   type RiskAssessment,
 } from "./engine";
+import { partialScoreNote } from "./partial";
 
 export const HORIZONS = [0, 24, 48, 72, 168] as const;
 export type Horizon = (typeof HORIZONS)[number];
@@ -55,12 +56,17 @@ export function translatedReasons(
   horizon: number,
   hasHistory: boolean,
 ): Record<RiskLanguage, string> {
-  return Object.fromEntries(
+  const reasons = Object.fromEntries(
     Object.entries(labels).map(([lang, t]) => [
       lang,
       `${t[r.level]} ${lang === "en" ? "risk expected" : lang === "ur" ? "خطرہ متوقع ہے" : "خطر اټکل شوی"} ${horizon ? (lang === "en" ? `within ${horizon} hours` : `${horizon} ${t.hours} ${t.within}`) : t.now}: ${t.rain} (${r.factors.forecastRain72h.value ?? t.missing} mm), ${t.flow} (${r.factors.dischargePeak.value ?? t.missing} m³/s). ${hasHistory ? (lang === "en" ? r.factors.dischargePeak.detail : lang === "ur" ? "بہاؤ کا موازنہ سالانہ زیادہ سے زیادہ تاریخی بہاؤ سے کیا گیا ہے۔" : "جریان د تاریخي کلني تر ټولو لوړ جریان سره پرتله شوی.") : t.history}`,
     ]),
   ) as Record<RiskLanguage, string>;
+  for (const language of ["en", "ur", "ps"] as const) {
+    const note = partialScoreNote(r.availableFactors, language);
+    if (note) reasons[language] += ` ${note}`;
+  }
+  return reasons;
 }
 
 /** Forecasts anchored to the stored provider time; never slide stale data to the visitor's current time. */
@@ -148,6 +154,7 @@ export function assessOutlook(input: RiskInput, horizon: Horizon): RiskAssessmen
     ) / 10;
   const result: RiskAssessment = {
     score,
+    availableFactors: available.length,
     level: levelFor(score),
     factors,
     confidence: historical !== null && available.length === 4 ? "Medium" : "Low",

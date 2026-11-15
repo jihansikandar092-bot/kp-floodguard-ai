@@ -1,4 +1,8 @@
 # Live monitoring
+## Partial-score safety
+- [ ] Store factor coverage and translated partial notes without changing score calculation.
+- [ ] Prevent partial batches from resolving alerts; test partial creation and resolution rules.
+- [ ] Verify real stored scores in preview and on the published dashboard/map, including RTL notes.
 ## Predictive Risk Outlook
 - [x] Audit current forecasts, alerts and pages.
 - [x] Store and compute five horizons with translated reasons and snapshot freshness; 60 rows for 12 districts. Existing retained weather lacks full 168-hour coverage, shown as unavailable; future scheduled requests cover eight calendar days.

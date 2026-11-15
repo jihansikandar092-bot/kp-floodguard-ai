@@ -7,6 +7,7 @@ import type { District } from "@/lib/data/districts";
 import type { StoredRiskAssessment } from "@/lib/risk/types";
 import { RiskBadge } from "@/components/site/Demo";
 import { WhyRisk } from "@/components/risk/RiskExplain";
+import { PartialScoreNote } from "@/components/risk/PartialScoreNote";
 
 export function DistrictDetail({
   district,
@@ -31,7 +32,7 @@ export function DistrictDetail({
           </p>
         </div>
       </div>
-      <div className="mt-3 flex items-center gap-3">
+      <div className="mt-3 flex flex-wrap items-center gap-3">
         {risk ? (
           <>
             <RiskBadge level={risk.level} />
@@ -42,6 +43,8 @@ export function DistrictDetail({
           <span className="text-sm text-muted-foreground">Flood risk: Not available</span>
         )}
       </div>
+
+      {risk && <PartialScoreNote availableFactors={risk.availableFactors} />}
 
       <div className="mt-6 rounded-lg border p-4">
         <div className="flex items-center justify-between text-sm">

@@ -1,4 +1,5 @@
 import type { FloodData, WeatherData } from "@/lib/api/live-data";
+import { partialScoreNote } from "./partial";
 
 export type RiskLevel = "low" | "medium" | "high";
 export type Confidence = "Low" | "Medium";
@@ -43,6 +44,7 @@ export interface RiskInput {
 }
 export interface RiskAssessment {
   score: number;
+  availableFactors: number;
   level: RiskLevel;
   confidence: Confidence;
   factors: Record<FactorKey, RiskFactor>;
@@ -164,10 +166,11 @@ export function assessRisk(input: RiskInput): RiskAssessment | null {
   const confidence: Confidence = histMedian !== null && complete ? "Medium" : "Low";
   return {
     score,
+    availableFactors: available.length,
     level: levelFor(score),
     confidence,
     factors,
-    reasonText: reason(factors, histMedian !== null, complete),
+    reasonText: reason(factors, histMedian !== null, complete) + (complete ? "" : ` ${partialScoreNote(available.length)}`),
   };
 }
 

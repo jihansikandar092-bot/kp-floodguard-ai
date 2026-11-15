@@ -37,6 +37,7 @@ export async function assessStoredSnapshots(admin: Admin) {
         district_id: snap.district_id,
         snapshot_id: snap.id,
         score: assessment.score,
+        available_factors: assessment.availableFactors,
         level: assessment.level,
         confidence: assessment.confidence,
         factors: assessment.factors as unknown as Json,
@@ -73,7 +74,7 @@ export async function readLatestAssessments(): Promise<StoredRiskAssessment[]> {
   const { data, error } = await publicDbClient()
     .from("risk_assessments")
     .select(
-      "district_id,snapshot_id,score,level,confidence,factors,reason_text,computed_at,horizon_hours,snapshot_at,reason_templates",
+      "district_id,snapshot_id,score,available_factors,level,confidence,factors,reason_text,computed_at,horizon_hours,snapshot_at,reason_templates",
     )
     .order("computed_at", { ascending: false })
     .limit(500);
@@ -88,6 +89,7 @@ export async function readLatestAssessments(): Promise<StoredRiskAssessment[]> {
       districtId: r.district_id,
       snapshotId: r.snapshot_id,
       score: r.score,
+      availableFactors: r.available_factors,
       level: r.level as StoredRiskAssessment["level"],
       confidence: r.confidence === "Medium" ? "Medium" : "Low",
       factors: r.factors as unknown as StoredRiskAssessment["factors"],

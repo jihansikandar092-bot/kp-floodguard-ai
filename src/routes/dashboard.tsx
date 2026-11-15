@@ -22,6 +22,7 @@ import { HowScoreWorks, RISK_DISCLAIMER } from "@/components/risk/RiskExplain";
 import { AlertsPanel } from "@/components/dashboard/AlertsPanel";
 import { alertsOptions } from "@/lib/alerts/alerts-query";
 import { RiskOutlook } from "@/components/risk/RiskOutlook";
+import { PartialScoreNote } from "@/components/risk/PartialScoreNote";
 
 export const Route = createFileRoute("/dashboard")({
   validateSearch: (s: Record<string, unknown>): { district?: string | undefined } => {
@@ -251,6 +252,7 @@ function DashboardPage() {
                 ? `Score 0–100 · computed ${latestRisk.replace("T", " ").slice(0, 16)} UTC · risk_assessments`
                 : "Score 0–100"
             }
+            action={riskRows.some(({ r }) => r.availableFactors < 4) ? <span className="text-xs text-muted-foreground">Partial scores below</span> : undefined}
             bodyClassName="h-96"
           >
             {riskRows.length ? (
@@ -265,6 +267,12 @@ function DashboardPage() {
             )}
           </Panel>
         </div>
+        {riskRows.filter(({ r }) => r.availableFactors < 4).map(({ d, r }) => (
+          <div key={d.id} className="text-sm">
+            <span>{d.name} · {r.score}/100</span>
+            <PartialScoreNote availableFactors={r.availableFactors} />
+          </div>
+        ))}
       </div>
     </>
   );
