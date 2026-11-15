@@ -61,5 +61,5 @@ use the editor.
 - Historical imports claim one district/source per bounded invocation with a database lease and minimum request spacing; persist each phase, pause on 429, and read charts only from stored annual statistics so visitors never initiate imports. Label post-July-2022 GloFAS data as archived forecasts, not reanalysis.
 - Chat uses server-only webhook configuration, atomic hashed-IP limits and compact stored five-horizon/alert context; include context in the Chat Trigger input so the existing n8n agent receives it, and fall back to translated guided intake without exposing internal errors.
 - Responsible-AI explanations reuse RISK_CONFIG and HORIZONS so displayed rules match the engine.
-- The service worker (vite-plugin-pwa generateSW, registered only via src/lib/pwa/register-sw.ts) precaches static build files and keeps a network-first copy of the /emergency page only; it never caches server functions or API data, so offline views never show unlabelled stale readings.
-- Offline emergency requests queue on the device with a client_request_id idempotency key and go through the same server validation and rate limit when resent, so a queued request is stored at most once.
+- Service worker: static files plus network-first /emergency shell only, never API data, so offline views never show unlabelled stale readings.
+- Offline requests queue on-device with a client_request_id key and use normal validation/limits when resent, so each is stored once.
