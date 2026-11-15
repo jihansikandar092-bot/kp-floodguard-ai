@@ -70,7 +70,9 @@ export function RiskOutlook({
                       availableFactors={rows[i]?.availableFactors ?? 0}
                       language={language}
                     />
-                    <Link to="/responsible-ai" className="mt-1 block text-xs underline">Responsible AI & Privacy</Link>
+                    <Link to="/responsible-ai" className="mt-1 block text-xs underline">
+                      Responsible AI & Privacy
+                    </Link>
                     <p className="mt-2 text-xs text-muted-foreground">
                       {rows[i]?.reasonTemplates[language] ?? rows[i]?.reasonText}
                     </p>
@@ -151,7 +153,9 @@ export function RiskOutlook({
         </>
       )}
       <p className="text-xs text-muted-foreground">{RISK_DISCLAIMER}</p>
-      <Link to="/responsible-ai" className="block text-xs underline">Responsible AI & Privacy</Link>
+      <Link to="/responsible-ai" className="block text-xs underline">
+        Responsible AI & Privacy
+      </Link>
     </section>
   );
 }

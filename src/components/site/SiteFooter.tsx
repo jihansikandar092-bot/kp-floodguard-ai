@@ -112,7 +112,15 @@ function FooterLink({
   hash,
   children,
 }: {
-  to: "/" | "/dashboard" | "/map" | "/emergency" | "/login" | "/integrations" | "/contact" | "/responsible-ai";
+  to:
+    | "/"
+    | "/dashboard"
+    | "/map"
+    | "/emergency"
+    | "/login"
+    | "/integrations"
+    | "/contact"
+    | "/responsible-ai";
   hash?: string | undefined;
   children: React.ReactNode;
 }) {

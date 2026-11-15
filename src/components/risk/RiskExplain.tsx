@@ -40,7 +40,9 @@ export function WhyRisk({ assessment }: { assessment: StoredRiskAssessment }) {
         {utc(assessment.computedAt)} from stored Open-Meteo / GloFAS snapshot. {RISK_DISCLAIMER}
       </p>
       <PartialScoreNote availableFactors={assessment.availableFactors} />
-      <Link to="/responsible-ai" className="mt-2 block text-xs underline">Responsible AI & Privacy</Link>
+      <Link to="/responsible-ai" className="mt-2 block text-xs underline">
+        Responsible AI & Privacy
+      </Link>
     </section>
   );
 }

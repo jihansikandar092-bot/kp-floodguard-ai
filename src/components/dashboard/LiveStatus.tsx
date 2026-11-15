@@ -24,7 +24,12 @@ export function LiveStatus({ data, rows }: { data: LiveMonitoring; rows: LiveDis
   return (
     <div className="space-y-2 border-b pb-4 text-sm">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="font-semibold">Data sources and last update: Open-Meteo / GloFAS · {data.fetchedAt ? `${data.fetchedAt.replace("T", " ").slice(0, 19)} UTC` : "Not available"}</p>
+        <p className="font-semibold">
+          Data sources and last update: Open-Meteo / GloFAS ·{" "}
+          {data.fetchedAt
+            ? `${data.fetchedAt.replace("T", " ").slice(0, 19)} UTC`
+            : "Not available"}
+        </p>
         <Button
           variant="outline"
           size="sm"
