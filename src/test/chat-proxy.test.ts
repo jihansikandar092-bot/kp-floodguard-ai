@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 const records = vi.hoisted(() => ({
-  health: vi.fn(),
+  health: vi.fn(async () => undefined),
   limit: vi.fn(async () => ({ data: true, error: null })),
 }));
 vi.mock("@/integrations/supabase/client.server", () => ({ supabaseAdmin: { rpc: records.limit } }));
@@ -44,16 +44,20 @@ describe("chat proxy recovery", () => {
   });
   it("aborts provider calls at 20 seconds and falls back", async () => {
     vi.useFakeTimers();
+    let started = false;
     vi.stubGlobal(
       "fetch",
       vi.fn(
-        (_url, init: RequestInit) =>
-          new Promise((_resolve, reject) =>
+        (_url, init: RequestInit) => {
+          started = true;
+          return new Promise((_resolve, reject) =>
             init.signal?.addEventListener("abort", () => reject(new Error("internal timeout"))),
-          ),
+          );
+        },
       ),
     );
     const promise = handleChatRequest(request("ps"), "https://workflow.example/chat");
+    while (!started) await new Promise(resolve => setImmediate(resolve));
     await vi.advanceTimersByTimeAsync(20000);
     const response = await promise;
     expect(response.status).toBe(503);
