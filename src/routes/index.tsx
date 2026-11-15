@@ -6,9 +6,7 @@ import {
   BrainCircuit,
   CloudRain,
   Database,
-  History,
   Map as MapIcon,
-  Mic,
   Radar,
   Siren,
   Users,
@@ -20,7 +18,7 @@ import { MapLegend } from "@/components/map/KPMap";
 import { LiveStatus, MonitoringError, MonitoringPending } from "@/components/dashboard/LiveStatus";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { liveMonitoringOptions } from "@/lib/api/monitoring-query";
-import { liveSnapshot } from "@/lib/api/live-data";
+import { platformHealthOptions } from "@/lib/api/service-health-query";
 import { districtListOptions } from "@/lib/api/district-query";
 import riverImg from "@/assets/swat-river-monitoring.jpg";
 
@@ -69,18 +67,13 @@ const FEATURES = [
   },
   {
     icon: Waves,
-    title: "River water level monitoring",
-    text: "River levels plotted against their danger marks.",
-  },
-  {
-    icon: History,
-    title: "Historical flood analysis",
-    text: "Learn from past flood seasons such as 2010 and 2022.",
+    title: "Modelled river discharge",
+    text: "GloFAS discharge forecasts; not measured river depth or official danger marks.",
   },
   {
     icon: BrainCircuit,
-    title: "ML flood-risk prediction",
-    text: "Risk scores from models trained on weather and flood history.",
+    title: "AI-assisted risk scoring",
+    text: "Experimental rule-based estimates from available weather and modelled discharge factors.",
   },
   {
     icon: MapIcon,
@@ -93,14 +86,9 @@ const FEATURES = [
     text: "Guided help in English and Urdu, with Pashto planned.",
   },
   {
-    icon: Mic,
-    title: "Voice-based assistance",
-    text: "Speak instead of type — designed for Retell AI voice calls.",
-  },
-  {
     icon: Users,
     title: "Rescue request coordination",
-    text: "Coordinators triage, assign and track every request.",
+    text: "Authorized coordinators review requests and update their status; rescue is never dispatched automatically.",
   },
 ];
 
@@ -109,13 +97,13 @@ const STEPS = [
     n: "01",
     icon: Database,
     title: "Collect",
-    text: "Gather weather forecasts, river discharge and historical flood records for every district.",
+    text: "Read stored Open-Meteo weather forecasts and GloFAS modelled river discharge.",
   },
   {
     n: "02",
     icon: BrainCircuit,
     title: "Analyse",
-    text: "Machine-learning models combine the signals into a flood-risk score per district.",
+    text: "AI-assisted risk scoring combines available factors using documented rules and weights.",
   },
   {
     n: "03",
@@ -128,7 +116,7 @@ const STEPS = [
 function Index() {
   const { data } = useSuspenseQuery(liveMonitoringOptions());
   const { data: districts } = useSuspenseQuery(districtListOptions());
-  const totals = liveSnapshot(data).totals;
+  const {data: platform} = useSuspenseQuery(platformHealthOptions());
   return (
     <>
       {/* HERO */}
@@ -149,7 +137,7 @@ function Index() {
               <span className="text-emergency">Safer</span> Communities.
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-navy-muted">
-              AI-powered flood prediction and emergency assistance for Khyber Pakhtunkhwa.
+              AI-assisted risk scoring, stored environmental monitoring and emergency request review for Khyber Pakhtunkhwa.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button asChild size="lg" variant="navy-solid">
@@ -166,11 +154,11 @@ function Index() {
             <dl className="mt-12 grid max-w-lg grid-cols-3 gap-6 border-t border-navy-line pt-6">
               <HeroStat
                 k="Districts monitored"
-                v={data.referenceCount ? String(data.referenceCount) : "Not available"}
+                v={String(platform.districtCount ?? "Not available")}
               />
-              <HeroStat k="Rainfall (24h · mm)" v={String(totals.rainfall24h ?? "Not available")} />
-              <HeroStat k="Temperature (°C)" v={String(totals.temperature ?? "Not available")} />
+              <HeroStat k="Stored snapshots" v={String(platform.snapshotCount ?? "Not available")} />
             </dl>
+            <p className="mt-3 text-xs text-navy-muted">Source: database reference and snapshot records.</p>
           </div>
 
           <div className="relative animate-fade-up [animation-delay:150ms]">
@@ -189,7 +177,7 @@ function Index() {
                 <KPSchematicMap districts={districts} />
               </div>
               <div className="absolute inset-x-5 bottom-5 flex items-center justify-between rounded-lg border border-navy-line bg-navy px-3 py-2 text-xs">
-                <span className="text-navy-muted">Flood risk: Not available</span>
+                <span className="text-navy-muted">District reference map</span>
                 <span className="[&_li]:text-navy-foreground">
                   <MapLegend />
                 </span>
@@ -208,7 +196,7 @@ function Index() {
           <div className="relative">
             <img
               src={riverImg}
-              alt="A swollen mountain river with a river-gauge monitoring station on its bank"
+              alt="River landscape artwork; not a monitoring observation"
               width={1280}
               height={896}
               loading="lazy"
@@ -217,14 +205,14 @@ function Index() {
             <div className="absolute -bottom-6 right-4 max-w-[240px] rounded-xl border bg-card p-4 shadow-float sm:right-[-1.5rem]">
               <p className="eyebrow text-muted-foreground">Signal sources</p>
               <p className="mt-2 text-sm font-semibold">
-                Weather · River gauges · Flood history · Citizen reports
+                Weather forecasts · Modelled discharge · Citizen requests
               </p>
             </div>
           </div>
           <div>
             <p className="eyebrow text-emergency">About the project</p>
             <h2 className="mt-3 text-3xl font-extrabold md:text-4xl">
-              One platform from early warning to rescue coordination
+              Environmental monitoring and coordinator-reviewed requests
             </h2>
             <div className="mt-6 space-y-4 text-muted-foreground leading-relaxed">
               <p>
@@ -233,9 +221,9 @@ function Index() {
                 one place.
               </p>
               <p>
-                It combines <strong className="text-foreground">weather monitoring</strong>,{" "}
-                <strong className="text-foreground">historical flood data</strong> and{" "}
-                <strong className="text-foreground">machine learning</strong> to estimate
+                It combines <strong className="text-foreground">stored weather forecasts</strong>,{" "}
+                <strong className="text-foreground">modelled river discharge</strong> and{" "}
+                <strong className="text-foreground">AI-assisted risk scoring</strong> to estimate
                 district-level flood risk, and pairs it with an{" "}
                 <strong className="text-foreground">AI emergency assistant</strong> that helps
                 citizens report what they need — in their own language.
@@ -289,7 +277,7 @@ function Index() {
           <div className="mx-auto max-w-2xl text-center">
             <p className="eyebrow text-emergency">How it works</p>
             <h2 className="mt-3 text-3xl font-extrabold md:text-4xl">
-              Data in. Risk out. Help on the way.
+              Data in. Risk estimates. Human review.
             </h2>
           </div>
           <ol className="relative mt-14 grid gap-6 md:grid-cols-3">
@@ -322,8 +310,7 @@ function Index() {
               <BarChart3 className="size-7" aria-hidden />
               <h2 className="mt-4 text-2xl font-extrabold">Explore district risk</h2>
               <p className="mt-2 text-primary-foreground/75">
-                Rainfall, river levels, history and risk comparison for Swat, Nowshera, Bannu, Upper
-                Dir and Mardan.
+                Stored rainfall, modelled river discharge and experimental risk comparisons across monitored districts.
               </p>
             </div>
             <div className="flex flex-wrap gap-2">

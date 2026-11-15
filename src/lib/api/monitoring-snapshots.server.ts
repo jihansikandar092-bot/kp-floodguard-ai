@@ -7,6 +7,7 @@ import {
   retryingMonitoringFetch,
   startOfUtcDay,
 } from "./snapshot-rules";
+import { checkStoredServices } from "./service-health.server";
 
 export async function readMonitoringSnapshots(): Promise<LiveMonitoring> {
   const client = publicDbClient();
@@ -50,6 +51,7 @@ export async function readMonitoringSnapshots(): Promise<LiveMonitoring> {
 // Called only by the authenticated scheduler, never by page reads.
 export async function refreshMonitoringSnapshots(triggerSource: "schedule" | "manual") {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  await checkStoredServices();
   const startedAt = new Date().toISOString();
   const { data: run, error: startError } = await supabaseAdmin
     .from("monitoring_runs")

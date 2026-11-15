@@ -17,6 +17,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { AssistantWidget } from "@/components/assistant/AssistantWidget";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { platformHealthOptions } from "@/lib/api/service-health-query";
 
 function NotFoundComponent() {
   return (
@@ -80,6 +81,7 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  loader: async ({context}) => { await context.queryClient.ensureQueryData(platformHealthOptions()); },
   head: () => ({
     meta: [
       { charSet: "utf-8" },
