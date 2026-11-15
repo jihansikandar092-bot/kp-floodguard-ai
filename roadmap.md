@@ -1,4 +1,9 @@
 # Live monitoring
+## Southern and Merged coverage
+- [x] Preserve existing references: 22 total, 12 focus rows, ten approximate headquarters coordinates flagged for owner review.
+- [x] Add district search/group filtering, 12 map outlines and stored-risk landing focus section; preview and published checks pass, including Tank emergency/assistant choices.
+- [x] Verify real preview refresh: 22/22 successful, both providers 200; published Bannu/Tank/Lakki Marwat/D.I. Khan values and five affected pages verified, 89 tests and lint pass, automatic build OK.
+- [ ] Successful scheduled/hosted refresh: blocked by provider daily-limit 429. Published manual invocation retained all 22 real snapshots; schedule path pauses until 00:00 UTC. History discovers all 22 references (12 focus progress rows) but collection awaits existing rate-limit spacing. Separate type-check output is unavailable; platform-managed validation only.
 ## Chat hardening and grounding
 - [x] Enforce validated UUID/1000-character/language input and atomic approved IP limits; 400 input checks and actual preview/published 16th-call 429 verified.
 - [x] Use saved webhook configuration, compact five-horizon risk/alerts context and safe translated automatic intake fallback; timeout and wrong-URL/restoration unit tests passed.

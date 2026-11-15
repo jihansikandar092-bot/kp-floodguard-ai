@@ -21,12 +21,17 @@ import { liveMonitoringOptions } from "@/lib/api/monitoring-query";
 import { platformHealthOptions } from "@/lib/api/service-health-query";
 import { districtListOptions } from "@/lib/api/district-query";
 import riverImg from "@/assets/swat-river-monitoring.jpg";
+import { riskAssessmentOptions } from "@/lib/risk/risk-query";
+import { RiskBadge } from "@/components/site/Status";
+import { RISK_DISCLAIMER } from "@/components/risk/RiskExplain";
+import { PartialScoreNote } from "@/components/risk/PartialScoreNote";
 
 export const Route = createFileRoute("/")({
   loader: async ({ context }) => {
     await Promise.all([
       context.queryClient.ensureQueryData(liveMonitoringOptions()),
       context.queryClient.ensureQueryData(districtListOptions()),
+      context.queryClient.ensureQueryData(riskAssessmentOptions()),
     ]);
   },
   pendingComponent: MonitoringPending,
@@ -117,6 +122,7 @@ function Index() {
   const { data } = useSuspenseQuery(liveMonitoringOptions());
   const { data: districts } = useSuspenseQuery(districtListOptions());
   const { data: platform } = useSuspenseQuery(platformHealthOptions());
+  const { data: risks } = useSuspenseQuery(riskAssessmentOptions());
   return (
     <>
       {/* HERO */}
@@ -197,6 +203,57 @@ function Index() {
         <LiveStatus data={data} rows={data.districts} />
       </div>
       {/* ABOUT */}
+      <section className="border-y py-10">
+        <div className="container-page">
+          <h2 className="text-2xl font-bold">Focus on Southern and Merged Districts</h2>
+          <p className="mt-3 text-sm text-muted-foreground">{RISK_DISCLAIMER}</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            New district locations use approximate headquarters coordinates. Please review them.
+          </p>
+          <ul className="mt-6 grid gap-x-6 sm:grid-cols-2 lg:grid-cols-3">
+            {districts
+              .filter((d) => d.isArdc)
+              .map((d) => {
+                const risk = risks.find((r) => r.districtId === d.id && r.horizonHours === 0);
+                return (
+                  <li key={d.id} className="border-b py-4">
+                    <Link
+                      to="/dashboard"
+                      search={{ district: d.id }}
+                      className="font-semibold hover:underline"
+                    >
+                      {d.name}
+                    </Link>
+                    <div className="mt-2">
+                      {risk ? (
+                        <RiskBadge level={risk.level} />
+                      ) : (
+                        <span className="text-sm text-muted-foreground">
+                          Data not available yet
+                        </span>
+                      )}
+                    </div>
+                    {risk && (
+                      <>
+                        <PartialScoreNote availableFactors={risk.availableFactors} />
+                        <p className="mt-2 text-xs text-muted-foreground">
+                          Source: stored risk assessments ·{" "}
+                          {risk.computedAt.replace("T", " ").slice(0, 16)} UTC · data{" "}
+                          {risk.snapshotAt?.replace("T", " ").slice(0, 16) ?? "Not available"} UTC
+                        </p>
+                      </>
+                    )}
+                    {d.coordinatesApproximate && (
+                      <p className="mt-2 text-xs text-muted-foreground">
+                        Approximate HQ: {d.lat}, {d.lng}
+                      </p>
+                    )}
+                  </li>
+                );
+              })}
+          </ul>
+        </div>
+      </section>
       <section id="about" className="scroll-mt-28 py-20 lg:py-28">
         <div className="container-page grid items-center gap-12 lg:grid-cols-2">
           <div className="relative">

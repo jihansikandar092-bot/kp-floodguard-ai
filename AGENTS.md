@@ -49,6 +49,7 @@ use the editor.
 - Keep monitoring run logs service-role-only; public snapshot reads must match an existing district and the stored metric identity and contain weather or flood data, preserving citizen access without unrestricted row policies.
 - Store roles in a separate user_roles table and check them server-side with a security-definer has_role() function, never in client storage; this prevents privilege escalation and recursive role-policy checks.
 - District references (names, coordinates) load from the `districts` table via a shared district-list query; code only supplies tehsil/river labels by id, so the table stays the single source of monitored districts.
+- Focus membership and approximate-coordinate provenance also come from district reference rows; filters and outlines must never infer membership from names, preserving owner-reviewed coverage.
 - Freshness labels: under 1 h Live, 1–3 h Delayed (X h), over 3 h Outdated; only Outdated uses the emergency colour, so normal readings never look like warnings.
 - Snapshot merges retain last good values per metric and record them in retainedMetrics; monitoring_runs.trigger_source distinguishes schedule from manual runs (manual calls send trigger: "manual").
 - Emergency requests are inserted only through a validated server function (per-IP hashed hourly limit, codes from a DB trigger); coordinator/admin roles gate reads and updates via has_role(), so citizen data never reaches the browser unauthenticated.

@@ -32,6 +32,17 @@ export function DistrictDetail({
           </p>
         </div>
       </div>
+      {district.coordinatesApproximate && (
+        <p className="mt-2 text-xs text-muted-foreground">
+          Approximate headquarters coordinates: {district.lat}, {district.lng}. Please review these
+          coordinates.
+        </p>
+      )}
+      {!live?.weather && !live?.flood && (
+        <p role="status" className="mt-2 text-sm text-muted-foreground">
+          Data not available yet
+        </p>
+      )}
       <div className="mt-3 flex flex-wrap items-center gap-3">
         {risk ? (
           <>

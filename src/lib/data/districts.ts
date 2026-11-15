@@ -11,6 +11,8 @@ export interface District {
   lat: number;
   lng: number;
   region: string | null;
+  isArdc: boolean;
+  coordinatesApproximate: boolean;
   river: string | null;
   tehsils: string[];
 }
@@ -24,6 +26,8 @@ export interface DistrictRow {
   lat: number;
   lng: number;
   region: string | null;
+  is_ardc?: boolean | null;
+  coordinates_approximate?: boolean;
 }
 
 // Administrative sub-division and main river names, keyed by district id.
@@ -62,6 +66,9 @@ export function toDistrict(row: DistrictRow): District {
     lat: row.lat,
     lng: row.lng,
     region: row.region,
+    isArdc: row.is_ardc === true,
+    // New focus-district coordinates are approximate headquarters references; owner review requested.
+    coordinatesApproximate: row.coordinates_approximate === true,
     river: details?.river ?? null,
     tehsils: details?.tehsils ?? [],
   };

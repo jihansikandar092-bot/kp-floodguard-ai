@@ -24,7 +24,7 @@ export async function readDistricts() {
   const { toDistrict } = await import("@/lib/data/districts");
   const { data, error } = await publicDbClient()
     .from("districts")
-    .select("id,slug,name_en,name_ur,name_ps,lat,lng,region")
+    .select("id,slug,name_en,name_ur,name_ps,lat,lng,region,is_ardc,coordinates_approximate")
     .order("name_en");
   if (error) throw new Error("District list temporarily unavailable");
   return (data ?? []).map(toDistrict);
