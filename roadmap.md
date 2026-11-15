@@ -1,8 +1,9 @@
 # Live monitoring
 ## Chat hardening and grounding
-- [ ] Enforce validated UUID/1000-character/language input and atomic approved IP limits.
-- [ ] Use saved webhook configuration, compact live risk/alerts context and safe translated automatic intake fallback.
-- [ ] Remove webhook references, show data times, and verify real chat, limits and wrong-URL recovery in preview/published.
+- [x] Enforce validated UUID/1000-character/language input and atomic approved IP limits; 400 input checks and actual preview/published 16th-call 429 verified.
+- [x] Use saved webhook configuration, compact five-horizon risk/alerts context and safe translated automatic intake fallback; timeout and wrong-URL/restoration unit tests passed.
+- [x] Remove webhook references, add data-time rendering and verify translated automatic intake fallback in preview/published.
+- [ ] Verify a real grounded chat reply and data-time display: saved n8n webhook returns HTTP 200 with only myField, not an AI reply, even after owner updated it. Wrong-URL test covered helper configuration in isolated tests; live secret was not deliberately changed again.
 ## Historical collection
 - [x] Extend existing yearly statistics and add resumable, exclusive hourly collection progress.
 - [x] Add real selected-district annual discharge/rainfall charts with accurate source coverage labels.
