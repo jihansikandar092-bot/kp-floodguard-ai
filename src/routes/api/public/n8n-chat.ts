@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
+import { recordServiceHealth } from "@/lib/api/service-health.server";
 
 const N8N_CHAT_URL =
   "https://najiyawazir.app.n8n.cloud/webhook/811faed4-007c-4cac-a579-4881b0135999/chat";
@@ -32,10 +33,12 @@ export const Route = createFileRoute("/api/public/n8n-chat")({
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ action: "sendMessage", ...parsed.data }),
+            signal: AbortSignal.timeout(25000),
           });
           const raw = await res.text();
           if (!res.ok) {
-            console.error(`n8n chat failed [${res.status}]: ${raw}`);
+            console.error(`n8n chat failed [${res.status}]`);
+            await recordServiceHealth("n8n chat", false, `n8n chat returned HTTP ${res.status}`);
             return Response.json(
               { error: res.status === 404 ? "workflow_inactive" : "upstream_error" },
               { status: 502 },
@@ -48,10 +51,19 @@ export const Route = createFileRoute("/api/public/n8n-chat")({
             /* plain text reply */
           }
           const reply = extractReply(data);
-          if (!reply) return Response.json({ error: "empty_reply" }, { status: 502 });
+          if (!reply) {
+            await recordServiceHealth("n8n chat", false, "n8n chat returned no reply");
+            return Response.json({ error: "empty_reply" }, { status: 502 });
+          }
+          await recordServiceHealth("n8n chat", true);
           return Response.json({ reply });
         } catch (e) {
-          console.error("n8n chat network error", e);
+          console.error("n8n chat network error", e instanceof Error ? e.name : "Unknown error");
+          await recordServiceHealth(
+            "n8n chat",
+            false,
+            "n8n chat network request failed or timed out",
+          );
           return Response.json({ error: "network_error" }, { status: 502 });
         }
       },

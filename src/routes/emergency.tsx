@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AlertTriangle, Bot, CheckCircle2, Phone } from "lucide-react";
 import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { DemoBadge, PageHeader } from "@/components/site/Demo";
+import { PageHeader } from "@/components/site/Status";
 import { EmergencyForm, type SubmittedRequest } from "@/components/emergency/EmergencyForm";
 import { openAssistant } from "@/lib/assistant/events";
 import { formatPkt } from "@/lib/request-display";
@@ -122,7 +123,7 @@ function Confirmation({ request, onReset }: { request: SubmittedRequest; onReset
         </div>
       </div>
 
-      <div className="mt-6 flex gap-3 rounded-lg border border-demo-foreground/20 bg-demo p-4 text-sm text-demo-foreground">
+      <div className="mt-6 flex gap-3 rounded-lg border border-notice-foreground/20 bg-notice p-4 text-sm text-notice-foreground">
         <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden />
         <p>
           In a life-threatening emergency call Rescue 1122 immediately. This request is recorded for
@@ -149,7 +150,9 @@ function Confirmation({ request, onReset }: { request: SubmittedRequest; onReset
         <Button variant="outline" onClick={onReset}>
           Submit another request
         </Button>
-        <DemoBadge className="ml-auto" label="STATUS: PENDING REVIEW" />
+        <Badge className="ml-auto" variant="pending">
+          Pending review
+        </Badge>
       </div>
     </div>
   );

@@ -8,7 +8,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { KPMap, MapLegend } from "@/components/map/KPMap";
 import { DistrictDetail } from "@/components/map/DistrictDetail";
-import { DemoBanner, PageHeader } from "@/components/site/Demo";
+import { SafetyNotice, PageHeader } from "@/components/site/Status";
 import { districtListOptions } from "@/lib/api/district-query";
 import { riskAssessmentOptions } from "@/lib/risk/risk-query";
 import { RISK_COLOR_VAR } from "@/lib/data/districts";
@@ -72,7 +72,7 @@ function MapPage() {
             Fetching selected district directly from Open-Meteo…
           </p>
         )}
-        <DemoBanner>{RISK_DISCLAIMER}</DemoBanner>
+        <SafetyNotice>{RISK_DISCLAIMER}</SafetyNotice>
         <div className="flex flex-wrap items-center gap-3">
           <label htmlFor="map-horizon" className="text-sm font-bold">
             Risk horizon

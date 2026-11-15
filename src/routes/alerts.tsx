@@ -3,7 +3,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { alertsOptions } from "@/lib/alerts/alerts-query";
 import { districtListOptions } from "@/lib/api/district-query";
 import { AlertsPanel } from "@/components/dashboard/AlertsPanel";
-import { PageHeader } from "@/components/site/Demo";
+import { PageHeader } from "@/components/site/Status";
 export const Route = createFileRoute("/alerts")({
   loader: async ({ context }) => {
     await Promise.all([

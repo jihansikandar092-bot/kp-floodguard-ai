@@ -7,6 +7,7 @@ import {
   retryingMonitoringFetch,
   startOfUtcDay,
 } from "./snapshot-rules";
+import { checkStoredServices } from "./service-health.server";
 
 export async function readMonitoringSnapshots(): Promise<LiveMonitoring> {
   const client = publicDbClient();
@@ -50,6 +51,7 @@ export async function readMonitoringSnapshots(): Promise<LiveMonitoring> {
 // Called only by the authenticated scheduler, never by page reads.
 export async function refreshMonitoringSnapshots(triggerSource: "schedule" | "manual") {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  await checkStoredServices();
   const startedAt = new Date().toISOString();
   const { data: run, error: startError } = await supabaseAdmin
     .from("monitoring_runs")
@@ -126,11 +128,24 @@ export async function refreshMonitoringSnapshots(triggerSource: "schedule" | "ma
       const success = latest.districts.some((d) =>
         service === "Open-Meteo" ? d.weather : d.flood,
       );
+      const failure =
+        diagnostic?.error ||
+        latest.districts.some((d) => (service === "Open-Meteo" ? d.weatherError : d.floodError));
+      const successfulAt = latest.districts
+        .flatMap((d) => {
+          const time = service === "Open-Meteo" ? d.weatherUpdatedAt : d.floodUpdatedAt;
+          return time ? [time] : [];
+        })
+        .sort()
+        .at(-1);
       return {
         service,
-        ...(success ? { last_success_at: finishedAt } : {}),
-        ...(diagnostic?.error
-          ? { last_error_at: finishedAt, last_error_text: diagnostic.error }
+        ...(success && successfulAt ? { last_success_at: successfulAt } : {}),
+        ...(failure
+          ? {
+              last_error_at: finishedAt,
+              last_error_text: `${service} monitoring request failed${diagnostic?.status ? ` (HTTP ${diagnostic.status})` : ""}; last-good readings retained.`,
+            }
           : {}),
       };
     });

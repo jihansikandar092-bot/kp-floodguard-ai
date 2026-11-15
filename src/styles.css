@@ -64,8 +64,8 @@
   --color-risk-high: var(--risk-high);
   --color-risk-high-soft: var(--risk-high-soft);
   --color-water: var(--water);
-  --color-demo: var(--demo);
-  --color-demo-foreground: var(--demo-foreground);
+  --color-notice: var(--notice);
+  --color-notice-foreground: var(--notice-foreground);
 
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
@@ -132,8 +132,8 @@
   --risk-high-soft: oklch(0.95 0.035 25);
 
   --water: oklch(0.62 0.12 235);
-  --demo: oklch(0.93 0.07 90);
-  --demo-foreground: oklch(0.38 0.08 70);
+  --notice: oklch(0.93 0.07 90);
+  --notice-foreground: oklch(0.38 0.08 70);
 
   --chart-1: oklch(0.3 0.085 262);
   --chart-2: oklch(0.62 0.12 235);

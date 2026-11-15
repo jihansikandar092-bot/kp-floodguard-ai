@@ -79,31 +79,6 @@ export function RiverChart({ data }: { data: { day: string; discharge: number | 
   );
 }
 
-export function HistoricalChart({ data }: { data: { year: string; events: number }[] }) {
-  return (
-    <ResponsiveContainer width="100%" height="100%">
-      <BarChart data={data} margin={{ top: 8, right: 8, left: -24, bottom: 0 }}>
-        <CartesianGrid stroke="var(--border)" vertical={false} />
-        <XAxis dataKey="year" {...axis} interval={1} />
-        <YAxis {...axis} allowDecimals={false} />
-        <Tooltip
-          {...tooltipStyle}
-          cursor={{ fill: "var(--muted)" }}
-          formatter={(v: number) => [v, "Flood events (illustrative)"]}
-        />
-        <Bar dataKey="events" radius={[4, 4, 0, 0]}>
-          {data.map((d) => (
-            <Cell
-              key={d.year}
-              fill={d.year === "2010" || d.year === "2022" ? "var(--emergency)" : "var(--navy)"}
-            />
-          ))}
-        </Bar>
-      </BarChart>
-    </ResponsiveContainer>
-  );
-}
-
 export function RiskComparisonChart({
   data,
   highlightId,

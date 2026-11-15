@@ -1,18 +1,9 @@
 import { Info } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import type { RiskLevel } from "@/lib/data/districts";
-import { RISK_LABEL } from "@/lib/data/districts";
+import { RISK_LABEL, type RiskLevel } from "@/lib/data/districts";
 
-export function DemoBadge({ className, label = "DEMO" }: { className?: string; label?: string }) {
-  return (
-    <Badge variant="demo" className={cn("text-[0.62rem]", className)}>
-      {label}
-    </Badge>
-  );
-}
-
-export function DemoBanner({
+export function SafetyNotice({
   children,
   className,
 }: {
@@ -23,7 +14,7 @@ export function DemoBanner({
     <div
       role="note"
       className={cn(
-        "flex items-start gap-3 rounded-lg border border-demo-foreground/20 bg-demo px-4 py-3 text-sm text-demo-foreground",
+        "flex items-start gap-3 rounded-lg border border-notice-foreground/20 bg-notice px-4 py-3 text-sm text-notice-foreground",
         className,
       )}
     >
@@ -32,7 +23,6 @@ export function DemoBanner({
     </div>
   );
 }
-
 export function RiskBadge({ level, className }: { level: RiskLevel; className?: string }) {
   return (
     <Badge variant={level} className={cn("gap-1.5", className)}>
@@ -45,7 +35,6 @@ export function RiskBadge({ level, className }: { level: RiskLevel; className?: 
     </Badge>
   );
 }
-
 export function PageHeader({
   eyebrow,
   title,

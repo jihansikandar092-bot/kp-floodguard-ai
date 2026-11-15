@@ -1,4 +1,4 @@
-import { Bot, Mic, Phone, RotateCcw, Send, X } from "lucide-react";
+import { Bot, Phone, RotateCcw, Send, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -38,7 +38,6 @@ const UI = {
     statusAi: "AI Chat · FloodGuard AI agent",
     danger: "Life in danger? Call Rescue 1122 now.",
     placeholder: "Type your message…",
-    mic: "Voice assistance (Retell AI) — coming soon",
     send: "Send",
     reset: "Start over",
     summaryTitle: "Request summary",
@@ -52,7 +51,6 @@ const UI = {
     statusAi: "AI چیٹ · FloodGuard AI ایجنٹ",
     danger: "جان کو خطرہ ہے؟ فوراً ریسکیو 1122 پر کال کریں۔",
     placeholder: "اپنا پیغام لکھیں…",
-    mic: "آواز کی سہولت (Retell AI) — جلد آ رہی ہے",
     send: "بھیجیں",
     reset: "دوبارہ شروع کریں",
     summaryTitle: "درخواست کا خلاصہ",
@@ -389,7 +387,7 @@ export function AssistantWidget() {
                     m.role === "user"
                       ? "rounded-br-sm bg-primary text-primary-foreground"
                       : "rounded-bl-sm border bg-card text-card-foreground",
-                    m.requestId && "border-demo-foreground/30 bg-demo text-demo-foreground",
+                    m.requestId && "border-notice-foreground/30 bg-notice text-notice-foreground",
                   )}
                 >
                   {m.text}
@@ -438,16 +436,6 @@ export function AssistantWidget() {
               handle(input);
             }}
           >
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span>
-                  <Button type="button" variant="outline" size="icon" disabled aria-label={ui.mic}>
-                    <Mic />
-                  </Button>
-                </span>
-              </TooltipTrigger>
-              <TooltipContent>{ui.mic}</TooltipContent>
-            </Tooltip>
             <label htmlFor="assistant-input" className="sr-only">
               {ui.placeholder}
             </label>

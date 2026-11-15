@@ -5,7 +5,7 @@ import { rainfall24h, todayDischarge, type LiveDistrict } from "@/lib/api/live-d
 
 import type { District } from "@/lib/data/districts";
 import type { StoredRiskAssessment } from "@/lib/risk/types";
-import { RiskBadge } from "@/components/site/Demo";
+import { RiskBadge } from "@/components/site/Status";
 import { WhyRisk } from "@/components/risk/RiskExplain";
 import { PartialScoreNote } from "@/components/risk/PartialScoreNote";
 

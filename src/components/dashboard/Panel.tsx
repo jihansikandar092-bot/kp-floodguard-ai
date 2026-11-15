@@ -1,6 +1,5 @@
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { DemoBadge } from "@/components/site/Demo";
 
 export function Panel({
   title,
@@ -38,7 +37,6 @@ export function StatCard({
   unit,
   hint,
   tone = "navy",
-  demo = false,
 }: {
   icon: LucideIcon;
   label: string;
@@ -46,7 +44,6 @@ export function StatCard({
   unit?: string;
   hint?: string;
   tone?: "navy" | "water" | "emergency";
-  demo?: boolean;
 }) {
   const toneClass = {
     navy: "bg-secondary text-primary",
@@ -59,7 +56,6 @@ export function StatCard({
         <span className={cn("grid size-9 place-items-center rounded-lg", toneClass)}>
           <Icon className="size-4.5" aria-hidden />
         </span>
-        {demo && <DemoBadge />}
       </div>
       <p className="mt-4 text-xs font-medium text-muted-foreground">{label}</p>
       <p className="mt-1 font-mono text-xl font-bold break-words ">

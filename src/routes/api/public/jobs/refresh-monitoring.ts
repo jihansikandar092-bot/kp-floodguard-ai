@@ -14,10 +14,15 @@ export const Route = createFileRoute("/api/public/jobs/refresh-monitoring")({
               .object({ kind: z.literal("monitoring"), trigger: z.literal("manual").optional() })
               .strict(),
             z.object({ kind: z.literal("risk") }).strict(),
+            z.object({ kind: z.literal("health") }).strict(),
           ])
           .safeParse(await request.json().catch(() => null));
         if (!body.success)
           return Response.json({ error: "Invalid schedule payload" }, { status: 400 });
+        if (body.data.kind === "health") {
+          const { checkStoredServices } = await import("@/lib/api/service-health.server");
+          return Response.json(await checkStoredServices());
+        }
         // Operator-only: assess the currently stored snapshots without calling providers.
         if (body.data.kind === "risk") {
           const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
