@@ -136,3 +136,12 @@ export function districtLabel(
   if (!d) return fallback;
   return (lang === "ur" ? d.name_ur : lang === "ps" ? d.name_ps : null) ?? d.name_en;
 }
+
+/** The safety sentences repeated in every email footer, translated. */
+export function safetyNotice(lang: SubLanguage) {
+  if (lang === "ur")
+    return "یہ ماڈل شدہ پیشگوئیوں پر مبنی ایک تجرباتی اندازہ ہے، سرکاری وارننگ نہیں۔ ہنگامی صورت میں ریسکیو 1122 پر کال کریں۔ PDMA اور محکمہ موسمیات پاکستان کی ہدایات پر عمل کریں۔";
+  if (lang === "ps")
+    return "دا د ماډل شویو وړاندوینو پر بنسټ یو تجربوي اټکل دی، رسمي خبرداری نه دی. په بیړني حالت کې ریسکیو 1122 ته زنګ ووهئ. د PDMA او د پاکستان د هواپېژندنې ریاست لارښوونې تعقیب کړئ.";
+  return "This is an experimental estimate based on modelled forecasts, not an official warning. In an emergency call Rescue 1122. Follow PDMA and Pakistan Meteorological Department advisories.";
+}

@@ -4,6 +4,7 @@ import {
   districtLabel,
   eventKey,
   NOTIFY_CONFIG,
+  safetyNotice,
   TEST_PREFIX,
   type AlertRow,
   type DeliveryRow,
@@ -21,12 +22,7 @@ interface FullSub extends SubscriptionRow {
 const lang = (l: string): SubLanguage => (l === "ur" || l === "ps" ? l : "en");
 
 export function footerText(l: SubLanguage, unsubscribeToken: string) {
-  const unsub = `${SITE_URL}/unsubscribe?token=${unsubscribeToken}`;
-  const notice = alertMessage(l, "KP FloodGuard AI", "", 0, `${SITE_URL}/alerts`)
-    .split(": ")
-    .slice(1)
-    .join(": ");
-  return `${notice}\nUnsubscribe: ${unsub}`;
+  return `${safetyNotice(l)}\nUnsubscribe: ${SITE_URL}/unsubscribe?token=${unsubscribeToken}`;
 }
 
 async function deliver(sub: FullSub, subject: string, text: string, link: string) {
