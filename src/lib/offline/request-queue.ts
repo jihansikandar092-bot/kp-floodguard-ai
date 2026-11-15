@@ -106,5 +106,7 @@ export function flushQueue(
 /** True when a thrown submit error looks like a connectivity failure. */
 export function isNetworkFailure(e: unknown, online: boolean) {
   if (!online) return true;
-  return e instanceof TypeError || (e instanceof Error && /fetch|network|load failed/i.test(e.message));
+  return (
+    e instanceof TypeError || (e instanceof Error && /fetch|network|load failed/i.test(e.message))
+  );
 }

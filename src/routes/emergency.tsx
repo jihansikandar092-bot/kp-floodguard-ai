@@ -46,7 +46,12 @@ function EmergencyPage() {
     const last = o.sent.at(-1);
     if (last) {
       const { clientRequestId: _id, language: _l, isTest, ...values } = last.item.payload;
-      setSubmitted({ ...values, code: last.code, createdAt: last.createdAt, isTest: !!isTest } as SubmittedRequest);
+      setSubmitted({
+        ...values,
+        code: last.code,
+        createdAt: last.createdAt,
+        isTest: !!isTest,
+      } as SubmittedRequest);
     }
     if (o.rejected[0]) setRejected(o.rejected[0].message);
   }, []);
@@ -70,8 +75,8 @@ function EmergencyPage() {
             />
             {rejected && (
               <p role="alert" className="text-sm font-semibold text-emergency">
-                A saved request could not be accepted: {rejected} Please submit again or call
-                Rescue 1122.
+                A saved request could not be accepted: {rejected} Please submit again or call Rescue
+                1122.
               </p>
             )}
           </div>
