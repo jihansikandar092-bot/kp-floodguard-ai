@@ -43,7 +43,7 @@ describe("chat proxy recovery", () => {
     expect(await restored.json()).toMatchObject({ reply: "reply", fallback: false });
   });
   it("aborts provider calls at 20 seconds and falls back", async () => {
-    vi.useFakeTimers();
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
     let started = false;
     vi.stubGlobal(
       "fetch",
