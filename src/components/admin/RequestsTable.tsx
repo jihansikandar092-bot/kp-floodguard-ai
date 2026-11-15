@@ -417,7 +417,7 @@ function FilterSelect({
   options: { value: string; label: string }[];
 }) {
   return (
-    <Select value={value} onChange={onChange}>
+    <Select value={value} onValueChange={onChange}>
       <SelectTrigger aria-label={`Filter by ${label}`}>
         <SelectValue placeholder={label} />
       </SelectTrigger>
