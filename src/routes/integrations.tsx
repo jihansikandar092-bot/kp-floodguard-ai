@@ -69,8 +69,8 @@ function IntegrationsPage() {
                   </div>
                   <div>
                     <dt className="font-semibold">Last error</dt>
-                    <dd className="break-words">{health?.lastErrorText ?? "Not available"}</dd>
-                    <dd>{healthTime(health?.lastErrorAt)}</dd>
+                    <dd className="break-words">{health?.lastErrorText ?? "None recorded"}</dd>
+                    {health?.lastErrorAt && <dd>{healthTime(health.lastErrorAt)}</dd>}
                   </div>
                 </dl>
               </article>
