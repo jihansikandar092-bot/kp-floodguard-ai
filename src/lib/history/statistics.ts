@@ -17,7 +17,7 @@ export function annualStatistics(
 ) {
   if (dates.length !== values.length) throw new Error("Historical response length mismatch");
   const byDate = new Map(dates.map((d, i) => [d, values[i]]));
-  const result = [];
+  const result: { year: number; max_discharge_m3s?: number; annual_max_discharge?: number; max_rain_1d_mm?: number; max_rain_3d_mm?: number; total_rain_mm?: number }[] = [];
   for (let year = HISTORY_START_YEAR; year <= lastYear; year++) {
     const start = Date.UTC(year, 0, 1);
     const end = Date.UTC(year + 1, 0, 1);

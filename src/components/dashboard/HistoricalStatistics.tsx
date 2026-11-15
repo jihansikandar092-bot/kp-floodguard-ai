@@ -7,8 +7,8 @@ export function HistoricalStatistics({
   districtId,
   districtName,
 }: {
-  districtId?: string;
-  districtName?: string;
+  districtId?: string | undefined;
+  districtName?: string | undefined;
 }) {
   const { data } = useSuspenseQuery(historicalOptions());
   const rows = data.stats.filter((r) => r.district_id === districtId);
