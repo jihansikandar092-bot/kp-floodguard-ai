@@ -1,4 +1,8 @@
 # Live monitoring
+## Responsible AI and privacy
+- [ ] Add configuration-backed responsible-AI page with Urdu summary and honest privacy/retention disclosures.
+- [ ] Add footer and score links, submission consent line and source/update line.
+- [ ] Verify preview/published pages and links; retention period and operational deletion contact remain owner decisions.
 ## Southern and Merged coverage
 - [x] Preserve existing references: 22 total, 12 focus rows, ten approximate headquarters coordinates flagged for owner review.
 - [x] Add district search/group filtering, 12 map outlines and stored-risk landing focus section; preview and published checks pass, including Tank emergency/assistant choices.

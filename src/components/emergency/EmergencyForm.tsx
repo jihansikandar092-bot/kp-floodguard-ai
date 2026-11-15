@@ -27,6 +27,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Checkbox } from "@/components/ui/checkbox";
 import { submitEmergencyRequest } from "@/lib/api/requests.functions";
 import { useCoordinator } from "@/lib/api/use-coordinator";
+import { Link } from "@tanstack/react-router";
 
 export interface SubmittedRequest extends EmergencyRequestInput {
   code: string;
@@ -263,6 +264,7 @@ export function EmergencyForm({ onSubmitted }: { onSubmitted: (r: SubmittedReque
           Submit Emergency Request
         </Button>
       </div>
+      <p className="text-xs text-muted-foreground">By submitting, you agree that your details will be stored for authorised coordinators to review as described in <Link to="/responsible-ai" className="underline">Responsible AI & Privacy</Link>. AI never dispatches rescue.</p>
     </form>
   );
 }
