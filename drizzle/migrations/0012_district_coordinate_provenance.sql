@@ -1,0 +1,2 @@
+ALTER TABLE public.districts ADD COLUMN coordinates_approximate boolean NOT NULL DEFAULT false;
+COMMENT ON COLUMN public.districts.coordinates_approximate IS 'Approximate headquarters reference coordinates, not district boundaries or verified river gauge locations; owner review requested.';

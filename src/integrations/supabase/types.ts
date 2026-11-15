@@ -114,6 +114,7 @@ export type Database = {
       }
       districts: {
         Row: {
+          coordinates_approximate: boolean
           id: string
           is_ardc: boolean | null
           lat: number
@@ -125,6 +126,7 @@ export type Database = {
           slug: string
         }
         Insert: {
+          coordinates_approximate?: boolean
           id: string
           is_ardc?: boolean | null
           lat: number
@@ -136,6 +138,7 @@ export type Database = {
           slug: string
         }
         Update: {
+          coordinates_approximate?: boolean
           id?: string
           is_ardc?: boolean | null
           lat?: number
