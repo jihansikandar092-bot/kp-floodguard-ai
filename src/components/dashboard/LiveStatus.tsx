@@ -75,7 +75,6 @@ export function LiveStatus({ data, rows }: { data: LiveMonitoring; rows: LiveDis
       )}
       {hydrated && <RetainedDetails rows={retained} />}
       {unavailable && (
-       {unavailable && (
         <div className="rounded-md border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
           <p>
             Some live readings are temporarily unavailable for{" "}
@@ -94,7 +93,7 @@ export function LiveStatus({ data, rows }: { data: LiveMonitoring; rows: LiveDis
           )}
         </div>
       )}
- (
+      {rows.length > 1 && (
         <p className="text-xs text-muted-foreground">
           Averages include available districts only: weather {rows.filter((d) => d.weather).length}/
           {rows.length}; river discharge {rows.filter((d) => d.flood).length}/{rows.length}.
