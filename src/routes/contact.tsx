@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AlertTriangle, Phone } from "lucide-react";
-import { PageHeader } from "@/components/site/Demo";
+import { PageHeader } from "@/components/site/Status";
 import { DISCLAIMER } from "@/components/site/SiteFooter";
 
 export const Route = createFileRoute("/contact")({
@@ -74,8 +74,7 @@ function ContactPage() {
           <div className="rounded-xl border bg-card p-5 shadow-card">
             <h2 className="font-bold">Project team</h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              KP FloodGuard AI is a prototype developed for research and innovation-competition
-              demonstration. Project contact details will be published here.
+              Project contact details: Not available.
             </p>
           </div>
           <div

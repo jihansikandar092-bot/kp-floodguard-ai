@@ -7,7 +7,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { CloudRain, Droplets, MapPinned, Thermometer, Waves, Wind } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { DemoBanner, PageHeader } from "@/components/site/Demo";
+import { SafetyNotice, PageHeader } from "@/components/site/Status";
 import { Panel, StatCard } from "@/components/dashboard/Panel";
 import {
   RainfallChart,
@@ -107,7 +107,7 @@ function DashboardPage() {
             Fetching selected district directly from Open-Meteo…
           </p>
         )}
-        <DemoBanner>{RISK_DISCLAIMER}</DemoBanner>
+        <SafetyNotice>{RISK_DISCLAIMER}</SafetyNotice>
         <HowScoreWorks />
 
         <nav aria-label="District filter" className="flex flex-wrap gap-2">
@@ -128,14 +128,12 @@ function DashboardPage() {
         />
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
           <StatCard
-            demo={false}
             icon={MapPinned}
             label="Districts monitored"
             value={data.referenceCount ?? "Not available"}
             hint={`${data.districts.filter((d) => d.weather && d.flood).length} with both sources`}
           />
           <StatCard
-            demo={false}
             icon={CloudRain}
             label="Rainfall (past 24h)"
             value={t.rainfall24h ?? "Not available"}
@@ -144,7 +142,6 @@ function DashboardPage() {
             tone="water"
           />
           <StatCard
-            demo={false}
             icon={Waves}
             label="River discharge (today)"
             value={t.discharge ?? "Not available"}
@@ -153,21 +150,18 @@ function DashboardPage() {
             tone="water"
           />
           <StatCard
-            demo={false}
             icon={Thermometer}
             label="Temperature"
             value={t.temperature ?? "Not available"}
             unit="°C"
           />
           <StatCard
-            demo={false}
             icon={Droplets}
             label="Humidity"
             value={t.humidity ?? "Not available"}
             unit="%"
           />
           <StatCard
-            demo={false}
             icon={Wind}
             label="Wind speed"
             value={t.wind ?? "Not available"}

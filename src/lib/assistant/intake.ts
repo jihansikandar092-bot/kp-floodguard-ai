@@ -2,9 +2,7 @@
  * Guided emergency intake for the assistant widget.
  *
  * This is a deterministic, rule-based flow (keyword classification + one question
- * at a time). It is the placeholder for the OpenAI-powered chatbot: when that is
- * connected, `classifyEmergency` and step parsing can be replaced by model calls
- * while the UI and confirmation step stay the same.
+ * at a time), separate from the n8n natural-language chat mode.
  */
 import type { District } from "@/lib/data/districts";
 import {

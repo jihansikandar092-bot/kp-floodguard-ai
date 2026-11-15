@@ -4,7 +4,7 @@ import { LogOut, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { getCoordinatorStatus } from "@/lib/api/requests.functions";
-import { DemoBanner, PageHeader } from "@/components/site/Demo";
+import { SafetyNotice, PageHeader } from "@/components/site/Status";
 import { RequestsTable } from "@/components/admin/RequestsTable";
 
 export const Route = createFileRoute("/admin")({
@@ -79,7 +79,7 @@ function AdminPage() {
         description="Review incoming requests, filter by district, emergency type and status, and update progress."
       />
       <div className="container-page space-y-6 py-8">
-        <DemoBanner>
+        <SafetyNotice>
           <div className="flex items-start gap-2">
             <ShieldAlert className="mt-0.5 size-4 shrink-0 sm:hidden" aria-hidden />
             <p>
@@ -89,7 +89,7 @@ function AdminPage() {
               Rescue 1122.
             </p>
           </div>
-        </DemoBanner>
+        </SafetyNotice>
         <RequestsTable />
       </div>
     </>

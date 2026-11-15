@@ -156,7 +156,7 @@ export function EmergencyForm({ onSubmitted }: { onSubmitted: (r: SubmittedReque
             type="tel"
             inputMode="tel"
             autoComplete="tel"
-            placeholder="0300 1234567"
+            placeholder="Your mobile number"
             {...register("phone")}
             aria-invalid={!!errors.phone}
           />

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ArrowDown, CircleDashed, CircleCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { PageHeader } from "@/components/site/Demo";
+import { PageHeader } from "@/components/site/Status";
 import { INTEGRATIONS } from "@/lib/api/integrations";
 
 export const Route = createFileRoute("/integrations")({
