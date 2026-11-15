@@ -119,7 +119,8 @@ export const createSubscription = createServerFn({ method: "POST" })
       return {
         ok: false,
         error: "unavailable",
-        message: "The confirmation email could not be sent, so you are not subscribed. During the prototype only the project owner's address can receive email; please use browser notifications instead.",
+        message:
+          "The confirmation email could not be sent, so you are not subscribed. During the prototype only the project owner's address can receive email; please use browser notifications instead.",
       };
     }
     return { ok: true, channel: "email" };

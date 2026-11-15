@@ -102,7 +102,11 @@ export function LiveStatus({ data, rows }: { data: LiveMonitoring; rows: LiveDis
 }
 const STALE_MS = 3 * 60 * 60 * 1000;
 /** Collapsed list of retained readings that are older than 3 hours or have no timestamp. */
-export function RetainedDetails({ rows }: { rows: Pick<LiveDistrict, "id" | "retainedMetrics">[] }) {
+export function RetainedDetails({
+  rows,
+}: {
+  rows: Pick<LiveDistrict, "id" | "retainedMetrics">[];
+}) {
   const items = rows
     .map((d) => ({
       id: d.id,
