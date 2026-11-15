@@ -13,7 +13,9 @@ export const Route = createFileRoute("/api/public/jobs/refresh-monitoring")({
             z
               .object({ kind: z.literal("monitoring"), trigger: z.literal("manual").optional() })
               .strict(),
-            z.object({ kind: z.literal("risk"), supersedeDegenerate: z.boolean().optional() }).strict(),
+            z
+              .object({ kind: z.literal("risk"), supersedeDegenerate: z.boolean().optional() })
+              .strict(),
             z.object({ kind: z.literal("health") }).strict(),
             z.object({ kind: z.literal("notify") }).strict(),
           ])
@@ -33,7 +35,12 @@ export const Route = createFileRoute("/api/public/jobs/refresh-monitoring")({
         if (body.data.kind === "risk") {
           const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
           const { assessStoredSnapshots } = await import("@/lib/risk/assessments.server");
-          return Response.json({ assessed: await assessStoredSnapshots(supabaseAdmin, body.data.supersedeDegenerate === true) });
+          return Response.json({
+            assessed: await assessStoredSnapshots(
+              supabaseAdmin,
+              body.data.supersedeDegenerate === true,
+            ),
+          });
         }
         // The managed schedule sends only { kind }; operator calls add trigger: "manual".
         const trigger = ("trigger" in body.data && body.data.trigger) || "schedule";
