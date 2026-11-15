@@ -11,6 +11,9 @@ import { EmergencyForm, type SubmittedRequest } from "@/components/emergency/Eme
 import { openAssistant } from "@/lib/assistant/events";
 import { formatPkt } from "@/lib/request-display";
 import { EMERGENCY_TYPE_LABEL } from "@/lib/emergency";
+import { useSiteLanguage } from "@/lib/i18n/site-language";
+import { SITE_TEXT } from "@/lib/i18n/site-text";
+const SITE_EN_NOTE = SITE_TEXT.en.em.formNote;
 
 import { districtListOptions } from "@/lib/api/district-query";
 
@@ -56,13 +59,15 @@ function EmergencyPage() {
     if (o.rejected[0]) setRejected(o.rejected[0].message);
   }, []);
   const queue = useOfflineQueue(onSent);
+  const { t } = useSiteLanguage();
+  const e = t.em;
 
   return (
     <>
       <PageHeader
-        eyebrow="Emergency assistance"
-        title="Request Emergency Help"
-        description="Tell us what you need and where. Coordinators use these details to prioritise help."
+        eyebrow={e.eyebrow}
+        title={e.title}
+        description={e.desc}
       />
       <div className="container-page grid gap-8 py-8 lg:grid-cols-[1fr_340px]">
         <div className="rounded-xl border bg-card p-5 shadow-card sm:p-8">
@@ -80,6 +85,9 @@ function EmergencyPage() {
               </p>
             )}
           </div>
+          {!submitted && e.formNote !== SITE_EN_NOTE && (
+            <p className="mb-4 rounded-md bg-muted p-3 text-sm">{e.formNote}</p>
+          )}
           {submitted ? (
             <Confirmation request={submitted} onReset={() => setSubmitted(null)} />
           ) : (
@@ -99,32 +107,32 @@ function EmergencyPage() {
         <aside className="space-y-4">
           <div className="rounded-xl border-2 border-emergency bg-emergency-soft p-5">
             <div className="flex items-center gap-2 font-bold text-emergency">
-              <AlertTriangle className="size-5" aria-hidden /> In immediate danger?
+              <AlertTriangle className="size-5" aria-hidden /> {e.danger}
             </div>
             <p className="mt-2 text-sm text-muted-foreground">
-              Call official rescue services first. This prototype does not dispatch rescue teams.
+              {e.dangerText}
             </p>
             <div className="mt-4 grid gap-2">
               <Button asChild variant="emergency">
                 <a href="tel:1122">
-                  <Phone /> Call Rescue 1122
+                  <Phone /> {e.call}
                 </a>
               </Button>
               <Button asChild variant="outline">
                 <a href="tel:1700">
-                  <Phone /> PDMA KP helpline 1700
+                  <Phone /> {e.pdma}
                 </a>
               </Button>
             </div>
           </div>
           <div className="rounded-xl border bg-card p-5 shadow-card">
             <Bot className="size-6 text-primary" aria-hidden />
-            <h2 className="mt-3 font-bold">Prefer to chat?</h2>
+            <h2 className="mt-3 font-bold">{e.chat}</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              The assistant asks one question at a time, in English or Urdu.
+              {e.chatText}
             </p>
             <Button variant="outline" className="mt-4 w-full" onClick={openAssistant}>
-              Open Emergency Assistant
+              {e.openChat}
             </Button>
           </div>
         </aside>

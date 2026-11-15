@@ -4,23 +4,42 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Logo } from "./Logo";
+import { useSiteLanguage } from "@/lib/i18n/site-language";
+import type { SiteLang } from "@/lib/i18n/site-text";
 
 const NAV = [
-  { to: "/dashboard", label: "Dashboard" },
-  { to: "/map", label: "Flood Map" },
-  { to: "/alerts", label: "Alerts" },
-  { to: "/integrations", label: "Integrations" },
-  { to: "/contact", label: "Contact" },
+  { to: "/dashboard", key: "dashboard" },
+  { to: "/map", key: "map" },
+  { to: "/alerts", key: "alerts" },
+  { to: "/integrations", key: "integrations" },
+  { to: "/contact", key: "contact" },
 ] as const;
+
+function LanguageSelect({ className }: { className?: string }) {
+  const { lang, setLang, t } = useSiteLanguage();
+  return (
+    <select
+      aria-label={t.language}
+      value={lang}
+      onChange={(e) => setLang(e.target.value as SiteLang)}
+      className={"h-8 rounded-md border border-input bg-background px-2 text-sm text-foreground " + (className ?? "")}
+    >
+      <option value="en">English</option>
+      <option value="ur">اردو</option>
+      <option value="ps">پښتو</option>
+    </select>
+  );
+}
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const { t } = useSiteLanguage();
   return (
     <header className="sticky top-0 z-40">
       <div className="bg-navy-deep text-navy-foreground">
         <div className="container-page flex h-9 items-center justify-between gap-4 text-xs">
           <p className="hidden sm:block text-navy-muted">
-            Prototype platform · Not an official emergency service
+            {t.prototype}
           </p>
           <div className="flex items-center gap-4 ml-auto">
             <a
@@ -48,24 +67,25 @@ export function SiteHeader() {
                 className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground hover:bg-muted"
                 activeProps={{ className: "text-primary bg-secondary" }}
               >
-                {item.label}
+                {t.nav[item.key]}
               </Link>
             ))}
           </nav>
           <div className="flex items-center gap-2">
+            <LanguageSelect />
             <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex">
               <Link to="/login">
-                <LogIn /> Coordinator login
+                <LogIn /> {t.login}
               </Link>
             </Button>
             <Button asChild variant="emergency" className="hidden sm:inline-flex">
               <Link to="/emergency">
-                <Siren /> Request Help
+                <Siren /> {t.help}
               </Link>
             </Button>
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
-                <Button variant="outline" size="icon" className="lg:hidden" aria-label="Open menu">
+                <Button variant="outline" size="icon" className="lg:hidden" aria-label={t.menu}>
                   <Menu />
                 </Button>
               </SheetTrigger>
@@ -83,7 +103,7 @@ export function SiteHeader() {
                     activeOptions={{ exact: true }}
                     activeProps={{ className: "bg-secondary text-primary" }}
                   >
-                    Home
+                    {t.nav.home}
                   </Link>
                   {NAV.map((item) => (
                     <Link
@@ -93,7 +113,7 @@ export function SiteHeader() {
                       className="rounded-md px-3 py-2.5 font-medium hover:bg-muted"
                       activeProps={{ className: "bg-secondary text-primary" }}
                     >
-                      {item.label}
+                      {t.nav[item.key]}
                     </Link>
                   ))}
                   <Link
@@ -101,11 +121,11 @@ export function SiteHeader() {
                     onClick={() => setOpen(false)}
                     className="mt-2 inline-flex items-center gap-2 rounded-md px-3 py-2.5 font-medium hover:bg-muted"
                   >
-                    <LogIn className="size-4" aria-hidden /> Coordinator login
+                    <LogIn className="size-4" aria-hidden /> {t.login}
                   </Link>
                   <Button asChild variant="emergency" className="mt-4">
                     <Link to="/emergency" onClick={() => setOpen(false)}>
-                      <Siren /> Request Emergency Help
+                      <Siren /> {t.helpLong}
                     </Link>
                   </Button>
                 </nav>
