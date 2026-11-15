@@ -1,11 +1,19 @@
+// @vitest-environment node
 import { readFileSync } from "node:fs";
 import { PGlite } from "@electric-sql/pglite";
-import { describe, it, expect } from "vitest";
+import { afterAll, beforeAll, describe, it, expect } from "vitest";
+
+let db: PGlite;
+beforeAll(async () => {
+  db = new PGlite();
+  await db.waitReady;
+}, 20000);
+afterAll(async () => {
+  await db?.close();
+});
 
 describe("historical import database safety", () => {
   it("claims exclusively, respects spacing and 429 pause, skips complete districts, and denies public writes", async () => {
-    const db = new PGlite();
-    try {
       await db.exec(`CREATE ROLE anon; CREATE ROLE authenticated; CREATE ROLE service_role;
         CREATE TABLE public.districts(id text primary key);
         INSERT INTO public.districts VALUES('swat'),('bannu');
@@ -63,8 +71,5 @@ describe("historical import database safety", () => {
       await expect(
         db.query("select * from public.claim_historical_district(2010)"),
       ).rejects.toThrow(/permission denied/);
-    } finally {
-      await db.close();
-    }
   });
 });

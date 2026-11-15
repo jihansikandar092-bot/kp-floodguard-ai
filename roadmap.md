@@ -1,4 +1,9 @@
 # Live monitoring
+## Request follow-ups
+- [x] Mark the five retained requests as tests and restore 0005 to pending with a status event; delete nothing.
+- [x] Verify published tracking attempt 11 using a nonexistent code and remove only its temporary rate-limit records.
+- [ ] Mask CSV phones and verify preview/published exports.
+- [ ] Investigate parallel database tests, isolate database startup, and rerun the full parallel suite.
 ## Responsible AI and privacy
 - [x] Add configuration-backed responsible-AI page with Urdu RTL summary, eight sections, analytics/storage disclosures and future subscription privacy section.
 - [x] Add footer and score links, submission consent line and source/update line; links verified without adding requests.
