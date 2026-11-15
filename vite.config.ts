@@ -28,6 +28,8 @@ export default defineConfig({
       workbox: {
         globPatterns: ["**/*.{js,css,woff2,png,svg,ico,webmanifest}"],
         navigateFallback: null,
+        // The build emits browser files under client/, but they are served from the site root.
+        modifyURLPrefix: { "client/": "" },
         cleanupOutdatedCaches: true,
         runtimeCaching: [
           {
