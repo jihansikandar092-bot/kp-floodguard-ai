@@ -40,7 +40,8 @@ const TECHNICAL_DETAILS_LABEL: Record<RiskLanguage, string> = {
 
 export type AlertDisplayFields = {
   reason_text: string;
-  reason_templates?: Record<string, string> | null;
+  /** Stored as jsonb; read as a language -> text map when present. */
+  reason_templates?: unknown;
   resolved_at: string | null;
   type: string;
   horizon_hours: number | null;
@@ -79,7 +80,8 @@ export function stripWithdrawalNote(text: string, language: RiskLanguage = "en")
 
 /** Language-selected reason text with the withdrawal note removed. */
 export function displayReason(alert: AlertDisplayFields, language: RiskLanguage) {
-  const raw = alert.reason_templates?.[language] ?? alert.reason_text;
+  const templates = alert.reason_templates as Record<string, string> | null | undefined;
+  const raw = templates?.[language] ?? alert.reason_text;
   return stripWithdrawalNote(raw, language) || stripWithdrawalNote(alert.reason_text, "en");
 }
 
