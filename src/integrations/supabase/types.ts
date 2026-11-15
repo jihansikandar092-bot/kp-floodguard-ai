@@ -153,6 +153,7 @@ export type Database = {
       }
       emergency_requests: {
         Row: {
+          client_request_id: string | null
           created_at: string
           description: string
           district_id: string | null
@@ -170,6 +171,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          client_request_id?: string | null
           created_at?: string
           description: string
           district_id?: string | null
@@ -187,6 +189,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          client_request_id?: string | null
           created_at?: string
           description?: string
           district_id?: string | null
