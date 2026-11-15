@@ -1,3 +1,4 @@
+import { RetainedDetails } from "@/components/dashboard/LiveStatus";
 import { Link } from "@tanstack/react-router";
 import { CloudRain, Droplets, Gauge, Thermometer, Waves, Wind } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -76,17 +77,11 @@ export function DistrictDetail({
           {live?.weatherError ?? live?.floodError ?? "Data not available for this metric"}
         </p>
       )}
-      {live?.retainedMetrics?.length ? (
-        <p role="status" className="mt-2 text-xs text-muted-foreground">
-          Last good value kept for:{" "}
-          {live.retainedMetrics
-            .map(
-              (m) =>
-                `${m.metric}${m.since ? ` (from ${m.since.replace("T", " ").slice(0, 16)} UTC)` : ""}`,
-            )
-            .join(", ")}
-        </p>
-      ) : null}
+      {live && (
+        <div className="mt-2">
+          <RetainedDetails rows={[live]} />
+        </div>
+      )}
       {risk && <WhyRisk assessment={risk} />}
       <dl className="mt-4 grid grid-cols-2 gap-3">
         <Metric

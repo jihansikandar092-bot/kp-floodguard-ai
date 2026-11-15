@@ -28,6 +28,12 @@ export async function sendEmail(to: string, subject: string, body: string, foote
     body: JSON.stringify({ from, to: [to], subject, html, text: `${body}\n\n${footer}` }),
     signal: AbortSignal.timeout(10_000),
   });
+  const { recordServiceHealth } = await import("@/lib/api/service-health.server");
+  await recordServiceHealth(
+    "Email alerts",
+    res.ok,
+    `Email provider refused a send (HTTP ${res.status})`,
+  );
   if (!res.ok) {
     const text = (await res.text()).slice(0, 200).replace(/[\w.+-]+@[\w-]+\.[\w.]+/g, "[email]");
     throw new Error(`Email provider HTTP ${res.status}: ${text}`);
@@ -47,6 +53,11 @@ export async function sendPush(contact: string, title: string, body: string, url
     { subject, publicKey, privateKey },
   );
   const res = await fetch(sub.endpoint, { ...payload, signal: AbortSignal.timeout(10_000) });
+  // 4xx usually means one expired browser subscription, not a service failure.
+  if (res.ok || res.status >= 500) {
+    const { recordServiceHealth } = await import("@/lib/api/service-health.server");
+    await recordServiceHealth("Web push", res.ok, `Push service error (HTTP ${res.status})`);
+  }
   if (!res.ok) throw new Error(`Push service HTTP ${res.status}`);
   return res.status;
 }

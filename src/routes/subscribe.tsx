@@ -221,6 +221,10 @@ function SubscribePage() {
                     <p className="text-xs text-muted-foreground">
                       We email a confirmation link first. Nothing is sent until you confirm.
                     </p>
+                    <p className="rounded-md border bg-muted p-2 text-xs text-foreground">
+                      During the prototype, email delivery works only for the project owner&apos;s
+                      address. Browser notifications work for everyone.
+                    </p>
                   </div>
                 ) : (
                   <p className="text-xs text-muted-foreground">

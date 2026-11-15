@@ -88,7 +88,7 @@ const FEATURES = [
   {
     icon: Bot,
     title: "AI emergency chat assistant",
-    text: "Guided help in English and Urdu, with Pashto planned.",
+    text: "Guided help in English, Urdu and Pashto.",
   },
   {
     icon: Users,
@@ -295,7 +295,7 @@ function Index() {
             <ul className="mt-8 grid gap-3 sm:grid-cols-2">
               {[
                 "Built for KP's districts and rivers",
-                "Bilingual: English and Urdu",
+                "Alerts, risk explanations and the emergency assistant are available in English, Urdu and Pashto. Full-site translation is planned.",
                 "Coordinator-ready request tracking",
                 "Modular, API-ready architecture",
               ].map((t) => (

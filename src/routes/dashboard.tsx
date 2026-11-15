@@ -78,7 +78,14 @@ function DashboardPage() {
   const { data: districts } = useSuspenseQuery(districtListOptions());
   const scopedDistricts = districts.filter((d) => !group || d.isArdc);
   const visibleDistricts = filterDistricts(districts, search, Boolean(group));
-  const snap = { district: districts.find((d) => d.id === searchId) };
+  const { data: risks } = useSuspenseQuery(riskAssessmentOptions());
+  // Without a chosen district, preselect the highest current risk so outlook and history show.
+  const defaultId = searchId
+    ? undefined
+    : risks
+        .filter((r) => r.horizonHours === 0 && scopedDistricts.some((d) => d.id === r.districtId))
+        .sort((a, b) => b.score - a.score)[0]?.districtId;
+  const snap = { district: districts.find((d) => d.id === (searchId ?? defaultId)) };
   const districtId = snap.district?.id;
   const { data: storedData } = useSuspenseQuery(liveMonitoringOptions());
   const { data: allData, fallbackLoading } = useMonitoringFallback(
@@ -92,7 +99,6 @@ function DashboardPage() {
   };
   const live = liveSnapshot(data, districtId);
   const t = live.totals;
-  const { data: risks } = useSuspenseQuery(riskAssessmentOptions());
   const riskRows = scopedDistricts
     .map((d) => ({ d, r: risks.find((r) => r.districtId === d.id && r.horizonHours === 0) }))
     .filter((x): x is { d: typeof x.d; r: NonNullable<typeof x.r> } => Boolean(x.r));

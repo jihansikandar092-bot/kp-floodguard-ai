@@ -24,11 +24,23 @@ export function LiveStatus({ data, rows }: { data: LiveMonitoring; rows: LiveDis
   return (
     <div className="space-y-2 border-b pb-4 text-sm">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="font-semibold">
-          Data sources and last update: Open-Meteo / GloFAS ·{" "}
+        <p className="text-xs text-muted-foreground">
+          <span
+            data-freshness={fresh.level}
+            className={cn(
+              "mr-1.5 inline-flex rounded-full border px-2 py-0.5 text-[11px] font-semibold",
+              fresh.level === "live" && "border-primary/30 text-primary",
+              fresh.level === "delayed" && "border-border text-foreground",
+              fresh.level === "outdated" && "border-emergency text-emergency",
+            )}
+          >
+            {fresh.label}
+          </span>
+          <span className="font-semibold text-foreground">Open-Meteo / GloFAS</span> · Last updated{" "}
           {data.fetchedAt
-            ? `${data.fetchedAt.replace("T", " ").slice(0, 19)} UTC`
-            : "Not available"}
+            ? `${data.fetchedAt.replace("T", " ").slice(0, 16)} UTC (${minutes(data.fetchedAt)} min ago)`
+            : "Not available"}{" "}
+          · Modelled data, not gauge measurements.
         </p>
         <Button
           variant="outline"
@@ -38,25 +50,6 @@ export function LiveStatus({ data, rows }: { data: LiveMonitoring; rows: LiveDis
           <RefreshCw className="size-3.5" /> Refresh
         </Button>
       </div>
-      <p className="text-xs text-muted-foreground">
-        Last updated:{" "}
-        {data.fetchedAt ? `${data.fetchedAt.replace("T", " ").slice(0, 19)} UTC` : "Not available"}{" "}
-        <span
-          data-freshness={fresh.level}
-          className={cn(
-            "ml-1 inline-flex rounded-full border px-2 py-0.5 text-[11px] font-semibold",
-            fresh.level === "live" && "border-primary/30 text-primary",
-            fresh.level === "delayed" && "border-border text-foreground",
-            fresh.level === "outdated" && "border-emergency text-emergency",
-          )}
-        >
-          {fresh.label}
-        </span>{" "}
-        · Modelled weather and river discharge, not gauge measurements.
-      </p>
-      <p className="text-xs text-muted-foreground">
-        {data.fetchedAt ? `Data updated ${minutes(data.fetchedAt)} minutes ago` : "Not available"}
-      </p>
       {fresh.level === "outdated" && (
         <p role="alert" className="text-emergency">
           Outdated: newest stored reading is older than 3 hours. After 6 hours the selected district
@@ -80,19 +73,7 @@ export function LiveStatus({ data, rows }: { data: LiveMonitoring; rows: LiveDis
           unchanged.
         </p>
       )}
-      {retained.length > 0 && (
-        <div role="status" className="space-y-0.5 text-xs text-muted-foreground">
-          <p className="font-medium text-foreground">Last good value kept for:</p>
-          {retained.map((d) => (
-            <p key={d.id}>
-              {d.id}:{" "}
-              {d.retainedMetrics
-                ?.map((m) => `${m.metric}${m.since ? ` (${minutes(m.since)} min old)` : ""}`)
-                .join(", ")}
-            </p>
-          ))}
-        </div>
-      )}
+      {hydrated && <RetainedDetails rows={retained} />}
       {unavailable && (
         <div role="alert" className="space-y-1 text-emergency">
           <p>
@@ -117,6 +98,42 @@ export function LiveStatus({ data, rows }: { data: LiveMonitoring; rows: LiveDis
         </p>
       )}
     </div>
+  );
+}
+const STALE_MS = 3 * 60 * 60 * 1000;
+/** Collapsed list of retained readings that are older than 3 hours or have no timestamp. */
+export function RetainedDetails({
+  rows,
+}: {
+  rows: Pick<LiveDistrict, "id" | "retainedMetrics">[];
+}) {
+  const items = rows
+    .map((d) => ({
+      id: d.id,
+      metrics: (d.retainedMetrics ?? []).filter(
+        (m) => !m.since || Date.now() - Date.parse(m.since) > STALE_MS,
+      ),
+    }))
+    .filter((d) => d.metrics.length > 0);
+  if (!items.length) return null;
+  return (
+    <details className="text-xs text-foreground">
+      <summary className="cursor-pointer font-medium">Retained readings (details)</summary>
+      <ul className="mt-1 space-y-0.5 pl-4">
+        {items.map((d) => (
+          <li key={d.id}>
+            {d.id}:{" "}
+            {d.metrics
+              .map((m) =>
+                m.since
+                  ? `${m.metric} (from ${m.since.replace("T", " ").slice(0, 16)} UTC)`
+                  : `${m.metric} (missing)`,
+              )
+              .join(", ")}
+          </li>
+        ))}
+      </ul>
+    </details>
   );
 }
 export function MonitoringError() {

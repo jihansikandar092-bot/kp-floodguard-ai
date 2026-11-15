@@ -27,5 +27,16 @@ export const INTEGRATIONS = [
     purpose:
       "Hourly collection of annual GloFAS discharge and ERA5 rainfall statistics, with saved progress and rate-limit pauses.",
   },
+  {
+    service: "Email alerts",
+    name: "Email alerts",
+    purpose:
+      "Confirmation and alert emails via Resend. Resend test sender, reaches the project owner only.",
+  },
+  {
+    service: "Web push",
+    name: "Web push",
+    purpose: "Browser notifications for subscribed citizens through their browser's push service.",
+  },
 ] as const;
 export const PLANNED_SERVICES = ["Retell AI", "SMS", "ML model"] as const;
