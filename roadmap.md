@@ -1,4 +1,9 @@
 # Live monitoring
+## Responsible AI and privacy
+- [x] Add configuration-backed responsible-AI page with Urdu RTL summary, eight sections, analytics/storage disclosures and future subscription privacy section.
+- [x] Add footer and score links, submission consent line and source/update line; links verified without adding requests.
+- [x] Verify preview/published page HTTP 200, footer/score/consent/contact links, live configuration values and mobile overflow; 89 tests and lint pass, automatic build OK. Separate type-check output unavailable.
+- [ ] Fixed retention policy and operational deletion contact: owner has not supplied a retention period or project contact address; page explicitly discloses both gaps rather than inventing them.
 ## Southern and Merged coverage
 - [x] Preserve existing references: 22 total, 12 focus rows, ten approximate headquarters coordinates flagged for owner review.
 - [x] Add district search/group filtering, 12 map outlines and stored-risk landing focus section; preview and published checks pass, including Tank emergency/assistant choices.

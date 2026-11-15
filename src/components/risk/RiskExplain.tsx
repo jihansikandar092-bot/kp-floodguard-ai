@@ -3,6 +3,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { FACTOR_LABEL, RISK_CONFIG, type FactorKey } from "@/lib/risk/engine";
 import type { StoredRiskAssessment } from "@/lib/risk/types";
 import { PartialScoreNote } from "./PartialScoreNote";
+import { Link } from "@tanstack/react-router";
 
 export const RISK_DISCLAIMER =
   "System-generated from modelled weather and river data. Experimental estimate, not an official warning.";
@@ -39,6 +40,9 @@ export function WhyRisk({ assessment }: { assessment: StoredRiskAssessment }) {
         {utc(assessment.computedAt)} from stored Open-Meteo / GloFAS snapshot. {RISK_DISCLAIMER}
       </p>
       <PartialScoreNote availableFactors={assessment.availableFactors} />
+      <Link to="/responsible-ai" className="mt-2 block text-xs underline">
+        Responsible AI & Privacy
+      </Link>
     </section>
   );
 }

@@ -31,6 +31,7 @@ export function SiteFooter() {
             </FooterLink>
             <FooterLink to="/dashboard">Flood Dashboard</FooterLink>
             <FooterLink to="/map">Interactive Map</FooterLink>
+            <FooterLink to="/responsible-ai">Responsible AI & Privacy</FooterLink>
           </FooterCol>
 
           <FooterCol title="Assistance">
@@ -111,7 +112,15 @@ function FooterLink({
   hash,
   children,
 }: {
-  to: "/" | "/dashboard" | "/map" | "/emergency" | "/login" | "/integrations" | "/contact";
+  to:
+    | "/"
+    | "/dashboard"
+    | "/map"
+    | "/emergency"
+    | "/login"
+    | "/integrations"
+    | "/contact"
+    | "/responsible-ai";
   hash?: string | undefined;
   children: React.ReactNode;
 }) {

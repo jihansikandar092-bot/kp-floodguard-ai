@@ -15,6 +15,7 @@ import type { StoredRiskAssessment } from "@/lib/risk/types";
 import { RISK_DISCLAIMER } from "./RiskExplain";
 import { RISK_CONFIG } from "@/lib/risk/engine";
 import { PartialScoreNote } from "./PartialScoreNote";
+import { Link } from "@tanstack/react-router";
 
 export function RiskOutlook({
   risks,
@@ -69,6 +70,9 @@ export function RiskOutlook({
                       availableFactors={rows[i]?.availableFactors ?? 0}
                       language={language}
                     />
+                    <Link to="/responsible-ai" className="mt-1 block text-xs underline">
+                      Responsible AI & Privacy
+                    </Link>
                     <p className="mt-2 text-xs text-muted-foreground">
                       {rows[i]?.reasonTemplates[language] ?? rows[i]?.reasonText}
                     </p>
@@ -149,6 +153,9 @@ export function RiskOutlook({
         </>
       )}
       <p className="text-xs text-muted-foreground">{RISK_DISCLAIMER}</p>
+      <Link to="/responsible-ai" className="block text-xs underline">
+        Responsible AI & Privacy
+      </Link>
     </section>
   );
 }

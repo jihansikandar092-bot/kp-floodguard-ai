@@ -18,6 +18,7 @@ import { Route as EmergencyRouteImport } from './routes/emergency'
 import { Route as IntegrationsRouteImport } from './routes/integrations'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MapRouteImport } from './routes/map'
+import { Route as ResponsibleAiRouteImport } from './routes/responsible-ai'
 import { Route as ApiPublicMonitoringStatusRouteImport } from './routes/api/public/monitoring-status'
 import { Route as ApiPublicN8nChatRouteImport } from './routes/api/public/n8n-chat'
 import { Route as ApiPublicJobsCollectHistoryRouteImport } from './routes/api/public/jobs/collect-history'
@@ -68,6 +69,11 @@ const MapRoute = MapRouteImport.update({
   path: '/map',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResponsibleAiRoute = ResponsibleAiRouteImport.update({
+  id: '/responsible-ai',
+  path: '/responsible-ai',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicMonitoringStatusRoute =
   ApiPublicMonitoringStatusRouteImport.update({
     id: '/api/public/monitoring-status',
@@ -102,6 +108,7 @@ export interface FileRoutesByFullPath {
   '/integrations': typeof IntegrationsRoute
   '/login': typeof LoginRoute
   '/map': typeof MapRoute
+  '/responsible-ai': typeof ResponsibleAiRoute
   '/api/public/monitoring-status': typeof ApiPublicMonitoringStatusRoute
   '/api/public/n8n-chat': typeof ApiPublicN8nChatRoute
   '/api/public/jobs/collect-history': typeof ApiPublicJobsCollectHistoryRoute
@@ -117,6 +124,7 @@ export interface FileRoutesByTo {
   '/integrations': typeof IntegrationsRoute
   '/login': typeof LoginRoute
   '/map': typeof MapRoute
+  '/responsible-ai': typeof ResponsibleAiRoute
   '/api/public/monitoring-status': typeof ApiPublicMonitoringStatusRoute
   '/api/public/n8n-chat': typeof ApiPublicN8nChatRoute
   '/api/public/jobs/collect-history': typeof ApiPublicJobsCollectHistoryRoute
@@ -133,6 +141,7 @@ export interface FileRoutesById {
   '/integrations': typeof IntegrationsRoute
   '/login': typeof LoginRoute
   '/map': typeof MapRoute
+  '/responsible-ai': typeof ResponsibleAiRoute
   '/api/public/monitoring-status': typeof ApiPublicMonitoringStatusRoute
   '/api/public/n8n-chat': typeof ApiPublicN8nChatRoute
   '/api/public/jobs/collect-history': typeof ApiPublicJobsCollectHistoryRoute
@@ -150,6 +159,7 @@ export interface FileRouteTypes {
     | '/integrations'
     | '/login'
     | '/map'
+    | '/responsible-ai'
     | '/api/public/monitoring-status'
     | '/api/public/n8n-chat'
     | '/api/public/jobs/collect-history'
@@ -165,6 +175,7 @@ export interface FileRouteTypes {
     | '/integrations'
     | '/login'
     | '/map'
+    | '/responsible-ai'
     | '/api/public/monitoring-status'
     | '/api/public/n8n-chat'
     | '/api/public/jobs/collect-history'
@@ -180,6 +191,7 @@ export interface FileRouteTypes {
     | '/integrations'
     | '/login'
     | '/map'
+    | '/responsible-ai'
     | '/api/public/monitoring-status'
     | '/api/public/n8n-chat'
     | '/api/public/jobs/collect-history'
@@ -196,6 +208,7 @@ export interface RootRouteChildren {
   IntegrationsRoute: typeof IntegrationsRoute
   LoginRoute: typeof LoginRoute
   MapRoute: typeof MapRoute
+  ResponsibleAiRoute: typeof ResponsibleAiRoute
   ApiPublicMonitoringStatusRoute: typeof ApiPublicMonitoringStatusRoute
   ApiPublicN8nChatRoute: typeof ApiPublicN8nChatRoute
   ApiPublicJobsCollectHistoryRoute: typeof ApiPublicJobsCollectHistoryRoute
@@ -267,6 +280,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MapRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/responsible-ai': {
+      id: '/responsible-ai'
+      path: '/responsible-ai'
+      fullPath: '/responsible-ai'
+      preLoaderRoute: typeof ResponsibleAiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/monitoring-status': {
       id: '/api/public/monitoring-status'
       path: '/api/public/monitoring-status'
@@ -308,6 +328,7 @@ const rootRouteChildren: RootRouteChildren = {
   IntegrationsRoute: IntegrationsRoute,
   LoginRoute: LoginRoute,
   MapRoute: MapRoute,
+  ResponsibleAiRoute: ResponsibleAiRoute,
   ApiPublicMonitoringStatusRoute: ApiPublicMonitoringStatusRoute,
   ApiPublicN8nChatRoute: ApiPublicN8nChatRoute,
   ApiPublicJobsCollectHistoryRoute: ApiPublicJobsCollectHistoryRoute,
