@@ -20,13 +20,24 @@ afterEach(async () => {
 });
 
 async function assessment(level: string, minute: number, nowLevel = level, staleHours = 0) {
-  const stamp = new Date(Date.now() - 60000 * (20-minute) - staleHours*3600000).toISOString();
-  for (const h of [0,24,48,72,168]) await db.query("INSERT INTO public.risk_assessments(district_id,level,reason_text,computed_at,horizon_hours,snapshot_at) VALUES('test-district',$1,'Isolated test reason',$2,$3,$2)",[h === 0 ? nowLevel : level,stamp,h]);
-  return db.query("SELECT public.sync_predictive_alert('test-district',$1,72,3,2)",[stamp]);
+  const stamp = new Date(Date.now() - 60000 * (20 - minute) - staleHours * 3600000).toISOString();
+  for (const h of [0, 24, 48, 72, 168])
+    await db.query(
+      "INSERT INTO public.risk_assessments(district_id,level,reason_text,computed_at,horizon_hours,snapshot_at) VALUES('test-district',$1,'Isolated test reason',$2,$3,$2)",
+      [h === 0 ? nowLevel : level, stamp, h],
+    );
+  return db.query("SELECT public.sync_predictive_alert('test-district',$1,72,3,2)", [stamp]);
 }
 async function alerts() {
   return (
-    await db.query<{ id: string; level: string; resolved_at: Date | null; source: string; type: string; escalated_at: Date | null }>(
+    await db.query<{
+      id: string;
+      level: string;
+      resolved_at: Date | null;
+      source: string;
+      type: string;
+      escalated_at: Date | null;
+    }>(
       "SELECT id,level,resolved_at,source,type,escalated_at FROM public.alerts ORDER BY created_at",
     )
   ).rows;
@@ -37,7 +48,12 @@ describe("database system alert rules", () => {
     await assessment("low", 0);
     await assessment("medium", 1);
     expect(await alerts()).toHaveLength(1);
-    expect((await alerts())[0]).toMatchObject({level:'medium',type:'active',resolved_at:null,source:'system'});
+    expect((await alerts())[0]).toMatchObject({
+      level: "medium",
+      type: "active",
+      resolved_at: null,
+      source: "system",
+    });
   });
   it("does not duplicate an active alert on repeated Medium assessments", async () => {
     await assessment("medium", 0);
@@ -59,7 +75,7 @@ describe("database system alert rules", () => {
     await assessment("high", 0);
     await assessment("low", 1);
     expect((await alerts())[0]?.resolved_at).toBeNull();
-    await assessment('low',2);
+    await assessment("low", 2);
     expect((await alerts())[0]?.resolved_at).not.toBeNull();
   });
   it("allows a new alert after resolution", async () => {
@@ -86,7 +102,18 @@ describe("database system alert rules", () => {
     await assessment("medium", 1);
     expect(await alerts()).toHaveLength(0);
   });
-  it('creates an expected alert when only a future horizon is Medium',async()=>{await assessment('medium',0,'low');expect((await alerts())[0]).toMatchObject({level:'medium',type:'expected'});});
-  it('quietly de-escalates the same alert',async()=>{await assessment('high',0);const id=(await alerts())[0]?.id;await assessment('medium',1);expect((await alerts())[0]).toMatchObject({id,level:'medium',escalated_at:null});});
-  it('never creates alerts from a snapshot at least three hours old',async()=>{await assessment('high',0,'high',3);expect(await alerts()).toHaveLength(0);});
+  it("creates an expected alert when only a future horizon is Medium", async () => {
+    await assessment("medium", 0, "low");
+    expect((await alerts())[0]).toMatchObject({ level: "medium", type: "expected" });
+  });
+  it("quietly de-escalates the same alert", async () => {
+    await assessment("high", 0);
+    const id = (await alerts())[0]?.id;
+    await assessment("medium", 1);
+    expect((await alerts())[0]).toMatchObject({ id, level: "medium", escalated_at: null });
+  });
+  it("never creates alerts from a snapshot at least three hours old", async () => {
+    await assessment("high", 0, "high", 3);
+    expect(await alerts()).toHaveLength(0);
+  });
 });
