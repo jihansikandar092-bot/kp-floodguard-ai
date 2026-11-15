@@ -106,7 +106,7 @@ function MapPage() {
                 Marker size reflects rainfall (24h)
               </span>
             </div>
-            <div className="relative z-0 h-[460px] md:h-[600px]">
+            <div className="relative z-0 h-[min(460px,65svh)] min-h-[320px] md:h-[600px]">
               <KPMap
                 data={data}
                 risks={risks}

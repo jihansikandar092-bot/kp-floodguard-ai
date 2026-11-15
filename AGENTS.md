@@ -50,8 +50,8 @@ use the editor.
 - Store roles in a separate user_roles table and check them server-side with a security-definer has_role() function, never in client storage; this prevents privilege escalation and recursive role-policy checks.
 - District references (names, coordinates) load from the `districts` table via a shared district-list query; code only supplies tehsil/river labels by id, so the table stays the single source of monitored districts.
 - Focus membership and approximate-coordinate provenance also come from district reference rows; filters and outlines must never infer membership from names, preserving owner-reviewed coverage.
-- Freshness labels: under 1 h Live, 1–3 h Delayed (X h), over 3 h Outdated; only Outdated uses the emergency colour, so normal readings never look like warnings.
-- Snapshot merges retain last good values per metric and record them in retainedMetrics; monitoring_runs.trigger_source distinguishes schedule from manual runs (manual calls send trigger: "manual").
+- Freshness: <1 h Live, 1–3 h Delayed, >3 h Outdated (only Outdated is emergency-coloured).
+- Snapshot merges keep last good values per metric (retainedMetrics); monitoring_runs.trigger_source marks schedule vs manual.
 - Emergency requests are inserted only through a validated server function (per-IP hashed hourly limit, codes from a DB trigger); coordinator/admin roles gate reads and updates via has_role(), so citizen data never reaches the browser unauthenticated.
 - /admin is guarded client-side (ssr:false beforeLoad: getUser → /login, then server has_role via getCoordinatorStatus); public sign-up is disabled in auth settings, so coordinator accounts are created manually.
 - Risk levels come only from stored risk_assessments, computed by the rule engine in src/lib/risk (all weights/thresholds in RISK_CONFIG) right after each successful snapshot write; an ML model plugs in via model-api.ts with the rule engine as fallback, so displays stay explainable and reproducible.
@@ -61,3 +61,5 @@ use the editor.
 - Historical imports claim one district/source per bounded invocation with a database lease and minimum request spacing; persist each phase, pause on 429, and read charts only from stored annual statistics so visitors never initiate imports. Label post-July-2022 GloFAS data as archived forecasts, not reanalysis.
 - Chat uses server-only webhook configuration, atomic hashed-IP limits and compact stored five-horizon/alert context; include context in the Chat Trigger input so the existing n8n agent receives it, and fall back to translated guided intake without exposing internal errors.
 - Responsible-AI explanations reuse RISK_CONFIG and HORIZONS so displayed rules match the engine.
+- Service worker caches static files and the /emergency shell only, never API data.
+- Offline requests carry a client_request_id so resends store once.

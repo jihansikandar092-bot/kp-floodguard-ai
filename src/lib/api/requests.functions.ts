@@ -28,6 +28,17 @@ export const submitEmergencyRequest = createServerFn({ method: "POST" })
     const phone = normalizePkPhone(data.phone);
     if (!phone) return { ok: false, error: "invalid", message: "Enter a valid mobile number." };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const findExisting = async () => {
+      if (!data.clientRequestId) return null;
+      const { data: hit } = await supabaseAdmin
+        .from("emergency_requests")
+        .select("request_code, created_at")
+        .eq("client_request_id", data.clientRequestId)
+        .maybeSingle();
+      return hit ? { ok: true as const, code: hit.request_code, createdAt: hit.created_at } : null;
+    };
+    const already = await findExisting();
+    if (already) return already;
 
     const ip =
       getRequestHeader("cf-connecting-ip") ??
@@ -85,9 +96,14 @@ export const submitEmergencyRequest = createServerFn({ method: "POST" })
         description: data.description,
         language: data.language,
         is_test: isTest,
+        client_request_id: data.clientRequestId ?? null,
       })
       .select("request_code, created_at")
       .single();
+    if (error?.code === "23505") {
+      const dup = await findExisting();
+      if (dup) return dup;
+    }
     if (error || !row) {
       console.error("emergency request insert failed", error?.message);
       return {
