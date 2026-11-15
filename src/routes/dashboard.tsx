@@ -21,6 +21,7 @@ import { RISK_COLOR_VAR, RISK_LABEL } from "@/lib/data/districts";
 import { HowScoreWorks, RISK_DISCLAIMER } from "@/components/risk/RiskExplain";
 import { AlertsPanel } from "@/components/dashboard/AlertsPanel";
 import { alertsOptions } from "@/lib/alerts/alerts-query";
+import { RiskOutlook } from "@/components/risk/RiskOutlook";
 
 export const Route = createFileRoute("/dashboard")({
   validateSearch: (s: Record<string, unknown>): { district?: string | undefined } => {
@@ -69,7 +70,7 @@ function DashboardPage() {
   const t = live.totals;
   const { data: risks } = useSuspenseQuery(riskAssessmentOptions());
   const riskRows = districts
-    .map((d) => ({ d, r: risks.find((r) => r.districtId === d.id) }))
+    .map((d) => ({ d, r: risks.find((r) => r.districtId === d.id && r.horizonHours === 0) }))
     .filter((x): x is { d: typeof x.d; r: NonNullable<typeof x.r> } => Boolean(x.r));
   const distribution = (["low", "medium", "high"] as const)
     .map((level) => ({
@@ -120,6 +121,7 @@ function DashboardPage() {
           ))}
         </nav>
 
+        <RiskOutlook district={snap.district?.name} risks={risks.filter(r=>r.districtId===districtId)} />
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
           <StatCard
             demo={false}
