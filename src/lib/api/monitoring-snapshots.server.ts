@@ -128,11 +128,16 @@ export async function refreshMonitoringSnapshots(triggerSource: "schedule" | "ma
       const success = latest.districts.some((d) =>
         service === "Open-Meteo" ? d.weather : d.flood,
       );
+      const failure = diagnostic?.error || latest.districts.some((d) => service === "Open-Meteo" ? d.weatherError : d.floodError);
+      const successfulAt = latest.districts.flatMap(d => {
+        const time = service === "Open-Meteo" ? d.weatherUpdatedAt : d.floodUpdatedAt;
+        return time ? [time] : [];
+      }).sort().at(-1);
       return {
         service,
-        ...(success ? { last_success_at: finishedAt } : {}),
-        ...(diagnostic?.error
-          ? { last_error_at: finishedAt, last_error_text: diagnostic.error }
+        ...(success && successfulAt ? { last_success_at: successfulAt } : {}),
+        ...(failure
+          ? { last_error_at: finishedAt, last_error_text: `${service} monitoring request failed${diagnostic?.status ? ` (HTTP ${diagnostic.status})` : ""}; last-good readings retained.` }
           : {}),
       };
     });
