@@ -14,39 +14,86 @@ export type Database = {
   }
   public: {
     Tables: {
+      alert_run_state: {
+        Row: {
+          district_id: string
+          last_computed_at: string | null
+          last_snapshot_at: string | null
+          low_runs: number
+        }
+        Insert: {
+          district_id: string
+          last_computed_at?: string | null
+          last_snapshot_at?: string | null
+          low_runs?: number
+        }
+        Update: {
+          district_id?: string
+          last_computed_at?: string | null
+          last_snapshot_at?: string | null
+          low_runs?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alert_run_state_district_id_fkey"
+            columns: ["district_id"]
+            isOneToOne: true
+            referencedRelation: "districts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       alerts: {
         Row: {
           created_at: string
           district_id: string
+          escalated_at: string | null
+          expected_by: string | null
+          horizon_hours: number
           id: string
           level: string
+          reason_templates: Json
           reason_text: string
           resolved_at: string | null
           risk_assessment_id: string
           source: string
           title: string
+          type: string
+          updated_at: string
         }
         Insert: {
           created_at?: string
           district_id: string
+          escalated_at?: string | null
+          expected_by?: string | null
+          horizon_hours?: number
           id?: string
           level: string
+          reason_templates?: Json
           reason_text: string
           resolved_at?: string | null
           risk_assessment_id: string
           source?: string
           title: string
+          type?: string
+          updated_at?: string
         }
         Update: {
           created_at?: string
           district_id?: string
+          escalated_at?: string | null
+          expected_by?: string | null
+          horizon_hours?: number
           id?: string
           level?: string
+          reason_templates?: Json
           reason_text?: string
           resolved_at?: string | null
           risk_assessment_id?: string
           source?: string
           title?: string
+          type?: string
+          updated_at?: string
         }
         Relationships: [
           {
@@ -269,10 +316,13 @@ export type Database = {
           confidence: string
           district_id: string
           factors: Json
+          horizon_hours: number
           id: string
           level: string
+          reason_templates: Json
           reason_text: string
           score: number
+          snapshot_at: string | null
           snapshot_id: string | null
         }
         Insert: {
@@ -280,10 +330,13 @@ export type Database = {
           confidence: string
           district_id: string
           factors: Json
+          horizon_hours?: number
           id?: string
           level: string
+          reason_templates?: Json
           reason_text: string
           score: number
+          snapshot_at?: string | null
           snapshot_id?: string | null
         }
         Update: {
@@ -291,10 +344,13 @@ export type Database = {
           confidence?: string
           district_id?: string
           factors?: Json
+          horizon_hours?: number
           id?: string
           level?: string
+          reason_templates?: Json
           reason_text?: string
           score?: number
+          snapshot_at?: string | null
           snapshot_id?: string | null
         }
         Relationships: [
@@ -375,6 +431,16 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      sync_predictive_alert: {
+        Args: {
+          _computed_at: string
+          _district_id: string
+          _fresh_hours: number
+          _low_runs: number
+          _max_horizon: number
+        }
+        Returns: string
       }
     }
     Enums: {
