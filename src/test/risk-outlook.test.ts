@@ -48,6 +48,21 @@ describe("risk outlook horizons", () => {
     for (const h of HORIZONS)
       expect(assessOutlook({ ...input, historicalAnnualMax: [] }, h)?.confidence).toBe("Low");
   });
+  it("stores three available factors and preserves renormalisation when 168-hour rain is missing", () => {
+    if (!input.weather) throw new Error("weather fixture missing");
+    const r = assessOutlook({...input, weather: {...input.weather, hourly: {time: times.slice(0, 145), precipitation: times.slice(0, 145).map(() => 1)}}}, 168);
+    if (!r) throw new Error("assessment missing");
+    expect(r.availableFactors).toBe(3);
+    expect(r.factors.forecastRain72h.score).toBeNull();
+    expect(r.score).toBe(97.6); // (89×0.15 + 100×0.35 + 100×0.20) / 0.70
+    const reasons = translatedReasons(r, 168, true);
+    expect(reasons.en).toContain("Partial: based on 3 of 4 factors");
+    expect(reasons.ur).toContain("4 میں سے 3");
+    expect(reasons.ps).toContain("پر 3 ولاړ");
+  });
+  it("complete assessments store four available factors", () => {
+    expect(assessOutlook(input, 168)?.availableFactors).toBe(4);
+  });
   it("generates English, Urdu and Pashto horizon templates", () => {
     const r = assessOutlook(input, 48);
     if (!r) throw new Error("assessment missing");
