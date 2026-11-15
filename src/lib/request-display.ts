@@ -26,7 +26,7 @@ export function filterRequests(
       (f.district === "all" || r.district === f.district) &&
       (f.type === "all" || r.type === f.type) &&
       (f.status === "all" || r.status === f.status) &&
-      (f.language === "all" || r.language === r.language) &&
+      (f.language === "all" || r.language === f.language) &&
       (!f.hideTest || !r.isTest) &&
       (!q ||
         r.code.toLowerCase().includes(q) ||
