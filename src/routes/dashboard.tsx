@@ -30,9 +30,14 @@ import { Input } from "@/components/ui/input";
 import { filterDistricts } from "@/lib/data/district-filter";
 
 export const Route = createFileRoute("/dashboard")({
-  validateSearch: (s: Record<string, unknown>): { district?: string | undefined; group?: "southern-merged" | undefined } => {
+  validateSearch: (
+    s: Record<string, unknown>,
+  ): { district?: string | undefined; group?: "southern-merged" | undefined } => {
     const d = s["district"];
-    return { district: typeof d === "string" && /^[a-z0-9-]{1,40}$/.test(d) ? d : undefined, group: s["group"] === "southern-merged" ? "southern-merged" : undefined };
+    return {
+      district: typeof d === "string" && /^[a-z0-9-]{1,40}$/.test(d) ? d : undefined,
+      group: s["group"] === "southern-merged" ? "southern-merged" : undefined,
+    };
   },
   loader: async ({ context }) => {
     await Promise.all([
@@ -75,8 +80,15 @@ function DashboardPage() {
   const snap = { district: districts.find((d) => d.id === searchId) };
   const districtId = snap.district?.id;
   const { data: storedData } = useSuspenseQuery(liveMonitoringOptions());
-  const { data: allData, fallbackLoading } = useMonitoringFallback(storedData, districts, districtId);
-  const data = { ...allData, districts: allData.districts.filter((d) => scopedDistricts.some((ref) => ref.id === d.id)) };
+  const { data: allData, fallbackLoading } = useMonitoringFallback(
+    storedData,
+    districts,
+    districtId,
+  );
+  const data = {
+    ...allData,
+    districts: allData.districts.filter((d) => scopedDistricts.some((ref) => ref.id === d.id)),
+  };
   const live = liveSnapshot(data, districtId);
   const t = live.totals;
   const { data: risks } = useSuspenseQuery(riskAssessmentOptions());
@@ -94,7 +106,8 @@ function DashboardPage() {
     .map((x) => x.r.computedAt)
     .sort()
     .at(-1);
-  const scope = snap.district?.name ?? (group ? "Southern and Merged Districts" : "All monitored districts");
+  const scope =
+    snap.district?.name ?? (group ? "Southern and Merged Districts" : "All monitored districts");
 
   return (
     <>
@@ -120,10 +133,24 @@ function DashboardPage() {
         <SafetyNotice>{RISK_DISCLAIMER}</SafetyNotice>
         <HowScoreWorks />
 
-        <Input aria-label="Search districts" placeholder="Search districts" value={search} onChange={(event) => setSearch(event.target.value)} className="max-w-md" />
+        <Input
+          aria-label="Search districts"
+          placeholder="Search districts"
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          className="max-w-md"
+        />
         <nav aria-label="District filter" className="flex flex-wrap gap-2">
-          <FilterChip active={!districtId && !group} label="All districts" search={{ district: undefined }} />
-          <FilterChip active={Boolean(group) && !districtId} label="Southern and Merged Districts" search={{ district: undefined, group: "southern-merged" }} />
+          <FilterChip
+            active={!districtId && !group}
+            label="All districts"
+            search={{ district: undefined }}
+          />
+          <FilterChip
+            active={Boolean(group) && !districtId}
+            label="Southern and Merged Districts"
+            search={{ district: undefined, group: "southern-merged" }}
+          />
           {visibleDistricts.map((d) => (
             <FilterChip
               key={d.id}
@@ -133,9 +160,18 @@ function DashboardPage() {
             />
           ))}
         </nav>
-        {!visibleDistricts.length && <p className="text-sm text-muted-foreground">No matching districts</p>}
-        {snap.district?.coordinatesApproximate && <p className="text-xs text-muted-foreground">Approximate headquarters coordinates: {snap.district.lat}, {snap.district.lng}. Please review these coordinates.</p>}
-        {snap.district && !live.rows.some((d) => d.weather || d.flood) && <p role="status">Data not available yet</p>}
+        {!visibleDistricts.length && (
+          <p className="text-sm text-muted-foreground">No matching districts</p>
+        )}
+        {snap.district?.coordinatesApproximate && (
+          <p className="text-xs text-muted-foreground">
+            Approximate headquarters coordinates: {snap.district.lat}, {snap.district.lng}. Please
+            review these coordinates.
+          </p>
+        )}
+        {snap.district && !live.rows.some((d) => d.weather || d.flood) && (
+          <p role="status">Data not available yet</p>
+        )}
 
         <RiskOutlook
           district={snap.district?.name}

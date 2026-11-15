@@ -49,7 +49,11 @@ export default function KPMapLeaflet({
             center={[d.lat, d.lng]}
             radius={selected ? radius + 4 : radius}
             pathOptions={{
-              color: selected ? "var(--navy-deep)" : d.isArdc ? "var(--primary)" : "var(--background)",
+              color: selected
+                ? "var(--navy-deep)"
+                : d.isArdc
+                  ? "var(--primary)"
+                  : "var(--background)",
               weight: selected ? 4 : d.isArdc ? 3 : 2,
               dashArray: d.isArdc ? "3 2" : undefined,
               fillColor: risk ? RISK_COLOR_VAR[risk.level] : "var(--water)",
@@ -59,9 +63,24 @@ export default function KPMapLeaflet({
           >
             <Tooltip direction="top" offset={[0, -8]}>
               <strong>{d.name}</strong>
-              {d.isArdc && <><br />Southern and Merged Districts · outlined marker</>}
-              {d.coordinatesApproximate && <><br />Approximate headquarters coordinates — please review.</>}
-              {!live?.weather && !live?.flood && <><br />Data not available yet</>}
+              {d.isArdc && (
+                <>
+                  <br />
+                  Southern and Merged Districts · outlined marker
+                </>
+              )}
+              {d.coordinatesApproximate && (
+                <>
+                  <br />
+                  Approximate headquarters coordinates — please review.
+                </>
+              )}
+              {!live?.weather && !live?.flood && (
+                <>
+                  <br />
+                  Data not available yet
+                </>
+              )}
               <br />
               Rainfall (24h): {rain ?? "Not available"} mm
               <br />
