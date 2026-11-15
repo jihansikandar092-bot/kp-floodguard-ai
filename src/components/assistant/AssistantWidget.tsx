@@ -22,11 +22,15 @@ import { useServerFn } from "@tanstack/react-start";
 import { submitEmergencyRequest } from "@/lib/api/requests.functions";
 
 import { OPEN_ASSISTANT_EVENT } from "@/lib/assistant/events";
+import { chatFallback, chatDataLabel } from "@/lib/assistant/chat";
 
 interface ChatMessage extends BotMessage {
   id: number;
   role: "bot" | "user";
   requestId?: string;
+  dataTime?: string;
+  source?: string;
+  disclaimer?: string;
 }
 // Server-side relay to the n8n Chat Agent (avoids CORS, keeps the webhook off the client).
 const N8N_CHAT_PROXY = "/api/public/n8n-chat";
@@ -58,6 +62,19 @@ const UI = {
       `آپ کی درخواست ${id} کے طور پر درج ہو گئی ہے۔ یہ کوآرڈینیٹرز کے جائزے کے لیے درج ہے؛ اس سے امداد بھیجنے کی ضمانت نہیں ملتی۔ جان کو خطرہ ہو تو فوراً ریسکیو 1122 پر کال کریں۔`,
     newReq: "نئی درخواست شروع کریں",
   },
+  ps: {
+    title: "بیړنی مرستیال",
+    status: "د بیړنۍ غوښتنې لارښود",
+    statusAi: "AI Chat · FloodGuard AI",
+    danger: "ژوند په خطر کې دی؟ ریسکیو 1122 ته زنګ ووهئ.",
+    placeholder: "خپل پیغام ولیکئ…",
+    send: "ولېږئ",
+    reset: "بیا پیل",
+    summaryTitle: "د غوښتنې لنډیز",
+    saved: (id: string) =>
+      `ستاسو غوښتنه ${id} ثبت شوه. همغږي کوونکي به یې وګوري؛ دا د مرستې لېږلو ضمانت نه دی. په بیړني حالت کې ریسکیو 1122 ته زنګ ووهئ.`,
+    newReq: "نوې غوښتنه",
+  },
 } as const;
 
 const FIELD_LABELS = {
@@ -79,6 +96,16 @@ const FIELD_LABELS = {
     fullName: "نام",
     phone: "فون",
     peopleAffected: "افراد",
+    description: "تفصیل",
+  },
+  ps: {
+    type: "ډول",
+    district: "ولسوالۍ",
+    tehsil: "تحصیل",
+    location: "ځای",
+    fullName: "نوم",
+    phone: "موبایل",
+    peopleAffected: "کسان",
     description: "تفصیل",
   },
 } as const;
@@ -142,7 +169,9 @@ export function AssistantWidget() {
           text:
             lang === "ur"
               ? "السلام علیکم! میں FloodGuard AI ہوں۔ آپ سیلاب، موسم، پانی کی سطح یا حفاظتی اقدامات کے بارے میں پوچھ سکتے ہیں۔"
-              : "Hello! I am FloodGuard AI. Ask me about floods, weather, river levels, or safety guidance.",
+              : lang === "ps"
+                ? "السلام علیکم! زه FloodGuard AI یم. د سیلاب، موسم او خوندیتوب په اړه پوښتنه وکړئ."
+                : "Hello! I am FloodGuard AI. Ask me about floods, weather, river levels, or safety guidance.",
         },
       ]);
     } else {
@@ -166,31 +195,43 @@ export function AssistantWidget() {
         const response = await fetch(N8N_CHAT_PROXY, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ sessionId: sessionIdRef.current, chatInput: text }),
+          body: JSON.stringify({
+            sessionId: sessionIdRef.current,
+            chatInput: text,
+            language: lang,
+          }),
         });
         const data = (await response.json().catch(() => ({}))) as {
           reply?: string;
           error?: string;
+          fallback?: boolean;
+          dataTime?: string;
+          source?: string;
+          disclaimer?: string;
         };
-        if (!response.ok || !data.reply) throw new Error(data.error ?? "upstream_error");
-        push([{ role: "bot", text: data.reply }]);
-      } catch (error) {
-        console.error("AI Chat Error:", error);
-        const code = error instanceof Error ? error.message : "";
-        const inactive = code === "workflow_inactive";
+        if (data.reply) {
+          push([
+            {
+              role: "bot",
+              text: data.reply,
+              ...(data.dataTime ? { dataTime: data.dataTime } : {}),
+              ...(data.source ? { source: data.source } : {}),
+              ...(data.disclaimer ? { disclaimer: data.disclaimer } : {}),
+            },
+          ]);
+          if (data.fallback) {
+            setChatMode("intake");
+            push([{ role: "bot", ...promptFor(state.step, state, lang) }]);
+          }
+          return;
+        }
+        throw new Error("Chat unavailable");
+      } catch {
         push([
-          {
-            role: "bot",
-            text:
-              lang === "ur"
-                ? inactive
-                  ? "AI معاون اس وقت دستیاب نہیں ہے۔ براہ کرم بعد میں کوشش کریں۔ ہنگامی صورت میں فوراً 1122 پر کال کریں۔"
-                  : "معذرت، AI معاون سے رابطہ نہیں ہو سکا۔ دوبارہ کوشش کریں۔ ہنگامی صورت میں فوراً 1122 پر کال کریں۔"
-                : inactive
-                  ? "The AI assistant is currently unavailable. Please try again later. If anyone is in danger, call Rescue 1122 now."
-                  : "Sorry, I couldn't reach the AI assistant. Please try again. If anyone is in danger, call Rescue 1122 now.",
-          },
+          { role: "bot", text: chatFallback[lang] },
+          { role: "bot", ...promptFor(state.step, state, lang) },
         ]);
+        setChatMode("intake");
       } finally {
         setBusy(false);
       }
@@ -244,7 +285,7 @@ export function AssistantWidget() {
 
   const ui = UI[lang];
   const lastBotId = [...messages].reverse().find((m) => m.role === "bot")?.id;
-  const rtl = lang === "ur";
+  const rtl = lang !== "en";
 
   return (
     <TooltipProvider delayDuration={150}>
@@ -323,18 +364,9 @@ export function AssistantWidget() {
               <LangButton active={lang === "ur"} onClick={() => changeLang("ur")} lang="ur">
                 اردو
               </LangButton>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span className="flex-1">
-                    <LangButton active={false} disabled lang="ps">
-                      پښتو · soon
-                    </LangButton>
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent>
-                  Pashto support will be added with the AI language model.
-                </TooltipContent>
-              </Tooltip>
+              <LangButton active={lang === "ps"} onClick={() => changeLang("ps")} lang="ps">
+                پښتو
+              </LangButton>
             </div>
             <div className="mt-3 flex gap-2">
               <button
@@ -345,7 +377,7 @@ export function AssistantWidget() {
                   chatMode === "intake" ? "bg-white text-slate-900" : "bg-navy text-white",
                 )}
               >
-                {lang === "ur" ? "ہنگامی فارم" : "Emergency Form"}
+                {lang === "ur" ? "ہنگامی فارم" : lang === "ps" ? "بیړنۍ فورمه" : "Emergency Form"}
               </button>
               <button
                 type="button"
@@ -355,7 +387,7 @@ export function AssistantWidget() {
                   chatMode === "ai" ? "bg-white text-slate-900" : "bg-navy text-white",
                 )}
               >
-                {lang === "ur" ? "AI چیٹ" : "AI Chat"}
+                {lang === "ur" ? "AI چیٹ" : lang === "ps" ? "AI خبرې" : "AI Chat"}
               </button>
             </div>
           </header>
@@ -391,6 +423,15 @@ export function AssistantWidget() {
                   )}
                 >
                   {m.text}
+                  {m.dataTime && (
+                    <p className="mt-2 text-xs text-muted-foreground" dir={rtl ? "rtl" : "ltr"}>
+                      {chatDataLabel[lang]}: {m.dataTime.replace("T", " ").slice(0, 19)} UTC ·{" "}
+                      {m.source}
+                    </p>
+                  )}
+                  {m.disclaimer && (
+                    <p className="mt-2 text-xs text-muted-foreground">{m.disclaimer}</p>
+                  )}
                   {m.summary && <Summary data={m.summary} lang={lang} title={ui.summaryTitle} />}
                 </div>
                 {m.chips && m.id === lastBotId && (
@@ -448,6 +489,7 @@ export function AssistantWidget() {
               dir="auto"
               lang={lang}
               autoComplete="off"
+              maxLength={chatMode === "ai" ? 1000 : undefined}
               className="h-9 min-w-0 flex-1 rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
             />
             <Button type="submit" size="icon" disabled={!input.trim() || busy} aria-label={ui.send}>

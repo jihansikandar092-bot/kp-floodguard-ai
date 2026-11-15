@@ -363,6 +363,24 @@ export type Database = {
           },
         ]
       }
+      rate_limits: {
+        Row: {
+          created_at: string
+          id: number
+          ip_hash: string
+        }
+        Insert: {
+          created_at?: string
+          id?: never
+          ip_hash: string
+        }
+        Update: {
+          created_at?: string
+          id?: never
+          ip_hash?: string
+        }
+        Relationships: []
+      }
       risk_assessments: {
         Row: {
           available_factors: number
@@ -499,6 +517,7 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      consume_chat_limit: { Args: { _ip_hash: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

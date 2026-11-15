@@ -1,4 +1,8 @@
 # Live monitoring
+## Chat hardening and grounding
+- [ ] Enforce validated UUID/1000-character/language input and atomic approved IP limits.
+- [ ] Use saved webhook configuration, compact live risk/alerts context and safe translated automatic intake fallback.
+- [ ] Remove webhook references, show data times, and verify real chat, limits and wrong-URL recovery in preview/published.
 ## Historical collection
 - [x] Extend existing yearly statistics and add resumable, exclusive hourly collection progress.
 - [x] Add real selected-district annual discharge/rainfall charts with accurate source coverage labels.

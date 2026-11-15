@@ -3,12 +3,12 @@ import { z } from "zod";
 export const EMERGENCY_TYPES = ["rescue", "medical", "food", "water", "shelter"] as const;
 export type EmergencyType = (typeof EMERGENCY_TYPES)[number];
 
-export const EMERGENCY_TYPE_LABEL: Record<EmergencyType, { en: string; ur: string }> = {
-  rescue: { en: "Rescue", ur: "ریسکیو / بچاؤ" },
-  medical: { en: "Medical Assistance", ur: "طبی امداد" },
-  food: { en: "Food", ur: "خوراک" },
-  water: { en: "Drinking Water", ur: "پینے کا پانی" },
-  shelter: { en: "Shelter", ur: "پناہ گاہ" },
+export const EMERGENCY_TYPE_LABEL: Record<EmergencyType, { en: string; ur: string; ps: string }> = {
+  rescue: { en: "Rescue", ur: "ریسکیو / بچاؤ", ps: "ژغورنه" },
+  medical: { en: "Medical Assistance", ur: "طبی امداد", ps: "طبي مرسته" },
+  food: { en: "Food", ur: "خوراک", ps: "خواړه" },
+  water: { en: "Drinking Water", ur: "پینے کا پانی", ps: "د څښاک اوبه" },
+  shelter: { en: "Shelter", ur: "پناہ گاہ", ps: "سرپناه" },
 };
 
 export const REQUEST_STATUSES = ["pending", "under_review", "in_progress", "resolved"] as const;
