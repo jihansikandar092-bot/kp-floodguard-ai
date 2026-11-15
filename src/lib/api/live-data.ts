@@ -89,7 +89,7 @@ export function weatherUrl(
     hourly: "precipitation,temperature_2m,relative_humidity_2m,wind_speed_10m",
     daily: "precipitation_sum",
     past_days: "3",
-    forecast_days: "7",
+    forecast_days: "8",
     timezone: "Asia/Karachi",
   }).toString();
   if (config?.apiKey) url.searchParams.set("apikey", config.apiKey);

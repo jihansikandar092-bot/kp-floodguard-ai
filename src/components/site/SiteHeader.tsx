@@ -8,6 +8,7 @@ import { Logo } from "./Logo";
 const NAV = [
   { to: "/dashboard", label: "Dashboard" },
   { to: "/map", label: "Flood Map" },
+  { to: "/alerts", label: "Alerts" },
   { to: "/integrations", label: "Integrations" },
   { to: "/contact", label: "Contact" },
 ] as const;

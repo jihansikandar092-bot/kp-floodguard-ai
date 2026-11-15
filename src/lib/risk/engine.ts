@@ -16,6 +16,7 @@ export const RISK_CONFIG = {
     dischargeTrend: { low: 0, high: 0.5 }, // relative change today → +3 days
   },
   trendDays: 3,
+  alerts: { maxHorizonHours: 72, freshHours: 3, lowRunsToResolve: 2 },
   thresholds: { medium: 35, high: 65 }, // Low < 35, Medium 35–65, High > 65
 } as const;
 
@@ -57,7 +58,9 @@ export function median(values: number[]) {
   if (!values.length) return null;
   const s = [...values].sort((a, b) => a - b);
   const m = Math.floor(s.length / 2);
-  return s.length % 2 ? s[m]! : (s[m - 1]! + s[m]!) / 2;
+  const middle = s[m];
+  if (middle === undefined) return null;
+  return s.length % 2 ? middle : ((s[m - 1] ?? middle) + middle) / 2;
 }
 export function levelFor(score: number): RiskLevel {
   const t = RISK_CONFIG.thresholds;

@@ -23,7 +23,7 @@ async function sha256(text: string) {
 
 /** Public: any citizen may submit. Validates, rate-limits per IP, stores the row. */
 export const submitEmergencyRequest = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) => submitRequestSchema.parse(input))
+  .validator((input: unknown) => submitRequestSchema.parse(input))
   .handler(async ({ data }): Promise<SubmitResponse> => {
     const phone = normalizePkPhone(data.phone);
     if (!phone) return { ok: false, error: "invalid", message: "Enter a valid mobile number." };
@@ -169,7 +169,7 @@ export const listEmergencyRequests = createServerFn({ method: "GET" })
 
 export const updateEmergencyStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z.object({ id: z.string().uuid(), status: z.enum(REQUEST_STATUSES) }).parse(input),
   )
   .handler(async ({ data, context }) => {
