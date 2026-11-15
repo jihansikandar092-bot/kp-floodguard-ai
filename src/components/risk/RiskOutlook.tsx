@@ -18,7 +18,7 @@ export function RiskOutlook({
   district,
 }: {
   risks: StoredRiskAssessment[];
-  district?: string;
+  district?: string | undefined;
 }) {
   const [language, setLanguage] = useState<RiskLanguage>("en");
   const rows = HORIZONS.map((h) => risks.find((r) => r.horizonHours === h));
