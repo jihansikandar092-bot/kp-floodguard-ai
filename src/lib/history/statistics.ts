@@ -27,11 +27,19 @@ export function annualStatistics(
     for (let day = start; day < end; day += 86400000) {
       const date = new Date(day).toISOString().slice(0, 10);
       const value = byDate.get(date);
-      if (value == null) { complete = false; break; }
+      if (value == null) {
+        complete = false;
+        break;
+      }
       daily.push(value);
       if (kind === "rainfall") {
-        const previous = [1, 2].map((offset) => byDate.get(new Date(day - offset * 86400000).toISOString().slice(0, 10)));
-        if (previous.some((v) => v == null)) { complete = false; break; }
+        const previous = [1, 2].map((offset) =>
+          byDate.get(new Date(day - offset * 86400000).toISOString().slice(0, 10)),
+        );
+        if (previous.some((v) => v == null)) {
+          complete = false;
+          break;
+        }
         rolling.push(value + (previous[0] ?? 0) + (previous[1] ?? 0));
       }
     }
@@ -40,8 +48,15 @@ export function annualStatistics(
     result.push({
       year,
       ...(kind === "discharge"
-        ? { max_discharge_m3s: round(Math.max(...daily)), annual_max_discharge: round(Math.max(...daily)) }
-        : { max_rain_1d_mm: round(Math.max(...daily)), max_rain_3d_mm: round(Math.max(...rolling)), total_rain_mm: round(daily.reduce((a,b) => a+b, 0)) }),
+        ? {
+            max_discharge_m3s: round(Math.max(...daily)),
+            annual_max_discharge: round(Math.max(...daily)),
+          }
+        : {
+            max_rain_1d_mm: round(Math.max(...daily)),
+            max_rain_3d_mm: round(Math.max(...rolling)),
+            total_rain_mm: round(daily.reduce((a, b) => a + b, 0)),
+          }),
     });
   }
   return result;
@@ -53,6 +68,9 @@ export function historicalSource(year: number) {
 
 export function collectionFailure(status: number) {
   return status === 429
-    ? { status: "paused" as const, last_error: "HTTP 429: collection paused until the next hourly run" }
+    ? {
+        status: "paused" as const,
+        last_error: "HTTP 429: collection paused until the next hourly run",
+      }
     : { status: "error" as const, last_error: `Historical provider HTTP ${status}` };
 }
