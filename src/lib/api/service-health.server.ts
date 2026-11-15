@@ -5,17 +5,15 @@ import type { ServiceHealth } from "./service-health";
 export async function recordServiceHealth(service: string, ok: boolean, message?: string) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const at = new Date().toISOString();
-  const { error } = await supabaseAdmin
-    .from("service_health")
-    .upsert(
-      {
-        service,
-        ...(ok
-          ? { last_success_at: at }
-          : { last_error_at: at, last_error_text: message ?? "Service check failed" }),
-      },
-      { onConflict: "service" },
-    );
+  const { error } = await supabaseAdmin.from("service_health").upsert(
+    {
+      service,
+      ...(ok
+        ? { last_success_at: at }
+        : { last_error_at: at, last_error_text: message ?? "Service check failed" }),
+    },
+    { onConflict: "service" },
+  );
   if (error) console.error("Service health record unavailable", service);
 }
 
