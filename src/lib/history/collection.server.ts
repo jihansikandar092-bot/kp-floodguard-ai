@@ -67,9 +67,7 @@ export async function collectHistoricalBatch() {
     if (!response.ok) {
       await update({
         ...collectionFailure(response.status),
-        ...(response.status === 429
-          ? { next_request_at: nextHourlyRun(Date.now()) }
-          : {}),
+        ...(response.status === 429 ? { next_request_at: nextHourlyRun(Date.now()) } : {}),
       });
       await recordServiceHealth(
         "Historical data",

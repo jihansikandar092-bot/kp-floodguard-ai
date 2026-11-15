@@ -1,5 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { annualStatistics, collectionFailure, historicalSource, nextHourlyRun } from "@/lib/history/statistics";
+import {
+  annualStatistics,
+  collectionFailure,
+  historicalSource,
+  nextHourlyRun,
+} from "@/lib/history/statistics";
 
 function days(year: number) {
   const dates = [];
