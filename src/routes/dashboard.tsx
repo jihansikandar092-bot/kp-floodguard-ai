@@ -121,7 +121,10 @@ function DashboardPage() {
           ))}
         </nav>
 
-        <RiskOutlook district={snap.district?.name} risks={risks.filter(r=>r.districtId===districtId)} />
+        <RiskOutlook
+          district={snap.district?.name}
+          risks={risks.filter((r) => r.districtId === districtId)}
+        />
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
           <StatCard
             demo={false}

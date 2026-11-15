@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AlertsRouteImport } from './routes/alerts'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as EmergencyRouteImport } from './routes/emergency'
@@ -29,6 +30,11 @@ const IndexRoute = IndexRouteImport.update({
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AlertsRoute = AlertsRouteImport.update({
+  id: '/alerts',
+  path: '/alerts',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -82,6 +88,7 @@ const ApiPublicJobsRefreshMonitoringRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/alerts': typeof AlertsRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
   '/emergency': typeof EmergencyRoute
@@ -95,6 +102,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/alerts': typeof AlertsRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
   '/emergency': typeof EmergencyRoute
@@ -109,6 +117,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/alerts': typeof AlertsRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
   '/emergency': typeof EmergencyRoute
@@ -124,6 +133,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/alerts'
     | '/contact'
     | '/dashboard'
     | '/emergency'
@@ -137,6 +147,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin'
+    | '/alerts'
     | '/contact'
     | '/dashboard'
     | '/emergency'
@@ -150,6 +161,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/alerts'
     | '/contact'
     | '/dashboard'
     | '/emergency'
@@ -164,6 +176,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
+  AlertsRoute: typeof AlertsRoute
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRoute
   EmergencyRoute: typeof EmergencyRoute
@@ -189,6 +202,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/alerts': {
+      id: '/alerts'
+      path: '/alerts'
+      fullPath: '/alerts'
+      preLoaderRoute: typeof AlertsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -260,6 +280,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
+  AlertsRoute: AlertsRoute,
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRoute,
   EmergencyRoute: EmergencyRoute,

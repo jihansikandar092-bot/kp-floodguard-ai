@@ -49,11 +49,11 @@ export const Route = createFileRoute("/map")({
 function MapPage() {
   const { data: DISTRICTS } = useSuspenseQuery(districtListOptions());
   const [chosenId, setSelectedId] = useState<string>();
-  const [horizon,setHorizon] = useState(0);
+  const [horizon, setHorizon] = useState(0);
   const district = DISTRICTS.find((d) => d.id === chosenId) ?? DISTRICTS[0];
   const selectedId = district?.id;
   const { data: allRisks } = useSuspenseQuery(riskAssessmentOptions());
-  const risks = allRisks.filter(r=>r.horizonHours===horizon);
+  const risks = allRisks.filter((r) => r.horizonHours === horizon);
   const { data: storedData } = useSuspenseQuery(liveMonitoringOptions());
   const { data, fallbackLoading } = useMonitoringFallback(storedData, DISTRICTS, selectedId);
   if (!district) return <p className="container-page py-12">No monitored districts available.</p>;
@@ -73,7 +73,31 @@ function MapPage() {
           </p>
         )}
         <DemoBanner>{RISK_DISCLAIMER}</DemoBanner>
-        <div className="flex flex-wrap items-center gap-3"><label htmlFor="map-horizon" className="text-sm font-bold">Risk horizon</label><select id="map-horizon" value={horizon} onChange={e=>setHorizon(Number(e.target.value))} className="rounded-md border bg-background p-2">{HORIZONS.map(h=><option key={h} value={h}>{horizonLabel(h)}</option>)}</select><span className="text-xs text-muted-foreground">Underlying snapshot: {risks.find(r=>r.districtId===selectedId)?.snapshotAt?.replace("T"," ").slice(0,16) ?? "Not available"} UTC</span></div>
+        <div className="flex flex-wrap items-center gap-3">
+          <label htmlFor="map-horizon" className="text-sm font-bold">
+            Risk horizon
+          </label>
+          <select
+            id="map-horizon"
+            value={horizon}
+            onChange={(e) => setHorizon(Number(e.target.value))}
+            className="rounded-md border bg-background p-2"
+          >
+            {HORIZONS.map((h) => (
+              <option key={h} value={h}>
+                {horizonLabel(h)}
+              </option>
+            ))}
+          </select>
+          <span className="text-xs text-muted-foreground">
+            Underlying snapshot:{" "}
+            {risks
+              .find((r) => r.districtId === selectedId)
+              ?.snapshotAt?.replace("T", " ")
+              .slice(0, 16) ?? "Not available"}{" "}
+            UTC
+          </span>
+        </div>
         <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
           <div className="overflow-hidden rounded-xl border bg-card shadow-card">
             <div className="flex flex-wrap items-center justify-between gap-3 border-b px-4 py-3">
