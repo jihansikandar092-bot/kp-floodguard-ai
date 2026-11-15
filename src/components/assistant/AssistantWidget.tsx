@@ -444,15 +444,6 @@ export function AssistantWidget() {
                   )}
                 >
                   {m.text}
-                  {m.dataTime && (
-                    <p className="mt-2 text-xs text-muted-foreground" dir={rtl ? "rtl" : "ltr"}>
-                      {chatDataLabel[lang]}: {m.dataTime.replace("T", " ").slice(0, 19)} UTC ·{" "}
-                      {m.source}
-                    </p>
-                  )}
-                  {m.disclaimer && (
-                    <p className="mt-2 text-xs text-muted-foreground">{m.disclaimer}</p>
-                  )}
                   {m.summary && <Summary data={m.summary} lang={lang} title={ui.summaryTitle} />}
                 </div>
                 {m.chips && m.id === lastBotId && (
@@ -525,6 +516,20 @@ export function AssistantWidget() {
               <Send />
             </Button>
           </form>
+          {(() => {
+            const last = [...messages].reverse().find((m) => m.dataTime || m.disclaimer);
+            if (!last) return null;
+            return (
+              <p className="border-t px-3 py-1.5 text-[10px] leading-snug text-muted-foreground" dir={rtl ? "rtl" : "ltr"}>
+                {last.dataTime && (
+                  <>
+                    {chatDataLabel[lang]}: {last.dataTime.replace("T", " ").slice(0, 16)} UTC · {last.source} ·{" "}
+                  </>
+                )}
+                {last.disclaimer}
+              </p>
+            );
+          })()}
         </div>
       )}
     </TooltipProvider>
