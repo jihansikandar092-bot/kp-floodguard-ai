@@ -123,7 +123,8 @@ function FooterLink({
     | "/integrations"
     | "/contact"
     | "/responsible-ai"
-    | "/subscribe";
+    | "/subscribe"
+    | "/track";
   hash?: string | undefined;
   children: React.ReactNode;
 }) {
