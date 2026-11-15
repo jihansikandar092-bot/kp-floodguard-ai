@@ -49,7 +49,7 @@ function AlertsPage() {
         }
       />
       <div className="container-page py-8">
-        <AlertsPanel districts={districts} />
+        <AlertsPanel districts={districts} showAllLink={false} />
       </div>
     </>
   );
