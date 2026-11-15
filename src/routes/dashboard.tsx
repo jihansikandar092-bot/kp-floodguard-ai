@@ -19,6 +19,8 @@ import { districtListOptions } from "@/lib/api/district-query";
 import { riskAssessmentOptions } from "@/lib/risk/risk-query";
 import { RISK_COLOR_VAR, RISK_LABEL } from "@/lib/data/districts";
 import { HowScoreWorks, RISK_DISCLAIMER } from "@/components/risk/RiskExplain";
+import { AlertsPanel } from "@/components/dashboard/AlertsPanel";
+import { alertsOptions } from "@/lib/alerts/alerts-query";
 
 export const Route = createFileRoute("/dashboard")({
   validateSearch: (s: Record<string, unknown>): { district?: string | undefined } => {
@@ -30,6 +32,7 @@ export const Route = createFileRoute("/dashboard")({
       context.queryClient.ensureQueryData(liveMonitoringOptions()),
       context.queryClient.ensureQueryData(districtListOptions()),
       context.queryClient.ensureQueryData(riskAssessmentOptions()),
+       context.queryClient.prefetchQuery(alertsOptions()),
     ]);
   },
   pendingComponent: MonitoringPending,
@@ -229,9 +232,7 @@ function DashboardPage() {
               </p>
             )}
           </Panel>
-          <Panel title="Recent flood alerts">
-            <p>Not available</p>
-          </Panel>
+          <AlertsPanel districts={districts} />
         </div>
 
         <div className="grid gap-6 lg:grid-cols-2">
