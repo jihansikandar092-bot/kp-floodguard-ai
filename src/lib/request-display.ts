@@ -11,7 +11,14 @@ const fmt = new Intl.DateTimeFormat("en-GB", {
 export const formatPkt = (iso: string) => `${fmt.format(new Date(iso))} PKT`;
 export function filterRequests(
   list: EmergencyRequest[],
-  f: { district: string; type: string; status: string; language: string; hideTest: boolean; q: string },
+  f: {
+    district: string;
+    type: string;
+    status: string;
+    language: string;
+    hideTest: boolean;
+    q: string;
+  },
 ) {
   const q = f.q.trim().toLowerCase();
   return list.filter(

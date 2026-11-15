@@ -280,25 +280,26 @@ export const listRequestEvents = createServerFn({ method: "GET" })
 /** Coordinators: open (unresolved, non-test) request counts per district for the admin map. */
 export const getOpenRequestCounts = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }): Promise<{ authorized: boolean; counts: Record<string, number> }> => {
-    if (!(await isCoordinator(context))) return { authorized: false, counts: {} };
-    const { data, error } = await context.supabase
-      .from("emergency_requests")
-      .select("district_id")
-      .neq("status", "resolved")
-      .eq("is_test", false)
-      .not("district_id", "is", null);
-    if (error) throw new Error("Counts temporarily unavailable");
-    const counts: Record<string, number> = {};
-    for (const r of data ?? []) {
-      if (r.district_id) counts[r.district_id] = (counts[r.district_id] ?? 0) + 1;
-    }
-    return { authorized: true, counts };
-  });
+  .handler(
+    async ({ context }): Promise<{ authorized: boolean; counts: Record<string, number> }> => {
+      if (!(await isCoordinator(context))) return { authorized: false, counts: {} };
+      const { data, error } = await context.supabase
+        .from("emergency_requests")
+        .select("district_id")
+        .neq("status", "resolved")
+        .eq("is_test", false)
+        .not("district_id", "is", null);
+      if (error) throw new Error("Counts temporarily unavailable");
+      const counts: Record<string, number> = {};
+      for (const r of data ?? []) {
+        if (r.district_id) counts[r.district_id] = (counts[r.district_id] ?? 0) + 1;
+      }
+      return { authorized: true, counts };
+    },
+  );
 
 export type TrackResponse =
-  | { ok: true; status: RequestStatus; updatedAt: string }
-  | { ok: false; message: string };
+  { ok: true; status: RequestStatus; updatedAt: string } | { ok: false; message: string };
 
 /** Public: track a request by code + last 4 phone digits. Rate-limited; one generic error. */
 export const trackRequest = createServerFn({ method: "POST" })

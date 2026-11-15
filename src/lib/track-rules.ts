@@ -16,7 +16,10 @@ export const trackInputSchema = z.object({
     .trim()
     .toUpperCase()
     .regex(/^KPF-\d{4}-\d{4}$/, "Enter the full request code, for example KPF-2026-0001."),
-  last4: z.string().trim().regex(/^\d{4}$/, "Enter exactly the last 4 digits of the phone number."),
+  last4: z
+    .string()
+    .trim()
+    .regex(/^\d{4}$/, "Enter exactly the last 4 digits of the phone number."),
 });
 export type TrackInput = z.infer<typeof trackInputSchema>;
 

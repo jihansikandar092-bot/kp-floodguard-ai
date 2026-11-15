@@ -77,7 +77,8 @@ function TrackPage() {
       <div className="container-page max-w-xl space-y-6 py-8">
         <SafetyNotice>
           <p>
-            In a life-threatening emergency do not wait for an update — call <strong>Rescue 1122</strong> now.
+            In a life-threatening emergency do not wait for an update — call{" "}
+            <strong>Rescue 1122</strong> now.
           </p>
         </SafetyNotice>
 

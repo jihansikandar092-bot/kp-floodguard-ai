@@ -23,7 +23,14 @@ const base: EmergencyRequest = {
   internalNote: null,
 };
 
-const all = { district: "all", type: "all", status: "all", language: "all", hideTest: false, q: "" };
+const all = {
+  district: "all",
+  type: "all",
+  status: "all",
+  language: "all",
+  hideTest: false,
+  q: "",
+};
 
 describe("track input rules", () => {
   it("accepts a valid code and 4 digits", () => {
@@ -34,7 +41,9 @@ describe("track input rules", () => {
   });
   it("rejects non-4-digit phone input", () => {
     expect(trackInputSchema.safeParse({ code: "KPF-2026-0001", last4: "456" }).success).toBe(false);
-    expect(trackInputSchema.safeParse({ code: "KPF-2026-0001", last4: "45678" }).success).toBe(false);
+    expect(trackInputSchema.safeParse({ code: "KPF-2026-0001", last4: "45678" }).success).toBe(
+      false,
+    );
   });
   it("matches phone by last 4 digits only", () => {
     expect(phoneMatchesLast4("+923001234567", "4567")).toBe(true);
