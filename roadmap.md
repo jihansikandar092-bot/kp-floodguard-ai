@@ -1,9 +1,9 @@
 # Live monitoring
 ## Real-data cleanup and integration health
-- [ ] Audit code and database; document before/after findings, preserve the three owner-retained verification requests.
-- [ ] Remove obsolete demo UI and unsupported landing/footer claims; hide unimplemented voice control.
-- [ ] Read integration statuses from service_health; record monitoring, database, chat and historical-data checks without inventing a historical import job.
-- [ ] Show actual source timestamps in footer; test preview and published pages and real chat, run all tests/lint and inspect automatic checks.
+- [x] Audit code and database; before/after findings delivered, three owner-retained verification requests unchanged.
+- [x] Remove obsolete demo UI, unused illustrative chart and unsupported landing/footer claims; hide unimplemented voice control.
+- [x] Read integration statuses from service_health; monitoring writes genuine metric timestamps and safe errors, authenticated checks record database/history availability, real chat records success. No historical import job exists: availability is checked and shown honestly as Not connected.
+- [x] Show actual source timestamps in footer; seven preview/published pages HTTP 200, real n8n chat HTTP 200 in both (280/261-character replies), no browser errors or mobile overflow; 69 tests, lint and automatic type-check/build passed. Published error-log search returned no entries.
 ## Partial-score safety
 - [x] Store factor coverage and translated partial notes without changing score calculation; 168 stored assessments checked, zero coverage mismatches.
 - [x] Prevent partial batches from resolving alerts; partial creation/resolution tests pass in isolated PostgreSQL, 66 total tests passed.
