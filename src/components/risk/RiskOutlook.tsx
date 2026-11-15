@@ -94,8 +94,8 @@ export function RiskOutlook({
                     ticks={[0, 24, 48, 72, 168]}
                     tickFormatter={horizonLabel}
                   />
-                  <YAxis yAxisId="rain" unit=" mm" />
-                  <YAxis yAxisId="flow" orientation="right" unit=" m³/s" />
+                  <YAxis yAxisId="rain" unit="mm" width={40} tick={{ fontSize: 11 }} />
+                  <YAxis yAxisId="flow" orientation="right" width={40} tick={{ fontSize: 11 }} />
                   <YAxis yAxisId="risk" domain={[0, 100]} hide />
                   <Legend />
                   <ReferenceArea
