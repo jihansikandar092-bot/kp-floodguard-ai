@@ -1,4 +1,10 @@
 # Live monitoring
+## System-generated alerts
+- [x] Audit existing risk assessments and alert panel; no sample list remains.
+- [x] Add public-read/server-write alerts and atomic assessment transition trigger.
+- [x] Show active and seven-day resolved alerts with official sources and safety disclaimer.
+- [x] Verify seven database transition/access tests, 52 total tests, lint and automatic build; desktop/mobile dashboard reads the real empty alerts table without browser errors. No live risk rise has occurred since installation; no fabricated alerts were added.
+
 - [x] Add district reference storage, monitoring run history and service health; verified 12 districts, 12 snapshots and 1 successful run.
 - [x] Stop retries on 429, support optional paid weather configuration, and verify retention and six-hour fallback rules in 19 passing tests.
 - [x] Remove invented observations, six alerts, generated historical series and seven seeded requests; connect landing numbers to stored readings.
