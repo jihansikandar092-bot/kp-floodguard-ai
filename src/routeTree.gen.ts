@@ -19,6 +19,9 @@ import { Route as IntegrationsRouteImport } from './routes/integrations'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MapRouteImport } from './routes/map'
 import { Route as ResponsibleAiRouteImport } from './routes/responsible-ai'
+import { Route as SubscribeRouteImport } from './routes/subscribe'
+import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
+import { Route as VerifySubscriptionRouteImport } from './routes/verify-subscription'
 import { Route as ApiPublicMonitoringStatusRouteImport } from './routes/api/public/monitoring-status'
 import { Route as ApiPublicN8nChatRouteImport } from './routes/api/public/n8n-chat'
 import { Route as ApiPublicJobsCollectHistoryRouteImport } from './routes/api/public/jobs/collect-history'
@@ -74,6 +77,21 @@ const ResponsibleAiRoute = ResponsibleAiRouteImport.update({
   path: '/responsible-ai',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SubscribeRoute = SubscribeRouteImport.update({
+  id: '/subscribe',
+  path: '/subscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UnsubscribeRoute = UnsubscribeRouteImport.update({
+  id: '/unsubscribe',
+  path: '/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VerifySubscriptionRoute = VerifySubscriptionRouteImport.update({
+  id: '/verify-subscription',
+  path: '/verify-subscription',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicMonitoringStatusRoute =
   ApiPublicMonitoringStatusRouteImport.update({
     id: '/api/public/monitoring-status',
@@ -109,6 +127,9 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/map': typeof MapRoute
   '/responsible-ai': typeof ResponsibleAiRoute
+  '/subscribe': typeof SubscribeRoute
+  '/unsubscribe': typeof UnsubscribeRoute
+  '/verify-subscription': typeof VerifySubscriptionRoute
   '/api/public/monitoring-status': typeof ApiPublicMonitoringStatusRoute
   '/api/public/n8n-chat': typeof ApiPublicN8nChatRoute
   '/api/public/jobs/collect-history': typeof ApiPublicJobsCollectHistoryRoute
@@ -125,6 +146,9 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/map': typeof MapRoute
   '/responsible-ai': typeof ResponsibleAiRoute
+  '/subscribe': typeof SubscribeRoute
+  '/unsubscribe': typeof UnsubscribeRoute
+  '/verify-subscription': typeof VerifySubscriptionRoute
   '/api/public/monitoring-status': typeof ApiPublicMonitoringStatusRoute
   '/api/public/n8n-chat': typeof ApiPublicN8nChatRoute
   '/api/public/jobs/collect-history': typeof ApiPublicJobsCollectHistoryRoute
@@ -142,6 +166,9 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/map': typeof MapRoute
   '/responsible-ai': typeof ResponsibleAiRoute
+  '/subscribe': typeof SubscribeRoute
+  '/unsubscribe': typeof UnsubscribeRoute
+  '/verify-subscription': typeof VerifySubscriptionRoute
   '/api/public/monitoring-status': typeof ApiPublicMonitoringStatusRoute
   '/api/public/n8n-chat': typeof ApiPublicN8nChatRoute
   '/api/public/jobs/collect-history': typeof ApiPublicJobsCollectHistoryRoute
@@ -160,6 +187,9 @@ export interface FileRouteTypes {
     | '/login'
     | '/map'
     | '/responsible-ai'
+    | '/subscribe'
+    | '/unsubscribe'
+    | '/verify-subscription'
     | '/api/public/monitoring-status'
     | '/api/public/n8n-chat'
     | '/api/public/jobs/collect-history'
@@ -176,6 +206,9 @@ export interface FileRouteTypes {
     | '/login'
     | '/map'
     | '/responsible-ai'
+    | '/subscribe'
+    | '/unsubscribe'
+    | '/verify-subscription'
     | '/api/public/monitoring-status'
     | '/api/public/n8n-chat'
     | '/api/public/jobs/collect-history'
@@ -192,6 +225,9 @@ export interface FileRouteTypes {
     | '/login'
     | '/map'
     | '/responsible-ai'
+    | '/subscribe'
+    | '/unsubscribe'
+    | '/verify-subscription'
     | '/api/public/monitoring-status'
     | '/api/public/n8n-chat'
     | '/api/public/jobs/collect-history'
@@ -209,6 +245,9 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   MapRoute: typeof MapRoute
   ResponsibleAiRoute: typeof ResponsibleAiRoute
+  SubscribeRoute: typeof SubscribeRoute
+  UnsubscribeRoute: typeof UnsubscribeRoute
+  VerifySubscriptionRoute: typeof VerifySubscriptionRoute
   ApiPublicMonitoringStatusRoute: typeof ApiPublicMonitoringStatusRoute
   ApiPublicN8nChatRoute: typeof ApiPublicN8nChatRoute
   ApiPublicJobsCollectHistoryRoute: typeof ApiPublicJobsCollectHistoryRoute
@@ -287,6 +326,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResponsibleAiRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/subscribe': {
+      id: '/subscribe'
+      path: '/subscribe'
+      fullPath: '/subscribe'
+      preLoaderRoute: typeof SubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/unsubscribe': {
+      id: '/unsubscribe'
+      path: '/unsubscribe'
+      fullPath: '/unsubscribe'
+      preLoaderRoute: typeof UnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/verify-subscription': {
+      id: '/verify-subscription'
+      path: '/verify-subscription'
+      fullPath: '/verify-subscription'
+      preLoaderRoute: typeof VerifySubscriptionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/monitoring-status': {
       id: '/api/public/monitoring-status'
       path: '/api/public/monitoring-status'
@@ -329,6 +389,9 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   MapRoute: MapRoute,
   ResponsibleAiRoute: ResponsibleAiRoute,
+  SubscribeRoute: SubscribeRoute,
+  UnsubscribeRoute: UnsubscribeRoute,
+  VerifySubscriptionRoute: VerifySubscriptionRoute,
   ApiPublicMonitoringStatusRoute: ApiPublicMonitoringStatusRoute,
   ApiPublicN8nChatRoute: ApiPublicN8nChatRoute,
   ApiPublicJobsCollectHistoryRoute: ApiPublicJobsCollectHistoryRoute,
