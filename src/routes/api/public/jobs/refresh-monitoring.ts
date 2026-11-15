@@ -15,6 +15,7 @@ export const Route = createFileRoute("/api/public/jobs/refresh-monitoring")({
               .strict(),
             z.object({ kind: z.literal("risk") }).strict(),
             z.object({ kind: z.literal("health") }).strict(),
+            z.object({ kind: z.literal("notify") }).strict(),
           ])
           .safeParse(await request.json().catch(() => null));
         if (!body.success)
@@ -22,6 +23,11 @@ export const Route = createFileRoute("/api/public/jobs/refresh-monitoring")({
         if (body.data.kind === "health") {
           const { checkStoredServices } = await import("@/lib/api/service-health.server");
           return Response.json(await checkStoredServices());
+        }
+        if (body.data.kind === "notify") {
+          const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+          const { dispatchAlertNotifications } = await import("@/lib/subscriptions/sender.server");
+          return Response.json(await dispatchAlertNotifications(supabaseAdmin));
         }
         // Operator-only: assess the currently stored snapshots without calling providers.
         if (body.data.kind === "risk") {
