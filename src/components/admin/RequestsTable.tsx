@@ -1,7 +1,9 @@
-import { Search } from "lucide-react";
+import { Download, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -23,6 +25,7 @@ import { districtListOptions } from "@/lib/api/district-query";
 import {
   EMERGENCY_TYPES,
   EMERGENCY_TYPE_LABEL,
+  REQUEST_LANGUAGES,
   REQUEST_STATUSES,
   STATUS_BADGE,
   STATUS_LABEL,
@@ -33,8 +36,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listEmergencyRequests, updateEmergencyStatus } from "@/lib/api/requests.functions";
 import { useCoordinator } from "@/lib/api/use-coordinator";
+import { RequestDrawer } from "@/components/admin/RequestDrawer";
 
-import { formatPkt, filterRequests, maskPhone } from "@/lib/request-display";
+import { formatPkt, filterRequests, maskPhone, requestsToCsv } from "@/lib/request-display";
 const ALL = "all";
 
 export function RequestsTable() {
@@ -44,6 +48,7 @@ export function RequestsTable() {
     queryKey: ["emergency-requests"],
     queryFn: () => listFn(),
     enabled: signedIn === true,
+    refetchInterval: 30_000,
     retry: false,
   });
   if (checking || (signedIn && list.isLoading))
@@ -73,7 +78,10 @@ function RequestsView({ requests }: { requests: EmergencyRequest[] }) {
   const [district, setDistrict] = useState(ALL);
   const [type, setType] = useState(ALL);
   const [status, setStatus] = useState(ALL);
+  const [language, setLanguage] = useState(ALL);
+  const [hideTest, setHideTest] = useState(true);
   const [q, setQ] = useState("");
+  const [selected, setSelected] = useState<EmergencyRequest | null>(null);
 
   const { data: districtList } = useQuery(districtListOptions());
   const districtOptions = useMemo(
@@ -84,8 +92,8 @@ function RequestsView({ requests }: { requests: EmergencyRequest[] }) {
     [requests, districtList],
   );
   const rows = useMemo(
-    () => filterRequests(requests, { district, type, status, q }),
-    [requests, district, type, status, q],
+    () => filterRequests(requests, { district, type, status, language, hideTest, q }),
+    [requests, district, type, status, language, hideTest, q],
   );
 
   const counts = useMemo(() => {
@@ -107,10 +115,22 @@ function RequestsView({ requests }: { requests: EmergencyRequest[] }) {
     onSuccess: (_d, v) => {
       toast.success(`${v.r.code} marked “${STATUS_LABEL[v.s]}”`);
       void qc.invalidateQueries({ queryKey: ["emergency-requests"] });
+      void qc.invalidateQueries({ queryKey: ["open-request-counts"] });
     },
     onError: () => toast.error("Status could not be updated"),
   });
   const changeStatus = (r: EmergencyRequest, s: RequestStatus) => mutation.mutate({ r, s });
+
+  const exportCsv = () => {
+    const blob = new Blob([requestsToCsv(rows)], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `kp-floodguard-requests-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success(`Exported ${rows.length} request${rows.length === 1 ? "" : "s"} as CSV`);
+  };
 
   return (
     <div className="space-y-6">
@@ -145,7 +165,7 @@ function RequestsView({ requests }: { requests: EmergencyRequest[] }) {
               aria-label="Search requests"
             />
           </div>
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 lg:w-[540px]">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:w-[640px]">
             <FilterSelect
               label="District"
               value={district}
@@ -167,12 +187,33 @@ function RequestsView({ requests }: { requests: EmergencyRequest[] }) {
               onChange={setStatus}
               options={REQUEST_STATUSES.map((s) => ({ value: s, label: STATUS_LABEL[s] }))}
             />
+            <FilterSelect
+              label="Language"
+              value={language}
+              onChange={setLanguage}
+              options={REQUEST_LANGUAGES.map((l) => ({ value: l, label: l.toUpperCase() }))}
+            />
           </div>
         </div>
 
-        <p className="px-4 pt-3 text-xs text-muted-foreground" aria-live="polite">
-          Showing {rows.length} of {requests.length} requests
-        </p>
+        <div className="flex flex-wrap items-center justify-between gap-3 px-4 pt-3">
+          <p className="text-xs text-muted-foreground" aria-live="polite">
+            Showing {rows.length} of {requests.length} requests · refreshes every 30 seconds
+          </p>
+          <div className="flex items-center gap-4">
+            <label className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Checkbox
+                checked={hideTest}
+                onCheckedChange={(v) => setHideTest(v === true)}
+                aria-label="Hide test requests"
+              />
+              Hide test requests
+            </label>
+            <Button variant="outline" size="sm" onClick={exportCsv} disabled={rows.length === 0}>
+              <Download /> Export CSV ({rows.length})
+            </Button>
+          </div>
+        </div>
 
         {/* Desktop table */}
         <div className="hidden p-2 xl:block">
@@ -189,6 +230,7 @@ function RequestsView({ requests }: { requests: EmergencyRequest[] }) {
                 <TableHead className="text-right">People</TableHead>
                 <TableHead>Description</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Details</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -228,6 +270,11 @@ function RequestsView({ requests }: { requests: EmergencyRequest[] }) {
                       id={r.code}
                     />
                   </TableCell>
+                  <TableCell>
+                    <Button variant="outline" size="sm" onClick={() => setSelected(r)}>
+                      Open
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -260,11 +307,16 @@ function RequestsView({ requests }: { requests: EmergencyRequest[] }) {
                   <Item k="Description" v={r.description} />
                 </div>
               </dl>
-              <StatusSelect
-                value={r.status}
-                onChange={(s) => changeStatus(r, s)}
-                id={`m-${r.code}`}
-              />
+              <div className="flex items-center gap-2">
+                <StatusSelect
+                  value={r.status}
+                  onChange={(s) => changeStatus(r, s)}
+                  id={`m-${r.code}`}
+                />
+                <Button variant="outline" size="sm" onClick={() => setSelected(r)}>
+                  Open
+                </Button>
+              </div>
             </li>
           ))}
         </ul>
@@ -275,6 +327,14 @@ function RequestsView({ requests }: { requests: EmergencyRequest[] }) {
           </p>
         )}
       </div>
+
+      <RequestDrawer
+        request={selected}
+        open={selected !== null}
+        onOpenChange={(o) => {
+          if (!o) setSelected(null);
+        }}
+      />
     </div>
   );
 }

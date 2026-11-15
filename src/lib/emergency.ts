@@ -72,7 +72,19 @@ export interface EmergencyRequest extends EmergencyRequestInput {
   id: string;
   code: string;
   createdAt: string; // ISO
+  updatedAt: string; // ISO
   status: RequestStatus;
   language: RequestLanguage;
   isTest: boolean;
+  assignedTeam: string | null;
+  internalNote: string | null;
+}
+
+/** One entry in a request's status history. */
+export interface RequestEvent {
+  id: string;
+  fromStatus: RequestStatus | null;
+  toStatus: RequestStatus;
+  note: string | null;
+  createdAt: string; // ISO
 }

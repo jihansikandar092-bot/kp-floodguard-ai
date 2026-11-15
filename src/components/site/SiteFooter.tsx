@@ -36,6 +36,7 @@ export function SiteFooter() {
 
           <FooterCol title="Assistance">
             <FooterLink to="/emergency">Emergency Assistance</FooterLink>
+            <FooterLink to="/track">Track your request</FooterLink>
             <FooterLink to="/subscribe">Subscribe to alerts</FooterLink>
             <FooterLink to="/login">Coordinator login</FooterLink>
             <FooterLink to="/integrations">Integrations</FooterLink>
@@ -122,7 +123,8 @@ function FooterLink({
     | "/integrations"
     | "/contact"
     | "/responsible-ai"
-    | "/subscribe";
+    | "/subscribe"
+    | "/track";
   hash?: string | undefined;
   children: React.ReactNode;
 }) {

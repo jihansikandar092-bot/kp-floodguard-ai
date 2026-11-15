@@ -7,8 +7,16 @@ import {
   normalizePkPhone,
   submitRequestSchema,
   type EmergencyRequest,
+  type RequestEvent,
   type RequestStatus,
 } from "@/lib/emergency";
+import {
+  TRACK_ATTEMPTS_PER_HOUR,
+  TRACK_GENERIC_MESSAGE,
+  TRACK_RATE_LIMIT_MESSAGE,
+  phoneMatchesLast4,
+  trackInputSchema,
+} from "@/lib/track-rules";
 
 export const RATE_LIMIT_PER_HOUR = 10;
 
@@ -168,6 +176,7 @@ export const listEmergencyRequests = createServerFn({ method: "GET" })
         id: r.id,
         code: r.request_code,
         createdAt: r.created_at,
+        updatedAt: r.updated_at,
         status: r.status as RequestStatus,
         language: r.language as EmergencyRequest["language"],
         isTest: r.is_test,
@@ -179,6 +188,8 @@ export const listEmergencyRequests = createServerFn({ method: "GET" })
         type: r.emergency_type as EmergencyRequest["type"],
         peopleAffected: r.people_affected,
         description: r.description,
+        assignedTeam: r.assigned_team,
+        internalNote: r.internal_note,
       })),
     };
   });
@@ -186,7 +197,13 @@ export const listEmergencyRequests = createServerFn({ method: "GET" })
 export const updateEmergencyStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((input: unknown) =>
-    z.object({ id: z.string().uuid(), status: z.enum(REQUEST_STATUSES) }).parse(input),
+    z
+      .object({
+        id: z.string().uuid(),
+        status: z.enum(REQUEST_STATUSES),
+        note: z.string().trim().max(500).optional(),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     const { error, count } = await context.supabase
@@ -194,5 +211,132 @@ export const updateEmergencyStatus = createServerFn({ method: "POST" })
       .update({ status: data.status }, { count: "exact" })
       .eq("id", data.id);
     if (error || !count) throw new Error("Status could not be updated");
+    // The database trigger already wrote the event row; attach the optional note to it.
+    if (data.note) {
+      const { data: ev } = await context.supabase
+        .from("request_events")
+        .select("id")
+        .eq("request_id", data.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (ev)
+        await context.supabase.from("request_events").update({ note: data.note }).eq("id", ev.id);
+    }
     return { ok: true };
+  });
+
+/** Coordinators: set the assigned team and internal note on a request. */
+export const updateRequestDetails = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((input: unknown) =>
+    z
+      .object({
+        id: z.string().uuid(),
+        assignedTeam: z.string().trim().max(120).nullable(),
+        internalNote: z.string().trim().max(2000).nullable(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { error, count } = await context.supabase
+      .from("emergency_requests")
+      .update(
+        {
+          assigned_team: data.assignedTeam || null,
+          internal_note: data.internalNote || null,
+        },
+        { count: "exact" },
+      )
+      .eq("id", data.id);
+    if (error || !count) throw new Error("Details could not be saved");
+    return { ok: true };
+  });
+
+/** Coordinators: full status history of one request, oldest first. */
+export const listRequestEvents = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .validator((input: unknown) => z.object({ requestId: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }): Promise<{ authorized: boolean; events: RequestEvent[] }> => {
+    if (!(await isCoordinator(context))) return { authorized: false, events: [] };
+    const { data: rows, error } = await context.supabase
+      .from("request_events")
+      .select("id, from_status, to_status, note, created_at")
+      .eq("request_id", data.requestId)
+      .order("created_at", { ascending: true });
+    if (error) throw new Error("History temporarily unavailable");
+    return {
+      authorized: true,
+      events: (rows ?? []).map((e) => ({
+        id: e.id,
+        fromStatus: (e.from_status as RequestStatus | null) ?? null,
+        toStatus: e.to_status as RequestStatus,
+        note: e.note,
+        createdAt: e.created_at,
+      })),
+    };
+  });
+
+/** Coordinators: open (unresolved, non-test) request counts per district for the admin map. */
+export const getOpenRequestCounts = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(
+    async ({ context }): Promise<{ authorized: boolean; counts: Record<string, number> }> => {
+      if (!(await isCoordinator(context))) return { authorized: false, counts: {} };
+      const { data, error } = await context.supabase
+        .from("emergency_requests")
+        .select("district_id")
+        .neq("status", "resolved")
+        .eq("is_test", false)
+        .not("district_id", "is", null);
+      if (error) throw new Error("Counts temporarily unavailable");
+      const counts: Record<string, number> = {};
+      for (const r of data ?? []) {
+        if (r.district_id) counts[r.district_id] = (counts[r.district_id] ?? 0) + 1;
+      }
+      return { authorized: true, counts };
+    },
+  );
+
+export type TrackResponse =
+  { ok: true; status: RequestStatus; updatedAt: string } | { ok: false; message: string };
+
+/** Public: track a request by code + last 4 phone digits. Rate-limited; one generic error. */
+export const trackRequest = createServerFn({ method: "POST" })
+  .validator((input: unknown) => trackInputSchema.parse(input))
+  .handler(async ({ data }): Promise<TrackResponse> => {
+    const ip =
+      getRequestHeader("cf-connecting-ip") ??
+      getRequestHeader("x-forwarded-for")?.split(",")[0]?.trim() ??
+      "unknown";
+    const ipHash = await sha256(`kpfg-track:${ip}`);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const since = new Date(Date.now() - 3600_000).toISOString();
+    const { count, error: countErr } = await supabaseAdmin
+      .from("rate_limits")
+      .select("id", { count: "exact", head: true })
+      .eq("ip_hash", ipHash)
+      .gte("created_at", since);
+    if (countErr) {
+      console.error("track rate limit check failed", countErr.message);
+      return { ok: false, message: "Tracking temporarily unavailable." };
+    }
+    if ((count ?? 0) >= TRACK_ATTEMPTS_PER_HOUR) {
+      return { ok: false, message: TRACK_RATE_LIMIT_MESSAGE };
+    }
+    await supabaseAdmin.from("rate_limits").insert({ ip_hash: ipHash });
+
+    const { data: row, error } = await supabaseAdmin
+      .from("emergency_requests")
+      .select("status, updated_at, phone")
+      .eq("request_code", data.code)
+      .maybeSingle();
+    if (error) {
+      console.error("track lookup failed", error.message);
+      return { ok: false, message: "Tracking temporarily unavailable." };
+    }
+    if (!row || !phoneMatchesLast4(row.phone, data.last4)) {
+      return { ok: false, message: TRACK_GENERIC_MESSAGE };
+    }
+    return { ok: true, status: row.status as RequestStatus, updatedAt: row.updated_at };
   });

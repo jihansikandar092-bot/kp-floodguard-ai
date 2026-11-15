@@ -20,6 +20,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as MapRouteImport } from './routes/map'
 import { Route as ResponsibleAiRouteImport } from './routes/responsible-ai'
 import { Route as SubscribeRouteImport } from './routes/subscribe'
+import { Route as TrackRouteImport } from './routes/track'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as VerifySubscriptionRouteImport } from './routes/verify-subscription'
 import { Route as ApiPublicMonitoringStatusRouteImport } from './routes/api/public/monitoring-status'
@@ -82,6 +83,11 @@ const SubscribeRoute = SubscribeRouteImport.update({
   path: '/subscribe',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TrackRoute = TrackRouteImport.update({
+  id: '/track',
+  path: '/track',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
   id: '/unsubscribe',
   path: '/unsubscribe',
@@ -128,6 +134,7 @@ export interface FileRoutesByFullPath {
   '/map': typeof MapRoute
   '/responsible-ai': typeof ResponsibleAiRoute
   '/subscribe': typeof SubscribeRoute
+  '/track': typeof TrackRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/verify-subscription': typeof VerifySubscriptionRoute
   '/api/public/monitoring-status': typeof ApiPublicMonitoringStatusRoute
@@ -147,6 +154,7 @@ export interface FileRoutesByTo {
   '/map': typeof MapRoute
   '/responsible-ai': typeof ResponsibleAiRoute
   '/subscribe': typeof SubscribeRoute
+  '/track': typeof TrackRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/verify-subscription': typeof VerifySubscriptionRoute
   '/api/public/monitoring-status': typeof ApiPublicMonitoringStatusRoute
@@ -167,6 +175,7 @@ export interface FileRoutesById {
   '/map': typeof MapRoute
   '/responsible-ai': typeof ResponsibleAiRoute
   '/subscribe': typeof SubscribeRoute
+  '/track': typeof TrackRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/verify-subscription': typeof VerifySubscriptionRoute
   '/api/public/monitoring-status': typeof ApiPublicMonitoringStatusRoute
@@ -188,6 +197,7 @@ export interface FileRouteTypes {
     | '/map'
     | '/responsible-ai'
     | '/subscribe'
+    | '/track'
     | '/unsubscribe'
     | '/verify-subscription'
     | '/api/public/monitoring-status'
@@ -207,6 +217,7 @@ export interface FileRouteTypes {
     | '/map'
     | '/responsible-ai'
     | '/subscribe'
+    | '/track'
     | '/unsubscribe'
     | '/verify-subscription'
     | '/api/public/monitoring-status'
@@ -226,6 +237,7 @@ export interface FileRouteTypes {
     | '/map'
     | '/responsible-ai'
     | '/subscribe'
+    | '/track'
     | '/unsubscribe'
     | '/verify-subscription'
     | '/api/public/monitoring-status'
@@ -246,6 +258,7 @@ export interface RootRouteChildren {
   MapRoute: typeof MapRoute
   ResponsibleAiRoute: typeof ResponsibleAiRoute
   SubscribeRoute: typeof SubscribeRoute
+  TrackRoute: typeof TrackRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
   VerifySubscriptionRoute: typeof VerifySubscriptionRoute
   ApiPublicMonitoringStatusRoute: typeof ApiPublicMonitoringStatusRoute
@@ -333,6 +346,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SubscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/track': {
+      id: '/track'
+      path: '/track'
+      fullPath: '/track'
+      preLoaderRoute: typeof TrackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/unsubscribe': {
       id: '/unsubscribe'
       path: '/unsubscribe'
@@ -390,6 +410,7 @@ const rootRouteChildren: RootRouteChildren = {
   MapRoute: MapRoute,
   ResponsibleAiRoute: ResponsibleAiRoute,
   SubscribeRoute: SubscribeRoute,
+  TrackRoute: TrackRoute,
   UnsubscribeRoute: UnsubscribeRoute,
   VerifySubscriptionRoute: VerifySubscriptionRoute,
   ApiPublicMonitoringStatusRoute: ApiPublicMonitoringStatusRoute,

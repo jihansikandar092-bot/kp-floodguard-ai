@@ -258,6 +258,7 @@ export type Database = {
       }
       emergency_requests: {
         Row: {
+          assigned_team: string | null
           client_request_id: string | null
           created_at: string
           description: string
@@ -265,6 +266,7 @@ export type Database = {
           emergency_type: string
           full_name: string
           id: string
+          internal_note: string | null
           is_test: boolean
           language: string
           location: string
@@ -276,6 +278,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          assigned_team?: string | null
           client_request_id?: string | null
           created_at?: string
           description: string
@@ -283,6 +286,7 @@ export type Database = {
           emergency_type: string
           full_name: string
           id?: string
+          internal_note?: string | null
           is_test?: boolean
           language?: string
           location: string
@@ -294,6 +298,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          assigned_team?: string | null
           client_request_id?: string | null
           created_at?: string
           description?: string
@@ -301,6 +306,7 @@ export type Database = {
           emergency_type?: string
           full_name?: string
           id?: string
+          internal_note?: string | null
           is_test?: boolean
           language?: string
           location?: string
@@ -491,6 +497,44 @@ export type Database = {
           ip_hash?: string
         }
         Relationships: []
+      }
+      request_events: {
+        Row: {
+          actor_user_id: string | null
+          created_at: string
+          from_status: string | null
+          id: string
+          note: string | null
+          request_id: string
+          to_status: string
+        }
+        Insert: {
+          actor_user_id?: string | null
+          created_at?: string
+          from_status?: string | null
+          id?: string
+          note?: string | null
+          request_id: string
+          to_status: string
+        }
+        Update: {
+          actor_user_id?: string | null
+          created_at?: string
+          from_status?: string | null
+          id?: string
+          note?: string | null
+          request_id?: string
+          to_status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "request_events_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "emergency_requests"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       risk_assessments: {
         Row: {
