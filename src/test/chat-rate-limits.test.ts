@@ -18,36 +18,34 @@ afterAll(async () => {
 const hash = "a".repeat(64);
 describe("atomic chat rate limits", () => {
   it("allows 15 requests per minute and rejects the 16th", async () => {
-      for (let n = 0; n < 15; n++)
-        expect(
-          (await db.query<{ ok: boolean }>("select public.consume_chat_limit($1) ok", [hash]))
-            .rows[0]?.ok,
-        ).toBe(true);
-      expect(
-        (await db.query<{ ok: boolean }>("select public.consume_chat_limit($1) ok", [hash])).rows[0]
-          ?.ok,
-      ).toBe(false);
-  });
-  it("allows 100 per hour and rejects the 101st", async () => {
-      await db.exec(
-        `insert into public.rate_limits(ip_hash,created_at) select '${hash}',now()-interval '2 minutes' from generate_series(1,99);`,
-      );
+    for (let n = 0; n < 15; n++)
       expect(
         (await db.query<{ ok: boolean }>("select public.consume_chat_limit($1) ok", [hash])).rows[0]
           ?.ok,
       ).toBe(true);
-      expect(
-        (await db.query<{ ok: boolean }>("select public.consume_chat_limit($1) ok", [hash])).rows[0]
-          ?.ok,
-      ).toBe(false);
+    expect(
+      (await db.query<{ ok: boolean }>("select public.consume_chat_limit($1) ok", [hash])).rows[0]
+        ?.ok,
+    ).toBe(false);
+  });
+  it("allows 100 per hour and rejects the 101st", async () => {
+    await db.exec(
+      `insert into public.rate_limits(ip_hash,created_at) select '${hash}',now()-interval '2 minutes' from generate_series(1,99);`,
+    );
+    expect(
+      (await db.query<{ ok: boolean }>("select public.consume_chat_limit($1) ok", [hash])).rows[0]
+        ?.ok,
+    ).toBe(true);
+    expect(
+      (await db.query<{ ok: boolean }>("select public.consume_chat_limit($1) ok", [hash])).rows[0]
+        ?.ok,
+    ).toBe(false);
   });
   it("does not let public callers read or bypass limits", async () => {
-      await db.exec("set role anon");
-      await expect(db.query("select * from public.rate_limits")).rejects.toThrow(
-        /permission denied/,
-      );
-      await expect(db.query("select public.consume_chat_limit($1)", [hash])).rejects.toThrow(
-        /permission denied/,
-      );
+    await db.exec("set role anon");
+    await expect(db.query("select * from public.rate_limits")).rejects.toThrow(/permission denied/);
+    await expect(db.query("select public.consume_chat_limit($1)", [hash])).rejects.toThrow(
+      /permission denied/,
+    );
   });
 });
