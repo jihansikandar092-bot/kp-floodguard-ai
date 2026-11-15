@@ -29,6 +29,17 @@ const input: RiskInput = {
   historicalAnnualMax: [200],
 };
 describe("risk outlook horizons", () => {
+  it("guards every horizon against low-flow peaks and retains the measured value", () => {
+    if (!input.flood) throw new Error("missing flood fixture");
+    const tiny = { ...input, historicalAnnualMax: [], flood: { daily: { ...input.flood.daily, river_discharge: input.flood.daily.river_discharge.map(() => 0.03) } } };
+    for (const h of HORIZONS) {
+      const r = assessOutlook(tiny, h);
+      expect(r?.factors.dischargePeak.value).toBe(0.03);
+      expect(r?.factors.dischargePeak.score).toBeNull();
+      expect(r?.factors.dischargeTrend.score).toBeNull();
+      expect(r?.availableFactors).toBe(2);
+    }
+  });
   it("preserves the existing Now assessment", () => {
     expect(assessOutlook(input, 0)).toEqual(assessRisk(input));
   });
