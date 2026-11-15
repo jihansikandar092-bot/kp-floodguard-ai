@@ -125,8 +125,8 @@ describe("database system alert rules", () => {
     expect(result.rows[0]?.reason_text).toContain(
       "Partial: based on 3 of 4 factors. A missing factor may mean the real risk is higher.",
     );
-    expect(result.rows[0]?.reason_templates.ur).toContain("4 میں سے 3");
-    expect(result.rows[0]?.reason_templates.ps).toContain("پر 3 ولاړ");
+    expect(result.rows[0]?.reason_templates["ur"]).toContain("4 میں سے 3");
+    expect(result.rows[0]?.reason_templates["ps"]).toContain("پر 3 ولاړ");
   });
   it("allows a new alert after resolution", async () => {
     await assessment("medium", 0);
