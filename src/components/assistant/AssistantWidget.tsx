@@ -221,7 +221,14 @@ export function AssistantWidget() {
           ]);
           if (data.fallback) {
             setChatMode("intake");
-            push([{ role: "bot", ...(state.step === "describe" || state.step === "done" ? greeting(lang) : promptFor(state.step, state, lang)) }]);
+            push([
+              {
+                role: "bot",
+                ...(state.step === "describe" || state.step === "done"
+                  ? greeting(lang)
+                  : promptFor(state.step, state, lang)),
+              },
+            ]);
           }
           return;
         }
@@ -229,7 +236,12 @@ export function AssistantWidget() {
       } catch {
         push([
           { role: "bot", text: chatFallback[lang] },
-          { role: "bot", ...(state.step === "describe" || state.step === "done" ? greeting(lang) : promptFor(state.step, state, lang)) },
+          {
+            role: "bot",
+            ...(state.step === "describe" || state.step === "done"
+              ? greeting(lang)
+              : promptFor(state.step, state, lang)),
+          },
         ]);
         setChatMode("intake");
       } finally {
