@@ -1,4 +1,10 @@
 # Live monitoring
+## Predictive Risk Outlook
+- [x] Audit current forecasts, alerts and pages.
+- [ ] Store and compute five horizons with translated reasons and snapshot freshness.
+- [ ] Predictive alert escalation, quiet de-escalation, two-run resolution and stale protection.
+- [ ] Outlook strip/chart, map selector and grouped /alerts page.
+- [ ] Test real stored Swat/Bannu outlooks; publish and verify affected pages.
 ## System-generated alerts
 - [x] Audit existing risk assessments and alert panel; no sample list remains.
 - [x] Add public-read/server-write alerts and atomic assessment transition trigger.

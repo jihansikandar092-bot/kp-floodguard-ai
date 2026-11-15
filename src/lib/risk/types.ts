@@ -9,4 +9,7 @@ export interface StoredRiskAssessment {
   factors: Record<FactorKey, RiskFactor>;
   reasonText: string;
   computedAt: string;
+  horizonHours: number;
+  snapshotAt: string | null;
+  reasonTemplates: Record<string, string>;
 }
