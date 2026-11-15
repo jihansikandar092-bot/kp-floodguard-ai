@@ -3,6 +3,7 @@ import {
   Area,
   ComposedChart,
   Line,
+  Legend,
   ReferenceArea,
   ResponsiveContainer,
   Tooltip,
@@ -12,6 +13,7 @@ import {
 import { HORIZONS, horizonLabel, type RiskLanguage } from "@/lib/risk/outlook";
 import type { StoredRiskAssessment } from "@/lib/risk/types";
 import { RISK_DISCLAIMER } from "./RiskExplain";
+import { RISK_CONFIG } from "@/lib/risk/engine";
 
 export function RiskOutlook({
   risks,
@@ -86,23 +88,24 @@ export function RiskOutlook({
                   <YAxis yAxisId="rain" unit=" mm" />
                   <YAxis yAxisId="flow" orientation="right" unit=" m³/s" />
                   <YAxis yAxisId="risk" domain={[0, 100]} hide />
+                  <Legend />
                   <ReferenceArea
                     yAxisId="risk"
                     y1={0}
-                    y2={35}
+                    y2={RISK_CONFIG.thresholds.medium}
                     fill="var(--risk-low)"
                     fillOpacity={0.08}
                   />
                   <ReferenceArea
                     yAxisId="risk"
-                    y1={35}
-                    y2={65}
+                    y1={RISK_CONFIG.thresholds.medium}
+                    y2={RISK_CONFIG.thresholds.high}
                     fill="var(--risk-medium)"
                     fillOpacity={0.08}
                   />
                   <ReferenceArea
                     yAxisId="risk"
-                    y1={65}
+                    y1={RISK_CONFIG.thresholds.high}
                     y2={100}
                     fill="var(--risk-high)"
                     fillOpacity={0.08}
