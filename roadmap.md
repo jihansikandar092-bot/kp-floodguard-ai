@@ -1,4 +1,9 @@
 # Live monitoring
+## Real-data cleanup and integration health
+- [ ] Audit code and database; document before/after findings, preserve the three owner-retained verification requests.
+- [ ] Remove obsolete demo UI and unsupported landing/footer claims; hide unimplemented voice control.
+- [ ] Read integration statuses from service_health; record monitoring, database, chat and historical-data checks without inventing a historical import job.
+- [ ] Show actual source timestamps in footer; test preview and published pages and real chat, run all tests/lint and inspect automatic checks.
 ## Partial-score safety
 - [x] Store factor coverage and translated partial notes without changing score calculation; 168 stored assessments checked, zero coverage mismatches.
 - [x] Prevent partial batches from resolving alerts; partial creation/resolution tests pass in isolated PostgreSQL, 66 total tests passed.
