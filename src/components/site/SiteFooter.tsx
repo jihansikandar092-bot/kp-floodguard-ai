@@ -11,7 +11,7 @@ export const DISCLAIMER =
 export function SiteFooter() {
   const { data } = useSuspenseQuery(platformHealthOptions());
   return (
-    <footer className="bg-navy-deep text-navy-foreground">
+    <footer className="bg-navy-deep pb-24 text-navy-foreground">
       <div className="container-page grid gap-10 py-14 md:grid-cols-12">
         <div className="md:col-span-4">
           <Logo inverted />
