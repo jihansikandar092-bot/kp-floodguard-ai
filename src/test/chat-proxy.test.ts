@@ -47,17 +47,15 @@ describe("chat proxy recovery", () => {
     let started = false;
     vi.stubGlobal(
       "fetch",
-      vi.fn(
-        (_url, init: RequestInit) => {
-          started = true;
-          return new Promise((_resolve, reject) =>
-            init.signal?.addEventListener("abort", () => reject(new Error("internal timeout"))),
-          );
-        },
-      ),
+      vi.fn((_url, init: RequestInit) => {
+        started = true;
+        return new Promise((_resolve, reject) =>
+          init.signal?.addEventListener("abort", () => reject(new Error("internal timeout"))),
+        );
+      }),
     );
     const promise = handleChatRequest(request("ps"), "https://workflow.example/chat");
-    while (!started) await new Promise(resolve => setImmediate(resolve));
+    while (!started) await new Promise((resolve) => setImmediate(resolve));
     await vi.advanceTimersByTimeAsync(20000);
     const response = await promise;
     expect(response.status).toBe(503);
