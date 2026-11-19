@@ -18,8 +18,10 @@ import { Route as EmergencyRouteImport } from './routes/emergency'
 import { Route as IntegrationsRouteImport } from './routes/integrations'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MapRouteImport } from './routes/map'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ResponsibleAiRouteImport } from './routes/responsible-ai'
 import { Route as SubscribeRouteImport } from './routes/subscribe'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as TrackRouteImport } from './routes/track'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as VerifySubscriptionRouteImport } from './routes/verify-subscription'
@@ -73,6 +75,11 @@ const MapRoute = MapRouteImport.update({
   path: '/map',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResponsibleAiRoute = ResponsibleAiRouteImport.update({
   id: '/responsible-ai',
   path: '/responsible-ai',
@@ -81,6 +88,11 @@ const ResponsibleAiRoute = ResponsibleAiRouteImport.update({
 const SubscribeRoute = SubscribeRouteImport.update({
   id: '/subscribe',
   path: '/subscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TrackRoute = TrackRouteImport.update({
@@ -132,8 +144,10 @@ export interface FileRoutesByFullPath {
   '/integrations': typeof IntegrationsRoute
   '/login': typeof LoginRoute
   '/map': typeof MapRoute
+  '/privacy': typeof PrivacyRoute
   '/responsible-ai': typeof ResponsibleAiRoute
   '/subscribe': typeof SubscribeRoute
+  '/terms': typeof TermsRoute
   '/track': typeof TrackRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/verify-subscription': typeof VerifySubscriptionRoute
@@ -152,8 +166,10 @@ export interface FileRoutesByTo {
   '/integrations': typeof IntegrationsRoute
   '/login': typeof LoginRoute
   '/map': typeof MapRoute
+  '/privacy': typeof PrivacyRoute
   '/responsible-ai': typeof ResponsibleAiRoute
   '/subscribe': typeof SubscribeRoute
+  '/terms': typeof TermsRoute
   '/track': typeof TrackRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/verify-subscription': typeof VerifySubscriptionRoute
@@ -173,8 +189,10 @@ export interface FileRoutesById {
   '/integrations': typeof IntegrationsRoute
   '/login': typeof LoginRoute
   '/map': typeof MapRoute
+  '/privacy': typeof PrivacyRoute
   '/responsible-ai': typeof ResponsibleAiRoute
   '/subscribe': typeof SubscribeRoute
+  '/terms': typeof TermsRoute
   '/track': typeof TrackRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/verify-subscription': typeof VerifySubscriptionRoute
@@ -195,8 +213,10 @@ export interface FileRouteTypes {
     | '/integrations'
     | '/login'
     | '/map'
+    | '/privacy'
     | '/responsible-ai'
     | '/subscribe'
+    | '/terms'
     | '/track'
     | '/unsubscribe'
     | '/verify-subscription'
@@ -215,8 +235,10 @@ export interface FileRouteTypes {
     | '/integrations'
     | '/login'
     | '/map'
+    | '/privacy'
     | '/responsible-ai'
     | '/subscribe'
+    | '/terms'
     | '/track'
     | '/unsubscribe'
     | '/verify-subscription'
@@ -235,8 +257,10 @@ export interface FileRouteTypes {
     | '/integrations'
     | '/login'
     | '/map'
+    | '/privacy'
     | '/responsible-ai'
     | '/subscribe'
+    | '/terms'
     | '/track'
     | '/unsubscribe'
     | '/verify-subscription'
@@ -256,8 +280,10 @@ export interface RootRouteChildren {
   IntegrationsRoute: typeof IntegrationsRoute
   LoginRoute: typeof LoginRoute
   MapRoute: typeof MapRoute
+  PrivacyRoute: typeof PrivacyRoute
   ResponsibleAiRoute: typeof ResponsibleAiRoute
   SubscribeRoute: typeof SubscribeRoute
+  TermsRoute: typeof TermsRoute
   TrackRoute: typeof TrackRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
   VerifySubscriptionRoute: typeof VerifySubscriptionRoute
@@ -332,6 +358,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MapRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/responsible-ai': {
       id: '/responsible-ai'
       path: '/responsible-ai'
@@ -344,6 +377,13 @@ declare module '@tanstack/react-router' {
       path: '/subscribe'
       fullPath: '/subscribe'
       preLoaderRoute: typeof SubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/track': {
@@ -408,8 +448,10 @@ const rootRouteChildren: RootRouteChildren = {
   IntegrationsRoute: IntegrationsRoute,
   LoginRoute: LoginRoute,
   MapRoute: MapRoute,
+  PrivacyRoute: PrivacyRoute,
   ResponsibleAiRoute: ResponsibleAiRoute,
   SubscribeRoute: SubscribeRoute,
+  TermsRoute: TermsRoute,
   TrackRoute: TrackRoute,
   UnsubscribeRoute: UnsubscribeRoute,
   VerifySubscriptionRoute: VerifySubscriptionRoute,

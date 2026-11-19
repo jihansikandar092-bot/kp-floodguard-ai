@@ -41,6 +41,8 @@ export function SiteFooter() {
             <FooterLink to="/login">Coordinator login</FooterLink>
             <FooterLink to="/integrations">Integrations</FooterLink>
             <FooterLink to="/contact">Contact</FooterLink>
+            <FooterLink to="/privacy">Privacy Policy</FooterLink>
+            <FooterLink to="/terms">Terms of Use</FooterLink>
           </FooterCol>
 
           <FooterCol title="Official helplines">
@@ -124,7 +126,9 @@ function FooterLink({
     | "/contact"
     | "/responsible-ai"
     | "/subscribe"
-    | "/track";
+    | "/track"
+    | "/privacy"
+    | "/terms";
   hash?: string | undefined;
   children: React.ReactNode;
 }) {
